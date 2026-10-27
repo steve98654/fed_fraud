@@ -1,0 +1,153 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Education},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Education}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 22 of 33 (score 2.7). \textbf{FY2026 outlays:} \$135B
+(USAspending). \textbf{As of:} 2026-10-27 (first written 2026-10-25).
+Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+Education's measured error rates are low (about 1\% for Pell and Direct
+Loans), but ``ghost student'' identity fraud is real and growing. The
+department says ID checks saved about \$1B. Public data are
+school-level, so we can flag the colleges most exposed, not the fake
+students.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  Pell Grant: 1.07\% improper in FY2025 (down from 2.64\%). Direct Loan:
+  0.99\%. (PaymentAccuracy.gov)
+\item
+  The department credits mandatory government ID checks with about \$1B
+  in savings; before them, under 1\% of students were verified.
+  Minnesota alone reported \$12.5M in student aid fraud. (CBS Austin,
+  Apr 2026)
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{FSA Data Center:} Title IV volume by school, program reviews,
+  and the Heightened Cash Monitoring list.
+\item
+  \textbf{College Scorecard} and \textbf{IPEDS} (enrollment, online
+  share, completion).
+\item
+  \textbf{Education OIG reports} and DOJ releases.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Ghost student exposure:} colleges, mostly online community
+  college programs, where aid volume jumps while completion and
+  retention fall.
+\item
+  \textbf{School risk:} schools on cash monitoring, with sanctions, or
+  with owners tied to closed schools.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+A school-level ghost student risk ranking, validated against colleges
+named in news and OIG cases.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+Student-level data are protected by privacy law and will not be public.
+Real detection needs a pilot with FSA.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+Federal Student Aid (Enforcement), and Education OIG.
+
+\hypertarget{related-briefs}{%
+\section{Related briefs}\label{related-briefs}}
+
+\url{nsf.pdf} (research award screen), \url{treasury.pdf} (AOTC
+education credit).
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://paymentaccuracy.gov/agency/ED}{PaymentAccuracy.gov:
+  Education}
+\item
+  \href{https://cbsaustin.com/news/nation-world/education-dept-saves-taxpayers-1-billion-in-fraud-targets-federal-student-aid-programs-linda-mcmahon-california-gavin-newsom}{CBS
+  Austin: Education says ID checks saved \$1B}
+\end{itemize}
+
+\end{document}

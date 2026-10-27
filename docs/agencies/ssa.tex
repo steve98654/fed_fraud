@@ -1,0 +1,158 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Social Security Administration},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Social Security Administration}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 22 of 33 (score 2.7). \textbf{FY2026 outlays:}
+\$1,664B (USAspending). \textbf{As of:} 2026-10-27. Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+SSA pays more benefits than any agency but publishes almost nothing at
+the payee level. Its error rates are low for retirement benefits and
+high for Supplemental Security Income (11.6\%). The most useful
+public-data role for SSA is as a supplier: its death records are what
+other agencies (OPM, PBGC, CMS) are missing when they pay dead people.
+Approach SSA as a data partner first and a target second.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  SSI: \$7.3B improper (11.6\%). Disability Insurance: \$2.3B. (GAO,
+  FY2025)
+\item
+  PBGC credited a pension plan for 3,479 deceased participants because
+  it did not check SSA's death file, overpaying about \$127M (2023).
+\item
+  GAO found FEHB paying about 400 providers for services dated at least
+  50 days after their death (2026).
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SSA State and county statistics:} beneficiaries and payments
+  by program and county; SSI recipients by state and county.
+\item
+  \textbf{SSA OIG audits and investigations:} representative payee and
+  disability fraud cases.
+\item
+  \textbf{Disability fraud cases} from DOJ and the Cooperative
+  Disability Investigations units, as labeled examples.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Geographic outliers:} counties where SSI or disability rolls
+  and award rates are far above peers after adjusting for age and
+  health.
+\item
+  \textbf{Facilitator networks:} attorneys, doctors and representative
+  payees who recur across charged disability cases.
+\item
+  \textbf{Death data gaps (cross-agency):} quantify how much other
+  agencies' payments could be stopped with full death data.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+A county-level SSI and disability outlier map, paired with a one-page
+case for SSA death data sharing built from the OPM and PBGC findings.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+No public payee-level data, and full death data sharing is restricted by
+law. This brief is mainly a data-access proposal.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+SSA Office of Anti-Fraud Programs, SSA OIG, and Treasury's Do Not Pay.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.gao.gov/products/gao-26-108694}{GAO-26-108694:
+  FY2025 improper payments}
+\item
+  \href{https://www.plansponsor.com/pbgc-says-central-states-will-reimburse-sfa-overpayment/}{PlanSponsor:
+  PBGC overpaid Central States \$127M for deceased participants}
+\item
+  \href{https://files.gao.gov/reports/GAO-26-108139/index.html}{GAO-26-108139:
+  FEHB paid deceased and excluded providers}
+\item
+  \href{https://www.usaspending.gov/agency}{USAspending agency profiles
+  (FY2026 outlays)}
+\end{itemize}
+
+\end{document}

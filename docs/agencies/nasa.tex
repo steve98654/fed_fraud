@@ -1,0 +1,144 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={NASA},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} NASA}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 16 of 33 (score 3.0). \textbf{FY2026 outlays:} \$23B
+(USAspending). \textbf{As of:} 2026-10-27. Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+NASA spends most of its budget on a few very large contracts, where
+fraud is about cost mischarging that public data cannot see. The
+public-data opening is small business research money (SBIR/STTR) and the
+supplier base under the large primes, where the SBA checks apply.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  \$23B in outlays in FY2026.
+\item
+  SBIR/STTR duplicate funding and misuse are recurring NASA OIG cases;
+  GAO found about \$445M in possibly duplicative SBIR awards across
+  agencies.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SBIR.gov} award data; \textbf{NASA TechPort} project data.
+\item
+  \textbf{FPDS / USAspending} contracts and subawards.
+\item
+  \textbf{SAM.gov} entities and exclusions; NASA OIG reports.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Duplicate research awards} across agencies (shared with
+  \url{doe.pdf} and \url{nsf.pdf}).
+\item
+  \textbf{Award-mill firms:} firms with many SBIR Phase I awards and no
+  Phase II or commercialization record.
+\item
+  \textbf{Supplier screen:} subcontractors under large primes tied to
+  excluded parties or sharing addresses with the prime.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+Include NASA in the cross-agency SBIR duplicate-award screen.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+Cost-plus contract mischarging and labor fraud are invisible in public
+data.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+NASA OIG, NASA Office of Small Business Programs.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.gao.gov/products/GAO-24-105470}{GAO-24-105470:
+  SBIR/STTR fraud vulnerabilities}
+\item
+  \href{https://www.sbir.gov/awards}{SBIR.gov awards data}
+\item
+  \href{https://www.usaspending.gov/agency}{USAspending agency profiles
+  (FY2026 outlays)}
+\end{itemize}
+
+\end{document}

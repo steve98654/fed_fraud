@@ -1,0 +1,159 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={General Services Administration},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} General Services Administration}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 6 of 33 (score 3.7). \textbf{FY2026 outlays:} \$38B
+(USAspending). \textbf{As of:} 2026-10-27. Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+GSA is the best technical partner in government for this program because
+it owns the data spine every brief uses: SAM.gov (entities and
+exclusions), FPDS (contracts) and the Multiple Award Schedules that
+other agencies buy through. Its own fraud risks are schedule pricing
+fraud, purchase card misuse and lease fraud. A GSA pilot improves the
+shared data for every other agency at once.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  \$38B in outlays (leases, Federal Buildings Fund, IT and schedules),
+  plus tens of billions a year in orders other agencies place on GSA
+  schedules.
+\item
+  Schedule contractors who misstate commercial pricing or sell
+  non-compliant goods are a recurring False Claims Act case type.
+\item
+  GSA SmartPay purchase and travel cards carry misuse risk across
+  agencies.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{SAM.gov:} entity registrations, owners, addresses, exclusions.
+\item
+  \textbf{FPDS / USAspending:} every contract action, including schedule
+  orders.
+\item
+  \textbf{GSA Advantage and CALC} schedule price data.
+\item
+  \textbf{GSA lease inventory} (lessor, location, rent).
+\item
+  \textbf{GSA OIG} reports and DOJ settlements.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Price outliers:} schedule prices far above peers for the same
+  item or labor category.
+\item
+  \textbf{Registration red flags:} many SAM.gov registrations at one
+  address, recycled officers across UEIs, and firms that re-register
+  after exclusion.
+\item
+  \textbf{Lease risk:} lessors linked to officials or shell entities,
+  and rents far above local comparables.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+A SAM.gov registration integrity report: clusters of entities sharing
+addresses, officers or bank-like identifiers, ranked by award dollars.
+This is the SBA entity screen run government-wide.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+Purchase card transactions and SAM.gov sensitive fields (bank data,
+TINs) are not public.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+GSA Federal Acquisition Service, the Integrated Award Environment
+(SAM.gov) team, and GSA OIG.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://sam.gov/data-services}{SAM.gov data services}
+\item
+  \href{https://smartpay.gsa.gov/guidance-and-audits/audits/}{GSA
+  SmartPay audit repository}
+\item
+  \href{https://www.usaspending.gov/agency}{USAspending agency profiles
+  (FY2026 outlays)}
+\end{itemize}
+
+\end{document}

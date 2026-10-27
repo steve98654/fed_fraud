@@ -1,0 +1,154 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Commerce},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Commerce}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 11 of 33 (score 3.3). \textbf{FY2026 outlays:} \$20B
+(USAspending). \textbf{As of:} 2026-10-27. Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+Commerce is a small spender today with two very large programs now
+paying out: NTIA's \$42.45B Broadband Equity, Access and Deployment
+(BEAD) program, passed through states to internet providers, and the
+CHIPS manufacturing incentives. Big new money to new or re-formed
+recipients is the classic setup for fraud, and both programs publish
+recipient-level data. This is a chance to screen before the money is
+spent, not after.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  \$20B in outlays but \$52B in budgetary resources in FY2026,
+  reflecting BEAD and CHIPS money not yet spent.
+\item
+  Broadband subsidy fraud has precedent in the FCC's E-Rate and rural
+  programs (see \url{fcc.pdf}): inflated costs, coverage claims that do
+  not match service, and bid rigging.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{State BEAD subgrantee selections} (published by each state)
+  and NTIA approvals.
+\item
+  \textbf{FCC National Broadband Map:} provider-reported coverage by
+  location.
+\item
+  \textbf{USAspending} for CHIPS, EDA and NIST awards.
+\item
+  \textbf{SAM.gov} and the FCC's USF data for provider histories.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Coverage claims vs.~reality:} BEAD-funded locations already
+  shown as served on the FCC map, or providers claiming coverage they
+  cannot show.
+\item
+  \textbf{Provider history:} BEAD winners with prior USF enforcement,
+  new entities with no network history, or shared owners across bidders.
+\item
+  \textbf{Cost outliers:} cost per location far above peers in similar
+  terrain.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+A BEAD subgrantee screen for two or three states that have published
+awards, joining FCC map and USF history.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+State award data formats vary; build-out verification needs field data.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+NTIA Office of Internet Connectivity and Growth, Commerce OIG, and state
+broadband offices.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://broadbandusa.ntia.gov/funding-programs/broadband-equity-access-and-deployment-bead-program}{NTIA
+  BEAD program}
+\item
+  \href{https://broadbandmap.fcc.gov/}{FCC National Broadband Map}
+\item
+  \href{https://www.usaspending.gov/agency}{USAspending agency profiles
+  (FY2026 outlays)}
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,158 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Justice},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Justice}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 20 of 33 (score 2.9). \textbf{FY2026 outlays:} \$52B
+(USAspending). \textbf{As of:} 2026-10-27. Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+DOJ matters more as our customer than as a target: it runs the
+whistleblower program behind america.gov/fraud, the Health Care Fraud
+Unit, the Trade Fraud Task Force and the Procurement Collusion Strike
+Force. Its own fraud risk is in grants (Office of Justice Programs, the
+Crime Victims Fund passed through states) and in prison contracts. The
+best DOJ product is a case-mining pipeline that turns its press releases
+into labeled training data for every other brief.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  \$52B in outlays, mostly salaries, prisons and grants to states and
+  nonprofits.
+\item
+  Grant risk: subgrantees of victim and public safety grants are many
+  and small, and DOJ OIG regularly finds unsupported costs.
+\item
+  No DOJ program is listed as high-risk for improper payments.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{DOJ press releases} (all U.S. Attorneys' offices), searchable
+  and structured enough to extract defendants, schemes, programs and
+  dollars.
+\item
+  \textbf{USAspending grants and subawards} for OJP, OVW and COPS.
+\item
+  \textbf{DOJ OIG audit reports} of grantees.
+\item
+  \textbf{FPDS} for Bureau of Prisons and other contracts.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Case mining (for all agencies):} extract defendant names,
+  entities, addresses, schemes and agency from press releases; join to
+  SAM.gov and USAspending to make labeled examples.
+\item
+  \textbf{Grant subrecipient risk:} subgrantees with prior OIG findings,
+  shared officers across grantees, or award growth without performance
+  data.
+\item
+  \textbf{Prison contract outliers:} commissary, medical and telecom
+  vendors with prices far above peers.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+A press-release case database: every fraud case since 2020 tagged by
+agency and scheme and linked to award records. It becomes the label set
+for every other prototype.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+Press releases cover charged cases only, which biases labels toward
+schemes DOJ already finds. Grant subaward reporting is incomplete.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+DOJ Criminal Division Fraud Section, Civil Division Commercial
+Litigation (False Claims Act), Office of Justice Programs, and DOJ OIG.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.justice.gov/fraud/whistleblower}{DOJ Whistleblower
+  Rewards Program terms}
+\item
+  \href{https://www.justice.gov/news}{DOJ news releases}
+\item
+  \href{https://www.usaspending.gov/agency}{USAspending agency profiles
+  (FY2026 outlays)}
+\end{itemize}
+
+\end{document}

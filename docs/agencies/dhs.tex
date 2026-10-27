@@ -1,0 +1,174 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Homeland Security (CBP and FEMA)},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Homeland Security (CBP and FEMA)}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 4 of 33 (score 3.9). \textbf{FY2026 outlays:} \$259B
+(USAspending). \textbf{As of:} 2026-10-27. Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+DHS is the biggest new opportunity outside the original eight, for two
+reasons. First, customs duty evasion has become a top DOJ priority: a
+joint DOJ and DHS Trade Fraud Task Force started in August 2025, and the
+largest customs False Claims Act settlement to date (\$54.4M) came in
+December 2025. Evasion through shell importers and false country of
+origin is a close cousin of SBA shell-entity fraud. Second, FEMA
+disaster aid has a long fraud history and publishes recipient-level data
+through OpenFEMA.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  Customs: DOJ announced three Task Force resolutions totaling over
+  \$100M on 2025-12-18, including Ceratizit (\$54.4M, Chinese goods
+  declared as Taiwanese). CBP reports 1,200 investigations from revenue
+  allegations.
+\item
+  FEMA: Public Assistance reported \$0.3B improper in FY2025 (GAO);
+  disaster grant and contractor fraud recur after every major storm.
+\item
+  DHS's own contracts (CBP, ICE, FEMA) run through FPDS like DoD's.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Vessel manifest data:} public by regulation (19 CFR 103.31)
+  and resold by commercial vendors; names importers, shippers and goods.
+\item
+  \textbf{Census trade statistics:} imports by product and country, for
+  mirror checks against partner-country exports.
+\item
+  \textbf{CBP EAPA and penalty notices}, DOJ customs settlements.
+\item
+  \textbf{OpenFEMA:} Public Assistance projects, Hazard Mitigation
+  awards, and housing assistance aggregates.
+\item
+  \textbf{FPDS / USAspending and SAM.gov} for DHS contractors.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Transshipment signals:} product lines where US imports from a
+  country far exceed that country's recorded exports to the US, then the
+  importers driving the gap.
+\item
+  \textbf{Shell importers:} new importers of record that share addresses
+  or officers with firms under penalty, or that appear right after a new
+  tariff.
+\item
+  \textbf{Disaster contractors:} new or out-of-area firms winning FEMA
+  work fast, shared owners across bidders, and payees tied to excluded
+  parties.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+A tariff-evasion lead list for two high-duty product groups (for example
+aluminum extrusions and plastic resin), built from mirror trade gaps and
+manifest data, with importer risk scores and reasons. Validate against
+settled cases.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+Entry-level customs data (declared value, duties paid) is not public,
+and good manifest coverage needs a paid vendor. Customs fraud cuts
+revenue, not spending, so it sits outside improper payment reporting.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+CBP Office of Trade, HSI, the DOJ-DHS Trade Fraud Task Force, FEMA's
+Fraud Investigations and Inspections Division, and DHS OIG.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.akingump.com/en/insights/alerts/dojs-yearend-customs-fraud-enforcement-signals-whats-ahead-in-2026}{Akin
+  Gump: DOJ year-end customs fraud enforcement (Jan 2026)}
+\item
+  \href{https://morganlewis.com/pubs/2025/09/us-department-of-justice-establishes-trade-fraud-task-force-to-counter-tariff-evasion}{Morgan
+  Lewis: DOJ establishes Trade Fraud Task Force (Sept 2025)}
+\item
+  \href{https://www.law.cornell.edu/cfr/text/19/103.31}{19 CFR 103.31:
+  public vessel manifest information}
+\item
+  \href{https://www.gao.gov/products/gao-26-108694}{GAO-26-108694:
+  FY2025 improper payments}
+\item
+  \href{https://www.fema.gov/about/openfema/data-sets}{OpenFEMA data
+  sets}
+\end{itemize}
+
+\end{document}

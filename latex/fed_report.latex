@@ -1,0 +1,90 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={$title-meta$},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{$if(brief)$0$else$2$endif$}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{$if(brief)$10pt}{6pt$else$16pt}{8pt$endif$}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+$if(brief)$
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}$if(series)$$series$$else$Federal fraud expansion$endif$\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} $title$}\par
+$if(subtitle)$\vspace{2pt}{\large\color{geomid} $subtitle$}\par$endif$
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+$else$
+% TITLE PAGE
+\begin{titlepage}
+\newcommand{\HRule}{\rule{\linewidth}{0.3mm}}
+\begin{center}
+\vspace*{0.2in}
+\textsc{\LARGE \geofirm}\\[0.6cm]
+\includegraphics[width=30mm]{icon.png}\\[8mm]
+\textsc{\Large $if(prepared)$$prepared$$else$Federal Fraud Expansion\\[0.15cm] Working Document$endif$}\\[0.5cm]
+\HRule\\[0.4cm]
+{\huge\bfseries $title$}\\[0.3cm]
+$if(subtitle)${\large $subtitle$}\\[0.2cm]$endif$
+\HRule\\[1cm]
+\begin{minipage}{0.8\textwidth}\centering\large
+Authored by:\\[0.18cm]
+\geosigner, \geosignertitle: \geoemail
+\end{minipage}\\[0.8cm]
+{\large When: \compiletime}\\[1.2cm]
+\geosurface{catenoid}{4.6cm}\\[0.9cm]
+$$\mathcal{G}(x)=x^x\qquad\nabla_{\dot\gamma}\dot\gamma=0$$\\[3mm]
+{\small\itshape \geopromise}
+\end{center}
+\end{titlepage}
+
+\pagestyle{geodesic}
+\tableofcontents
+\newpage
+$endif$
+
+$body$
+
+\end{document}
