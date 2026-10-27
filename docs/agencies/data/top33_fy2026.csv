@@ -1,0 +1,34 @@
+budget_rank,abbreviation,agency,toptier_code,fy,fq,outlays_usd,budgetary_resources_usd,brief
+1,HHS,Department of Health and Human Services,075,2026,4,2687036276023.63,3709407922072.44,hhs.md
+2,TREAS,Department of the Treasury,020,2026,4,1974592714924.28,3982061714337.72,treasury.md
+3,SSA,Social Security Administration,028,2026,4,1663748219825.58,1725080621636.67,ssa.md
+4,DOD,Department of Defense (War),097,2026,4,1345495480198.05,2617506434639.06,dod.md
+5,VA,Department of Veterans Affairs,036,2026,4,419008369132.37,527497420880.48,va.md
+6,DHS,Department of Homeland Security,070,2026,4,258878665703.04,645946447461.17,dhs.md
+7,USDA,Department of Agriculture,012,2026,4,219705792049.93,480739565355.37,usda.md
+8,OPM,Office of Personnel Management,024,2026,4,201211037895.55,385187344460.62,opm.md
+9,ED,Department of Education,091,2026,4,134685981382.19,169736984687.99,ed.md
+10,DOT,Department of Transportation,069,2026,4,125479710925.43,304243032038.72,dot.md
+11,HUD,Department of Housing and Urban Development,086,2026,4,84852887067.19,343264343455.14,hud.md
+12,DOL,Department of Labor,1601,2026,4,62931241239.05,90352048583.31,dol.md
+13,DOE,Department of Energy,089,2026,4,62670347332.00,141155070441.78,doe.md
+14,DOJ,Department of Justice,015,2026,4,51705305343.23,88148985487.80,doj.md
+15,DOS,Department of State,019,2026,4,38816371851.99,95192566149.49,state.md
+16,GSA,General Services Administration,047,2026,4,37784542850.08,57228942989.42,gsa.md
+17,DOI,Department of the Interior,014,2026,4,36821485523.31,96773322454.92,doi.md
+18,USACE,Corps of Engineers - Civil Works,096,2026,4,28476371355.68,77160707397.71,usace.md
+19,NASA,National Aeronautics and Space Administration,080,2026,4,22889244715.83,44028063933.25,nasa.md
+20,DOC,Department of Commerce,013,2026,4,20012273033.09,51981277320.11,doc.md
+21,EPA,Environmental Protection Agency,068,2026,4,17079612292.63,56866106074.70,epa.md
+22,SBA,Small Business Administration,073,2026,4,15042227942.33,20318800854.81,sba.md
+23,USAID,Agency for International Development,072,2026,4,11667759543.10,18454247152.99,usaid.md
+24,PBGC,Pension Benefit Guaranty Corporation,1602,2026,4,10570646210.44,91082342597.70,pbgc.md
+25,FCC,Federal Communications Commission,027,2026,4,10143243701.72,-4301610852.57,fcc.md
+26,NSF,National Science Foundation,049,2026,4,8053031182.02,10223664068.35,nsf.md
+27,FDIC,Federal Deposit Insurance Corporation,051,2026,4,4613942342.55,148363087427.13,fdic.md
+28,SEC,Securities and Exchange Commission,050,2026,4,1812097244.39,3269768394.78,sec.md
+29,DFC,U.S. International Development Finance Corporation,077,2026,4,1568291007.69,10369796040.89,dfc.md
+30,CNCS,Corporation for National and Community Service (AmeriCorps),485,2026,4,1195241351.04,2950225346.89,cncs.md
+31,PCORTF,Patient-Centered Outcomes Research Trust Fund,579,2026,4,1113676811.61,1259364841.44,pcortf.md
+32,NRC,Nuclear Regulatory Commission,031,2026,4,858488529.68,1189401765.05,nrc.md
+33,EOP,Executive Office of the President,1100,2026,4,851475969.99,1494258633.33,eop.md

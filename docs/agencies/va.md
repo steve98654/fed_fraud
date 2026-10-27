@@ -1,6 +1,7 @@
 # Veterans Affairs: one-page brief
 
-**Priority:** 4 of 7 (score 3.5). **As of:** 2026-10-25. Public data only.
+**Priority:** 8 of 33 (score 3.5). **FY2026 outlays:** $419B (USAspending).
+**As of:** 2026-10-27 (first written 2026-10-25). Public data only.
 
 ## Bottom line
 
@@ -46,6 +47,10 @@ Claims and community care payment details are not public.
 
 VA's Office of Small and Disadvantaged Business Utilization, Veterans
 Benefits Administration (Education Service), and VA OIG.
+
+## Related briefs
+
+[dod.md](dod.md) (shared contractor pipeline), [opm.md](opm.md) (benefit payees and death data).
 
 ## Sources
 

@@ -1,6 +1,7 @@
 # SBA: one-page brief (baseline)
 
-**Priority:** baseline, already underway (score 4.2). **As of:** 2026-10-25.
+**Priority:** 3 of 33, baseline already underway (score 4.2). **FY2026 outlays:**
+$15B (USAspending). **As of:** 2026-10-27 (first written 2026-10-25).
 
 ## Bottom line
 
@@ -42,6 +43,10 @@ pipeline exists.
 
 Pandemic program data are fixed in time, and loan-level data omit personal
 identifiers.
+
+## Related briefs
+
+[gsa.md](gsa.md) (SAM.gov owner), [dot.md](dot.md) (DBE fronts), [treasury.md](treasury.md) (PPP and ERC overlap), [fdic.md](fdic.md) (PPP lenders).
 
 ## Sources
 

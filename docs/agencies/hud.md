@@ -1,6 +1,7 @@
 # HUD: one-page brief
 
-**Priority:** 5 of 7 (score 3.0). **As of:** 2026-10-25. Public data only.
+**Priority:** 16 of 33 (score 3.0). **FY2026 outlays:** $85B (USAspending).
+**As of:** 2026-10-27 (first written 2026-10-25). Public data only.
 
 ## Bottom line
 
@@ -46,6 +47,10 @@ improper payments needs agency data in a pilot.
 
 HUD's Office of Multifamily Housing, the CFO's payment integrity team, and
 HUD OIG.
+
+## Related briefs
+
+[dhs.md](dhs.md) (FEMA disaster aid overlaps HUD disaster grants), [epa.md](epa.md) (grantee profile method).
 
 ## Sources
 
