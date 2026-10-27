@@ -8,7 +8,7 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$root"
 export TEXINPUTS="$root/latex/geodesic_brand//:"
 # Documents with a full title page and contents; everything else is a brief.
-reports="docs/plan.md docs/agencies/landscape.md docs/agencies/top33.md"
+reports="docs/plan.md docs/review_plan.md docs/agencies/landscape.md docs/agencies/top33.md"
 files=${@:-$(find docs -name '*.md' | sort)}
 fail=0
 for md in $files; do
