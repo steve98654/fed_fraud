@@ -1,0 +1,151 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Environmental Protection Agency},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Environmental Protection Agency}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 15 of 33 (score 3.1). \textbf{FY2026 outlays:} \$17B
+(USAspending). \textbf{As of:} 2026-10-27. Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+EPA spends mainly through grants: state revolving funds for water, and
+the large 2022 Inflation Reduction Act programs. Its biggest such
+program, the \$20B Greenhouse Gas Reduction Fund, became a political
+fight over alleged fraud. EPA terminated the grants, and the full D.C.
+Circuit ruled on 2026-08-04 that it likely did so unlawfully. A neutral,
+evidence-based screen of EPA grantees and subgrantees would be useful to
+either side, but the topic is politically charged and needs careful
+framing.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  \$17B in outlays and \$57B in budgetary resources in FY2026, much of
+  it multi-year grant money.
+\item
+  Risks: pass-through subgrants to new nonprofits, unsupported costs,
+  and contractors on revolving-fund projects.
+\item
+  EPA does not report a high-risk improper payment program.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{USAspending grants and subawards} for EPA programs.
+\item
+  \textbf{State revolving fund project lists} (published by states).
+\item
+  \textbf{SAM.gov} entities and exclusions; IRS Form 990 data for
+  nonprofit grantees; EPA OIG reports.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{New-nonprofit grantees:} recipients formed shortly before
+  award, with little revenue history on Form 990, receiving large sums.
+\item
+  \textbf{Subgrant chains:} money that passes through several entities
+  with shared officers before reaching a project.
+\item
+  \textbf{Contractor screen} on revolving-fund construction.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+A grantee profile for EPA's largest recent grant programs joining
+USAspending, SAM.gov and Form 990 data, with facts only and no fraud
+labels.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+Litigation and politics make ``fraud'' claims sensitive; present
+findings as risk indicators. Subaward reporting is incomplete.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+EPA Office of Grants and Debarment, EPA OIG.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.ksat.com/news/national/2026/08/04/divided-federal-appeals-court-says-trump-administration-was-wrong-to-terminate-climate-program/}{AP
+  via KSAT: appeals court rules EPA wrongly terminated \$20B fund (Aug
+  2026)}
+\item
+  \href{https://www.usaspending.gov/agency}{USAspending agency profiles
+  (FY2026 outlays)}
+\end{itemize}
+
+\end{document}

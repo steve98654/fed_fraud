@@ -1,0 +1,168 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Treasury (IRS and Fiscal Service)},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Treasury (IRS and Fiscal Service)}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 8 of 33 (score 3.5). \textbf{FY2026 outlays:}
+\$1,975B (USAspending; mostly interest on the debt). \textbf{As of:}
+2026-10-27. Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+Treasury holds the largest single fraud-prone payment outside health
+care: refundable tax credits paid through the IRS. The Earned Income Tax
+Credit alone had \$21.1B in improper payments in FY2025, and the
+pandemic Employee Retention Credit drew billions in fraudulent claims.
+Taxpayer data are confidential, so public work has to start from
+geography, preparers and promoters rather than individual returns. The
+payoff is large, but this is a proposal-first agency.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  EITC: \$21.1B improper (32.7\%). Additional Child Tax Credit: 13.6\%
+  rate. American Opportunity Tax Credit: 30.7\%. Premium Tax Credit:
+  31.6\%. (GAO, FY2025)
+\item
+  Employee Retention Credit: IRS Criminal Investigation had opened 545
+  ERC cases involving more than \$5.6B by February 2025, out of 2,039
+  COVID fraud investigations totaling \$10B.
+\item
+  Fiscal Service disburses most federal payments and runs Do Not Pay,
+  which makes it the natural home for any cross-agency screen.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{IRS Statistics of Income (SOI) ZIP code data:} EITC and
+  refundable credit counts and dollars by ZIP, by year.
+\item
+  \textbf{IRS Return Preparer data and enforcement releases:} preparer
+  injunctions and DOJ Tax Division cases name preparers and promoters.
+\item
+  \textbf{PPP loan-level data (SBA):} employer names, addresses and jobs
+  reported, which can be set against public ERC promoter cases.
+\item
+  \textbf{IRS-CI and DOJ press releases} as labeled examples.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Credit hot spots:} ZIP codes where EITC or ACTC claim rates
+  jump far above what income and household data predict, flagged for
+  preparer review.
+\item
+  \textbf{Promoter networks:} link charged ERC and EITC promoters to the
+  businesses, addresses and preparers that recur across cases.
+\item
+  \textbf{Pandemic overlap:} businesses with PPP loans that also appear
+  in ERC cases, to estimate double dipping and find similar unreviewed
+  firms.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+An EITC hot-spot map from SOI ZIP data, with a ranked list of anomalous
+areas and the known preparer cases inside them. Validate against DOJ
+preparer injunctions.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+Returns, preparer identifiers on returns, and ERC claims are
+confidential (26 U.S.C. 6103). Public data can only point to places and
+promoters; return level scoring needs an IRS partnership.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+IRS Return Preparer Office and Criminal Investigation, TIGTA, Treasury's
+Office of Payment Integrity (Do Not Pay), and DOJ Tax Division.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.gao.gov/products/gao-26-108694}{GAO-26-108694:
+  FY2025 improper payments}
+\item
+  \href{https://irs.gov/compliance/criminal-investigation/five-years-post-cares-act-irs-ci-has-launched-2039-covid-fraud-investigations-totaling-10b-in-attempted-fraud}{IRS-CI:
+  2,039 COVID fraud investigations, 545 ERC cases (March 2025)}
+\item
+  \href{https://www.crfb.org/blogs/federal-improper-payments-total-186-billion-fy-2025}{CRFB:
+  FY2025 improper payments by program}
+\item
+  \href{https://www.usaspending.gov/agency}{USAspending agency profiles
+  (FY2026 outlays)}
+\end{itemize}
+
+\end{document}

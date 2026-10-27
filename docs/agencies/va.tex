@@ -1,0 +1,155 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Veterans Affairs},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Veterans Affairs}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 8 of 33 (score 3.5). \textbf{FY2026 outlays:} \$419B
+(USAspending). \textbf{As of:} 2026-10-27 (first written 2026-10-25).
+Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+VA pairs naturally with DoD. Its service-disabled veteran-owned (SDVOSB)
+set-aside contracts use the same SAM.gov and FPDS pipeline, and its GI
+Bill school data let us screen schools. Benefit payment fraud itself
+(compensation, community care) is mostly hidden from public data.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  VA reported \$3.92B in improper and unknown payments across 7 programs
+  in FY2025: \$1.49B monetary loss and \$1.74B unknown. Compensation
+  alone was about \$2.3B. (PaymentAccuracy.gov, GAO)
+\item
+  SDVOSB pass-through and fake-eligibility schemes are recurring VA OIG
+  and DOJ cases.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{FPDS / USAspending} VA contracts with set-aside type.
+\item
+  \textbf{SAM.gov} and \textbf{SBA VetCert} certification lists.
+\item
+  \textbf{GI Bill Comparison Tool} data (school, enrollment, caution
+  flags).
+\item
+  \textbf{VA OIG reports} and DOJ releases.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{SDVOSB fronts:} certified firms that subcontract most work,
+  share officers with non-veteran firms, or appear just before large
+  awards.
+\item
+  \textbf{School risk:} GI Bill schools with fast enrollment growth,
+  caution flags, or ownership links to schools that closed or were
+  sanctioned.
+\item
+  \textbf{Community care providers:} cross-match VA community care
+  vendors against HHS-OIG's exclusion list (via the HHS pipeline).
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+Add VA to the DoD contractor screen (same code, VA awards) and a GI Bill
+school watch list.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+Claims and community care payment details are not public.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+VA's Office of Small and Disadvantaged Business Utilization, Veterans
+Benefits Administration (Education Service), and VA OIG.
+
+\hypertarget{related-briefs}{%
+\section{Related briefs}\label{related-briefs}}
+
+\url{dod.pdf} (shared contractor pipeline), \url{opm.pdf} (benefit
+payees and death data).
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://paymentaccuracy.gov/agency/VA}{PaymentAccuracy.gov: VA}
+\item
+  \href{https://www.gao.gov/products/gao-26-108694}{GAO-26-108694:
+  FY2025 improper payments}
+\end{itemize}
+
+\end{document}

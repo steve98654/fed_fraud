@@ -1,0 +1,148 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Labor},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Labor}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 26 of 33 (score 2.4). \textbf{FY2026 outlays:} \$63B
+(USAspending). \textbf{As of:} 2026-10-27 (first written 2026-10-25).
+Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+Unemployment insurance fraud was enormous during the pandemic and is
+still the highest-rate program here (14.9\%), but claimant data are held
+by states and are not public. With public data we can only point to
+states and periods that look wrong. Labor is a strong candidate once a
+state or DOL grants data.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  Federal-State Unemployment Insurance: \$5.6B improper (14.9\%) in
+  FY2025. (GAO)
+\item
+  GAO estimated pandemic UI fraud at \$100B to \$135B.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{DOL ETA state UI reports:} weekly claims, overpayments, and
+  fraud recoveries by state.
+\item
+  \textbf{DOL grants} on USAspending (state UI integrity grants).
+\item
+  \textbf{DOL OIG reports} and DOJ releases.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{State anomalies:} claims that diverge from local job loss, or
+  high overpayment rates relative to peers.
+\item
+  \textbf{Case mining:} extract the schemes from charged cases (shared
+  bank accounts, addresses, IP addresses) to build rules states can run.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+A state-by-state UI integrity dashboard from public aggregates, plus a
+playbook of rules drawn from charged cases.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+Detection at the claim level needs state data. This is a proposal-first,
+data-later agency.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+DOL Employment and Training Administration, DOL OIG, and state workforce
+agencies.
+
+\hypertarget{related-briefs}{%
+\section{Related briefs}\label{related-briefs}}
+
+\url{pbgc.pdf} (Form 5500 data), \url{ssa.pdf} (benefit data partner).
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.gao.gov/products/gao-26-108694}{GAO-26-108694:
+  FY2025 improper payments}
+\item
+  \href{https://www.gao.gov/products/gao-23-106696}{GAO-23-106696:
+  pandemic UI fraud of \$100B to \$135B}
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,252 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Partner agencies},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{2}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{16pt}{8pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% TITLE PAGE
+\begin{titlepage}
+\newcommand{\HRule}{\rule{\linewidth}{0.3mm}}
+\begin{center}
+\vspace*{0.2in}
+\textsc{\LARGE \geofirm}\\[0.6cm]
+\includegraphics[width=30mm]{icon.png}\\[8mm]
+\textsc{\Large Federal Fraud Expansion\\[0.15cm] Working Document}\\[0.5cm]
+\HRule\\[0.4cm]
+{\huge\bfseries Partner agencies}\\[0.3cm]
+{\large Landscape and prioritization}\\[0.2cm]
+\HRule\\[1cm]
+\begin{minipage}{0.8\textwidth}\centering\large
+Authored by:\\[0.18cm]
+\geosigner, \geosignertitle: \geoemail
+\end{minipage}\\[0.8cm]
+{\large When: \compiletime}\\[1.2cm]
+\geosurface{catenoid}{4.6cm}\\[0.9cm]
+$\mathcal{G}(x)=x^x\qquad\nabla_{\dot\gamma}\dot\gamma=0$\\[3mm]
+{\small\itshape \geopromise}
+\end{center}
+\end{titlepage}
+
+\pagestyle{geodesic}
+\tableofcontents
+\newpage
+
+\textbf{As of:} 2026-10-25. Public data only. Scores are our judgment
+from the sources listed at the end; they are a starting point for
+discussion, not a measured result.
+
+\textbf{Update 2026-10-27:} the same method now covers the 33 largest
+agencies by FY2026 outlays in \url{top33.pdf}. Ranks in the individual
+briefs are now out of 33.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+Start with \textbf{HHS (Medicare and Medicaid providers)}, then
+\textbf{DoD contracting} and \textbf{USDA nutrition programs}. Keep
+\textbf{SBA} running as the baseline that proves the method. HHS has the
+most money at risk (about \$90B in FY2025 improper payments across
+Medicare and Medicaid) and the richest public provider-level data, and
+its hospice and home health fraud is the stated priority of the new
+whistleblower program. DoD contracting is the closest match to the SBA
+work: the same SAM.gov, FPDS and set-aside data, applied to the largest
+contract budget in government. USDA's SNAP retailer and child meal
+programs bring the day care and food fraud patterns the program also
+names.
+
+\hypertarget{which-agencies-are-in-scope}{%
+\section{Which agencies are in
+scope}\label{which-agencies-are-in-scope}}
+
+america.gov/fraud is the intake form for DOJ's Whistleblower Incentive
+Program (WHIP), launched 2026-10-20 with \$25M from Treasury and awards
+of \$10K to \$30K when charges are filed. DOJ's terms page says tips
+must concern federal health care offenses or fraud on programs run by
+these \textbf{eight agencies}:
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.538\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.397\linewidth-2\tabcolsep}l@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Agency & \leavevmode\color{white}\bfseries Example program named by DOJ & \leavevmode\color{white}\bfseries Brief \\
+\endhead
+Health and Human Services (incl.~CMS) & Health care benefit programs & \url{hhs.pdf} \\
+War (Defense) & --- & \url{dod.pdf} \\
+Small Business Administration & --- & \url{sba.pdf} \\
+Agriculture & SNAP & \url{usda.pdf} \\
+Veterans Affairs & --- & \url{va.pdf} \\
+Housing and Urban Development & --- & \url{hud.pdf} \\
+Education & Student aid fraud & \url{ed.pdf} \\
+Labor & Unemployment fraud & \url{dol.pdf} \\
+\end{longtable}\endgroup
+
+DOJ (which pays the awards) and Treasury (which funds them) run the
+program rather than being program agencies, so they are partners for
+referrals, not targets. The site itself blocks automated reading, so
+this list comes from DOJ's terms page, which the site links to. It
+should still be checked against the live site. The wider task force and
+DOJ's National Fraud Detection Center also name Treasury (EITC), SSA,
+DHS, Interior and OMB; see ``Wave 2'' below.
+
+\hypertarget{how-we-scored}{%
+\section{How we scored}\label{how-we-scored}}
+
+Each agency gets 1 to 5 on four factors, weighted toward what we can do
+with public data alone.
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.283\linewidth-2\tabcolsep}l>{\raggedright\arraybackslash}p{\dimexpr 0.652\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Factor & \leavevmode\color{white}\bfseries Weight & \leavevmode\color{white}\bfseries What 5 means \\
+\endhead
+Exposure & 30\% & Tens of billions a year in improper payments or fraud-prone spend \\
+Public data & 30\% & Record-level data that names payees (providers, contractors, retailers) \\
+SBA method fit & 20\% & The SBA patterns (shell entities, shared identifiers, stacked awards, ineligible recipients) apply directly \\
+Actionability & 20\% & A WHIP priority area, active enforcement, and a clear owner to take findings to \\
+\end{longtable}\endgroup
+
+\hypertarget{ranking}{%
+\section{Ranking}\label{ranking}}
+
+\begingroup\footnotesize\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}l>{\raggedright\arraybackslash}p{\dimexpr 0.169\linewidth-2\tabcolsep}lllll>{\raggedright\arraybackslash}p{\dimexpr 0.441\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Rank & \leavevmode\color{white}\bfseries Agency & \leavevmode\color{white}\bfseries Exposure & \leavevmode\color{white}\bfseries \makecell[tl]{Public\\data} & \leavevmode\color{white}\bfseries \makecell[tl]{SBA\\fit} & \leavevmode\color{white}\bfseries Action & \leavevmode\color{white}\bfseries Score & \leavevmode\color{white}\bfseries First prototype \\
+\endhead
+1 & HHS (CMS) & 5 & 5 & 4 & 5 & \textbf{4.8} & Hospice and home health provider risk map \\
+2 & DoD & 4 & 5 & 5 & 3 & \textbf{4.3} & Small business set-aside contractor integrity screen \\
+--- & SBA (baseline) & 3 & 5 & 5 & 4 & \textbf{4.2} & Extend current work to 7(a), 504 and 8(a) \\
+3 & USDA & 4 & 3 & 4 & 5 & \textbf{3.9} & SNAP retailer and child meal sponsor anomalies \\
+4 & VA & 3 & 4 & 4 & 3 & \textbf{3.5} & SDVOSB contract and GI Bill school screen \\
+5 & HUD & 3 & 3 & 3 & 3 & \textbf{3.0} & Multifamily owner network and disaster grant screen \\
+6 & Education & 2 & 3 & 3 & 3 & \textbf{2.7} & Ghost student risk by college \\
+7 & Labor & 3 & 1 & 2 & 4 & \textbf{2.4} & State UI anomaly dashboard from aggregates \\
+\end{longtable}\endgroup
+
+Score = 0.3 × Exposure + 0.3 × Public data + 0.2 × SBA fit + 0.2 ×
+Action.
+
+\hypertarget{recommended-sequence}{%
+\section{Recommended sequence}\label{recommended-sequence}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Now: HHS and DoD.} HHS gives the biggest dollar story; DoD
+  gives the fastest technical win because it reuses the SBA contractor
+  pipeline as is.
+\item
+  \textbf{Next: USDA and VA.} USDA adds retailer and sponsor fraud; VA
+  shares the contractor pipeline with DoD and adds veteran-owned
+  set-asides.
+\item
+  \textbf{Later: HUD, Education, Labor.} Their public data is aggregate
+  or thin. They are better approached once an agency pilot grants
+  non-public data.
+\end{enumerate}
+
+\hypertarget{shared-building-blocks}{%
+\section{Shared building blocks}\label{shared-building-blocks}}
+
+Every brief reuses the same core, which is what makes a government-wide
+program realistic:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Entity spine:} SAM.gov entity records (UEI, address, owners,
+  exclusions) joined to USAspending awards and FPDS contracts.
+\item
+  \textbf{Exclusion and enforcement lists:} SAM.gov exclusions, HHS-OIG
+  LEIE, DOJ press releases and OIG reports, used both as labels to train
+  on and as watch lists.
+\item
+  \textbf{Common patterns:} many payees at one address, new entities
+  winning large awards fast, shared officers across ``competing'' firms,
+  payees tied to excluded parties, and spending far above peers.
+\end{itemize}
+
+\hypertarget{wave-2-candidates-outside-the-eight}{%
+\section{Wave 2 candidates (outside the
+eight)}\label{wave-2-candidates-outside-the-eight}}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.142\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.416\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.442\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Agency & \leavevmode\color{white}\bfseries Why it matters & \leavevmode\color{white}\bfseries Public data \\
+\endhead
+Treasury / IRS & EITC improper payments \$21.1B (32.7\%) in FY2025 & Aggregate only; preparer-level data not public \\
+SSA & SSI improper payments \$7.3B (11.6\%) in FY2025 & Aggregate only \\
+DHS / FEMA & Disaster assistance fraud & OpenFEMA has program-level and some recipient data \\
+\end{longtable}\endgroup
+
+All three now have full briefs: \url{treasury.pdf}, \url{ssa.pdf} and
+\url{dhs.pdf}; see \url{top33.pdf}.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.justice.gov/fraud/whistleblower}{DOJ Whistleblower
+  Rewards Program terms (lists the eight agencies)}
+\item
+  \href{https://www.latintimes.com/how-turn-fraudster-get-paid-immediately-inside-dojs-groundbreaking-whip-program-600382}{Latin
+  Times: inside DOJ's WHIP program (launch date, award range, \$25M)}
+\item
+  \href{https://runtimewire.com/article/america-gov-fraud-whistleblower-ai-intake}{Runtime
+  Wire: America.gov AI-assisted tip form}
+\item
+  \href{https://www.gao.gov/products/gao-26-108694}{GAO-26-108694:
+  improper payments rose to \$186B in FY2025}
+\item
+  \href{https://www.crfb.org/blogs/federal-improper-payments-total-186-billion-fy-2025}{CRFB:
+  FY2025 improper payments by program}
+\item
+  \href{https://www.gao.gov/products/GAO-24-105833}{GAO-24-105833:
+  federal fraud losses estimated at \$233B to \$521B a year}
+\item
+  \href{../plan.pdf}{Working plan for this project}
+\end{itemize}
+
+\end{document}

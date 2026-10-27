@@ -1,0 +1,156 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Energy},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Energy}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 11 of 33 (score 3.3). \textbf{FY2026 outlays:} \$63B
+(USAspending). \textbf{As of:} 2026-10-27. Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+Most DOE money goes to national lab operating contractors and nuclear
+cleanup, which are hard to score from outside. The fraud-prone slice is
+the fast-growing grant, loan and small business research money from the
+2021 infrastructure law and 2022 Inflation Reduction Act: many new
+recipients, large awards, and thin track records. That is where public
+award data and the SBA entity checks fit.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  \$63B in outlays and \$141B in budgetary resources in FY2026, swollen
+  by multi-year infrastructure and clean energy appropriations.
+\item
+  DOE is one of the largest SBIR/STTR funders. GAO found almost 8\% of
+  SBIR and STTR awardees had four or more fraud risk indicators and
+  about \$445M in possibly duplicative awards across agencies (2024).
+\item
+  DOE does not report a high-risk improper payment program.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{USAspending and FPDS:} grants, cooperative agreements,
+  contracts and subawards by recipient.
+\item
+  \textbf{SBIR.gov award data:} firm, PI, abstract and agency for every
+  award.
+\item
+  \textbf{DOE Loan Programs Office portfolio} listings.
+\item
+  \textbf{SAM.gov} entity and exclusion records; DOE OIG reports.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Duplicate research awards:} near-identical SBIR abstracts
+  funded by DOE and other agencies (text similarity across SBIR.gov).
+\item
+  \textbf{Thin recipients, big awards:} new entities winning large
+  grants, shared addresses across ``independent'' applicants, and
+  pass-through subawards.
+\item
+  \textbf{Excluded links:} recipients or principal investigators tied to
+  excluded parties or prior settlements.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+A cross-agency SBIR duplicate-award screen covering DOE, NSF, NASA and
+DoD. It is cheap (one public data set) and serves four briefs at once.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+Lab and cleanup contractor costs are not visible below the award level.
+Duplicate abstracts are leads; some overlap is legitimate.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+DOE OIG, DOE Office of Science SBIR/STTR program office, and the SBA
+SBIR program office.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.gao.gov/products/GAO-24-105470}{GAO-24-105470:
+  SBIR/STTR fraud vulnerabilities (Sept 2024)}
+\item
+  \href{https://www.sbir.gov/awards}{SBIR.gov awards data}
+\item
+  \href{https://www.usaspending.gov/agency}{USAspending agency profiles
+  (FY2026 outlays)}
+\end{itemize}
+
+\end{document}

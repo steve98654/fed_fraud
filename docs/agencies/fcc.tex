@@ -1,0 +1,158 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={FCC (Universal Service Fund)},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} FCC (Universal Service Fund)}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 8 of 33 (score 3.5). \textbf{FY2026 outlays:} \$10.1B
+(USAspending). \textbf{As of:} 2026-10-27. Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+Almost all FCC spending is the Universal Service Fund, run by USAC:
+E-Rate for schools and libraries, Lifeline for low-income phone service,
+Rural Health Care and High Cost support. USAC publishes unusually
+detailed data, down to each E-Rate funding request, service provider and
+school. That makes the FCC a contained, data-rich pilot where the SBA
+patterns (shared addresses, related bidders, ineligible recipients)
+apply well.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  \$10.1B in FY2026 outlays.
+\item
+  Lifeline: \$830M in FY2025 outlays with about 9\% improper (about
+  \$76M).
+\item
+  E-Rate kickback and bid rigging cases between providers, consultants
+  and school officials are a long-running DOJ case type.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{USAC Open Data:} E-Rate funding requests, commitments and
+  disbursements by applicant and provider; Lifeline subscribers and
+  support by provider and state; Rural Health Care commitments.
+\item
+  \textbf{FCC National Broadband Map} and Form 477 history.
+\item
+  \textbf{USAC investigation documents} and FCC enforcement actions.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{E-Rate collusion:} the same consultant or provider winning
+  across many applicants with one bid, prices far above peers, and
+  providers sharing owners with consultants.
+\item
+  \textbf{Lifeline outliers:} providers with subscriber counts or claims
+  per area far beyond eligible population.
+\item
+  \textbf{Rural Health Care pricing:} urban/rural rate gaps far above
+  peers.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+An E-Rate provider and consultant network map for the last five funding
+years, ranking relationships by single-bid share and price outliers.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+Subscriber identities are not public. Bids and contracts are summarized,
+not published in full.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+FCC Enforcement Bureau and OIG, USAC Internal Audit and whistleblower
+program.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://paymentaccuracy.gov/program/fcc-universal-service-fund-lifeline}{PaymentAccuracy.gov:
+  USF Lifeline}
+\item
+  \href{https://www.usac.org/about/contact-usac/submit-a-whistleblower-alert/investigation-documents/}{USAC
+  investigation documents}
+\item
+  \href{https://www.justice.gov/opa/pr/owner-illinois-technology-company-pleads-guilty-scheme-defraud-federal-e-rate-program}{DOJ:
+  Illinois technology company owner pleads guilty to E-Rate fraud}
+\item
+  \href{https://www.usaspending.gov/agency}{USAspending agency profiles
+  (FY2026 outlays)}
+\end{itemize}
+
+\end{document}

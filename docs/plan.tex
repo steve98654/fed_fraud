@@ -1,0 +1,206 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Federal fraud expansion},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{2}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{16pt}{8pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% TITLE PAGE
+\begin{titlepage}
+\newcommand{\HRule}{\rule{\linewidth}{0.3mm}}
+\begin{center}
+\vspace*{0.2in}
+\textsc{\LARGE \geofirm}\\[0.6cm]
+\includegraphics[width=30mm]{icon.png}\\[8mm]
+\textsc{\Large Federal Fraud Expansion\\[0.15cm] Working Document}\\[0.5cm]
+\HRule\\[0.4cm]
+{\huge\bfseries Federal fraud expansion}\\[0.3cm]
+{\large Working plan}\\[0.2cm]
+\HRule\\[1cm]
+\begin{minipage}{0.8\textwidth}\centering\large
+Authored by:\\[0.18cm]
+\geosigner, \geosignertitle: \geoemail
+\end{minipage}\\[0.8cm]
+{\large When: \compiletime}\\[1.2cm]
+\geosurface{catenoid}{4.6cm}\\[0.9cm]
+$\mathcal{G}(x)=x^x\qquad\nabla_{\dot\gamma}\dot\gamma=0$\\[3mm]
+{\small\itshape \geopromise}
+\end{center}
+\end{titlepage}
+
+\pagestyle{geodesic}
+\tableofcontents
+\newpage
+
+\textbf{Status:} Draft v0.1 (2026-10-25). Waiting on Steve's edits
+before step 1 starts.
+
+\hypertarget{goal}{%
+\section{Goal}\label{goal}}
+
+Take the SBA fraud work done with Rosemary and turn it into a repeatable
+playbook. Apply it first to the agencies in the federal fraud initiative
+(america.gov/fraud), then use those pilots to make the case for a
+government-wide program.
+
+\hypertarget{starting-assumptions-please-correct}{%
+\section{Starting assumptions (please
+correct)}\label{starting-assumptions-please-correct}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Starting agencies.} We could not read america.gov/fraud
+  directly because the site blocks automated access. This list comes
+  from public coverage of the March 2026 anti-fraud task force executive
+  order and DOJ's National Fraud Detection Center. It needs to be
+  checked against the site.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Agencies named under the task force: DOJ, Treasury, HHS, Education,
+    HUD, Labor, DHS, SBA and OMB, plus the Inspectors General.
+  \item
+    Inspector General offices in the Detection Center: USDA, Education,
+    HHS, DHS, HUD, Interior, Labor, VA, DoD (DCIS), TIGTA, SBA and SSA.
+  \end{itemize}
+\item
+  \textbf{Data.} We start with public data: USAspending, SAM.gov, FPDS,
+  PRAC data, OIG/GAO reports and DOJ press releases. Agencies would
+  provide internal data only after a pilot is approved.
+\item
+  \textbf{Audience.} Proposals go to agency leadership, such as deputy
+  secretaries, CFOs and chief data officers, and their Inspectors
+  General. They also go to the task force or OMB as the cross-agency
+  sponsor.
+\item
+  \textbf{What the SBA work produced.} Not yet in this repo. Step 1
+  depends on getting those materials.
+\end{itemize}
+
+\hypertarget{plan}{%
+\section{Plan}\label{plan}}
+
+\hypertarget{step-1-turn-the-sba-work-into-a-reusable-playbook}{%
+\subsection{Step 1: Turn the SBA work into a reusable
+playbook}\label{step-1-turn-the-sba-work-into-a-reusable-playbook}}
+
+Write down what the SBA effort does. That covers its data sources, fraud
+typologies (for example identity theft, shell entities, duplicate or
+stacked awards, and ineligible recipients), detection methods, outputs
+and measured results. Then separate the parts that carry over to other
+agencies from the parts that only fit SBA.
+
+\textbf{Deliverable:} \texttt{docs/playbook/sba-baseline.md} and a
+one-page summary of the method.
+
+\hypertarget{step-2-profile-the-initiative-agencies-and-rank-them}{%
+\subsection{Step 2: Profile the initiative agencies and rank
+them}\label{step-2-profile-the-initiative-agencies-and-rank-them}}
+
+For each agency, note its largest programs and how much money they pay
+out. Also note its known fraud and improper-payment exposure, using
+PaymentAccuracy.gov and OIG/GAO findings. Record which public data
+exists for it and how closely it matches the SBA playbook. Rank the
+agencies by impact and feasibility, and choose 2 or 3 for the first
+wave.
+
+\textbf{Deliverable:} \texttt{docs/agencies/landscape.md}, with one
+short profile per agency and a ranking matrix.
+
+\hypertarget{step-3-prototype-against-public-data-for-the-first-wave-agencies}{%
+\subsection{Step 3: Prototype against public data for the first-wave
+agencies}\label{step-3-prototype-against-public-data-for-the-first-wave-agencies}}
+
+Apply the SBA detection patterns to public data for the chosen agencies.
+Build wireframes for the analyst and leadership views. The goal is a
+convincing demo built from real public data, not a production system.
+
+\textbf{Deliverable:} code under
+\texttt{prototypes/\textless{}agency\textgreater{}/} and wireframes
+under \texttt{docs/wireframes/}.
+
+\hypertarget{step-4-write-proposals-for-agency-leadership}{%
+\subsection{Step 4: Write proposals for agency
+leadership}\label{step-4-write-proposals-for-agency-leadership}}
+
+Write one proposal per first-wave agency. Each covers the problem and
+estimated dollar exposure, what the prototype found, the pilot scope and
+data request, timeline, cost, success metrics and governance. Add a
+cross-agency proposal that presents the shared platform as the route to
+government-wide coverage.
+
+\textbf{Deliverable:}
+\texttt{docs/proposals/\textless{}agency\textgreater{}.md} and a slide
+deck for each meeting.
+
+\hypertarget{open-questions-for-steve}{%
+\section{Open questions for Steve}\label{open-questions-for-steve}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  What does the SBA work produce today, and can it be added here?
+\item
+  Who is the first audience: a specific agency leader, an IG, OMB, or
+  the task force?
+\item
+  Is any non-public data access expected for the pilots?
+\item
+  Is there a deadline or meeting the first output has to be ready for?
+\end{enumerate}
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.bakermckenzie.com/en/insight/publications/2026/03/united-states-trump-launches-nationwide-antifraud-task-force}{Baker
+  McKenzie: Trump launches nationwide antifraud task force (Mar 2026)}
+\item
+  \href{https://www.executivegov.com/articles/doj-national-fraud-detection-center}{ExecutiveGov:
+  DOJ launches National Fraud Detection Center}
+\end{itemize}
+
+\end{document}

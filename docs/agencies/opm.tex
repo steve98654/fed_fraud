@@ -1,0 +1,165 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Office of Personnel Management},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Office of Personnel Management}\par
+\vspace{2pt}{\large\color{geomid} One-page brief}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Priority:} 11 of 33 (score 3.3). \textbf{FY2026 outlays:} \$201B
+(USAspending). \textbf{As of:} 2026-10-27. Public data only.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+OPM runs two big payment streams: federal retirement (\$109B in FY2025)
+and the Federal Employees Health Benefits program (about \$70B, 8.2
+million members). Retirement error rates are low, but GAO found in April
+2026 that FEHB paid deceased, incarcerated and excluded providers, and
+that OPM's own debarment list is out of step with the HHS and SAM
+exclusion lists. That cross-list gap is something we can measure with
+public data alone.
+
+\hypertarget{exposure}{%
+\section{Exposure}\label{exposure}}
+
+\begin{itemize}
+\tightlist
+\item
+  Federal Retirement Services: \$109.4B outlays, about \$364M improper
+  (0.33\%) in FY2025.
+\item
+  FEHB: about 400 deceased providers paid for services at least 50 days
+  after death; over 2,000 claims from providers excluded elsewhere; over
+  2,500 claims from providers OPM had already debarred. (GAO, CY2022
+  claims)
+\item
+  Over 85\% of OPM OIG's debarment records lack an NPI, and at least
+  1,200 LEIE entries that meet OPM's debarment criteria are missing from
+  its list.
+\end{itemize}
+
+\hypertarget{public-data-we-can-use}{%
+\section{Public data we can use}\label{public-data-we-can-use}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{HHS-OIG LEIE, SAM.gov exclusions, and OPM OIG's debarment
+  list.}
+\item
+  \textbf{NPPES} NPI registry (addresses, taxonomies, deactivation
+  dates).
+\item
+  \textbf{CMS provider data} to profile FEHB-overlapping providers.
+\item
+  \textbf{OPM OIG investigative summaries} as labeled cases.
+\end{itemize}
+
+\hypertarget{detection-plays}{%
+\section{Detection plays}\label{detection-plays}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Exclusion list reconciliation:} match the three exclusion
+  lists on name, NPI, address and license to find providers barred in
+  one program and not another.
+\item
+  \textbf{Dead and deactivated providers:} NPIs deactivated or tied to
+  deceased individuals that still look active in carrier networks.
+\item
+  \textbf{Cross-program spillover:} providers flagged in Medicare work
+  (see \url{hhs.pdf}) who also serve FEHB members.
+\end{enumerate}
+
+\hypertarget{first-prototype}{%
+\section{First prototype}\label{first-prototype}}
+
+An exclusion-list reconciliation report: every provider excluded by HHS
+or SAM but missing from OPM's list, with matched identifiers. This
+reuses the HHS provider pipeline almost unchanged.
+
+\hypertarget{limits}{%
+\section{Limits}\label{limits}}
+
+FEHB claims are held by carriers and are not public, so we cannot see
+what was paid to whom. Retirement payee data is not public.
+
+\hypertarget{who-to-take-it-to}{%
+\section{Who to take it to}\label{who-to-take-it-to}}
+
+OPM Healthcare and Insurance, OPM OIG, and FEHB carriers' special
+investigation units.
+
+\hypertarget{sources}{%
+\section{Sources}\label{sources}}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://files.gao.gov/reports/GAO-26-108139/index.html}{GAO-26-108139:
+  FEHB provider eligibility risks (April 2026)}
+\item
+  \href{https://paymentaccuracy.gov/program/opm-federal-retirement-services}{PaymentAccuracy.gov:
+  OPM Federal Retirement Services}
+\item
+  \href{https://www.fedweek.com/issue-briefs/bogus-claims-cashing-checks-of-deceased-ig-cites-cases-of-fehbp-retirement-fraud/}{FedWeek:
+  OPM OIG retirement and FEHB fraud cases}
+\item
+  \href{https://www.usaspending.gov/agency}{USAspending agency profiles
+  (FY2026 outlays)}
+\end{itemize}
+
+\end{document}
