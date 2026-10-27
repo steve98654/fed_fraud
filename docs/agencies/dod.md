@@ -1,6 +1,7 @@
 # Department of War (Defense): one-page brief
 
-**Priority:** 2 of 7 (score 4.3). **As of:** 2026-10-25. Public data only.
+**Priority:** 2 of 33 (score 4.3). **FY2026 outlays:** $1,345B (USAspending).
+**As of:** 2026-10-27 (first written 2026-10-25). Public data only.
 
 ## Bottom line
 
@@ -56,6 +57,10 @@ excluded.
 
 The DoD Comptroller and Office of Small Business Programs, DCIS / DoD OIG,
 and DOJ's Procurement Collusion Strike Force.
+
+## Related briefs
+
+[usace.md](usace.md) and [gsa.md](gsa.md) (same contractor screen), [doe.md](doe.md) (shared SBIR duplicate-award screen).
 
 ## Sources
 

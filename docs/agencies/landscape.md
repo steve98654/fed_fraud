@@ -4,6 +4,10 @@
 sources listed at the end; they are a starting point for discussion, not a
 measured result.
 
+**Update 2026-10-27:** the same method now covers the 33 largest agencies by
+FY2026 outlays in [top33.md](top33.md). Ranks in the individual briefs are
+now out of 33.
+
 ## Bottom line
 
 Start with **HHS (Medicare and Medicaid providers)**, then **DoD contracting**
@@ -100,6 +104,9 @@ program realistic:
 | Treasury / IRS | EITC improper payments $21.1B (32.7%) in FY2025 | Aggregate only; preparer-level data not public |
 | SSA | SSI improper payments $7.3B (11.6%) in FY2025 | Aggregate only |
 | DHS / FEMA | Disaster assistance fraud | OpenFEMA has program-level and some recipient data |
+
+All three now have full briefs: [treasury.md](treasury.md), [ssa.md](ssa.md)
+and [dhs.md](dhs.md); see [top33.md](top33.md).
 
 ## Sources
 

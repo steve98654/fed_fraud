@@ -1,6 +1,7 @@
 # Labor: one-page brief
 
-**Priority:** 7 of 7 (score 2.4). **As of:** 2026-10-25. Public data only.
+**Priority:** 26 of 33 (score 2.4). **FY2026 outlays:** $63B (USAspending).
+**As of:** 2026-10-27 (first written 2026-10-25). Public data only.
 
 ## Bottom line
 
@@ -43,6 +44,10 @@ data-later agency.
 
 DOL Employment and Training Administration, DOL OIG, and state workforce
 agencies.
+
+## Related briefs
+
+[pbgc.md](pbgc.md) (Form 5500 data), [ssa.md](ssa.md) (benefit data partner).
 
 ## Sources
 

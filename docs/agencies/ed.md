@@ -1,6 +1,7 @@
 # Education: one-page brief
 
-**Priority:** 6 of 7 (score 2.7). **As of:** 2026-10-25. Public data only.
+**Priority:** 22 of 33 (score 2.7). **FY2026 outlays:** $135B (USAspending).
+**As of:** 2026-10-27 (first written 2026-10-25). Public data only.
 
 ## Bottom line
 
@@ -44,6 +45,10 @@ Real detection needs a pilot with FSA.
 ## Who to take it to
 
 Federal Student Aid (Enforcement), and Education OIG.
+
+## Related briefs
+
+[nsf.md](nsf.md) (research award screen), [treasury.md](treasury.md) (AOTC education credit).
 
 ## Sources
 

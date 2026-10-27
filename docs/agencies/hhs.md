@@ -1,6 +1,7 @@
 # HHS (Medicare and Medicaid): one-page brief
 
-**Priority:** 1 of 7 (score 4.8). **As of:** 2026-10-25. Public data only.
+**Priority:** 1 of 33 (score 4.8). **FY2026 outlays:** $2,687B (USAspending).
+**As of:** 2026-10-27 (first written 2026-10-25). Public data only.
 
 ## Bottom line
 
@@ -58,6 +59,10 @@ provider enrollment and ownership, not claims.
 ## Who to take it to
 
 CMS Center for Program Integrity, HHS-OIG, and the DOJ Health Care Fraud Unit.
+
+## Related briefs
+
+[opm.md](opm.md) (FEHB uses the same provider screen), [ssa.md](ssa.md) (death data), [pcortf.md](pcortf.md).
 
 ## Sources
 

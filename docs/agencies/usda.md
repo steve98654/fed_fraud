@@ -1,6 +1,7 @@
 # USDA: one-page brief
 
-**Priority:** 3 of 7 (score 3.9). **As of:** 2026-10-25. Public data only.
+**Priority:** 4 of 33 (score 3.9). **FY2026 outlays:** $220B (USAspending).
+**As of:** 2026-10-27 (first written 2026-10-25). Public data only.
 
 ## Bottom line
 
@@ -50,6 +51,10 @@ from location and ownership, not sales. CACFP data vary by state.
 
 The Food and Nutrition Service (Retailer Operations), USDA OIG, and state
 SNAP and child nutrition agencies.
+
+## Related briefs
+
+[treasury.md](treasury.md) and [ssa.md](ssa.md) (other means-tested benefits), [doe.md](doe.md) (SBIR screen).
 
 ## Sources
 
