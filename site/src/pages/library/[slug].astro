@@ -2,13 +2,18 @@
 import Base from '../../layouts/Base.astro';
 import PageTitle from '../../components/PageTitle.astro';
 import Placeholder from '../../components/Placeholder.astro';
+import DocBody from '../../components/DocBody.astro';
 import { library } from '../../data/library';
-import { url, fmtDate, weekEnd, REPO } from '../../lib/content';
+import { url, fmtDate, weekEnd, REPO, doc, docExists, mdInline } from '../../lib/content';
 
 export function getStaticPaths() {
   return library.map((d) => ({ params: { slug: d.slug }, props: { d } }));
 }
 const { d } = Astro.props;
+const rel = d.source.replace(/^docs\//, '');
+const written = d.status && docExists(rel) ? doc(rel) : undefined;
+const bottom = written?.sections.find((s) => s.heading === 'Bottom line');
+const body = written?.sections.filter((s) => s !== bottom) ?? [];
 ---
 
 <Base title={d.title} section="library" description={d.summary}>
@@ -23,25 +28,65 @@ const { d } = Astro.props;
   />
   <section class="section">
     <div class="container layout">
-      <Placeholder outline={d.outline} />
+      {
+        written ? (
+          <article>
+            {written.status && <p class="status" set:html={mdInline(written.status)} />}
+            {bottom && <div class="bottom prose" set:html={bottom.html} />}
+            <nav class="toc" aria-label="Contents">
+              <span>Contents</span>
+              <ol>
+                {body.map((s) => (
+                  <li>
+                    <a href={`#${s.id}`}>{s.heading.replace(/^\d+\.\s*/, '')}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+            <DocBody sections={body} callouts={['7.']} />
+          </article>
+        ) : (
+          <Placeholder outline={d.outline} />
+        )
+      }
       <aside class="facts">
         <h3>Document status</h3>
         <dl>
           <div>
             <dt>Status</dt>
-            <dd><span class="badge placeholder">Placeholder</span></dd>
+            <dd>
+              {written ? (
+                <span class="badge planned">{d.status}</span>
+              ) : (
+                <span class="badge placeholder">Placeholder</span>
+              )}
+            </dd>
           </div>
-          <div>
-            <dt>Due</dt>
-            <dd>Week {d.dueWeek} · {fmtDate(weekEnd(d.dueWeek))}</dd>
-          </div>
+          {
+            !written && (
+              <div>
+                <dt>Due</dt>
+                <dd>
+                  Week {d.dueWeek} · {fmtDate(weekEnd(d.dueWeek))}
+                </dd>
+              </div>
+            )
+          }
           <div>
             <dt>Review plan items</dt>
             <dd>{d.planIds.join(', ')}</dd>
           </div>
           <div>
-            <dt>Source file (when written)</dt>
-            <dd><code>{d.source}</code></dd>
+            <dt>{written ? 'Source file' : 'Source file (when written)'}</dt>
+            <dd>
+              {written ? (
+                <a href={`${REPO}/blob/main/${d.source}`} target="_blank" rel="noopener">
+                  <code>{d.source}</code>
+                </a>
+              ) : (
+                <code>{d.source}</code>
+              )}
+            </dd>
           </div>
           <div>
             <dt>Planned in</dt>
@@ -64,9 +109,43 @@ const { d } = Astro.props;
     font-size: 0.82rem;
     word-break: break-all;
   }
+  .status {
+    margin: 0 0 20px;
+    font-size: 0.86rem;
+    color: var(--muted);
+  }
+  .bottom {
+    font-size: 1.05rem;
+    border-left: 4px solid var(--geomid);
+    padding: 4px 0 4px 20px;
+    margin-bottom: 28px;
+  }
+  .toc {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    margin-bottom: 36px;
+    font-size: 0.92rem;
+  }
+  .toc span {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--geomid);
+  }
+  .toc ol {
+    margin: 8px 0 0;
+    padding-left: 20px;
+    columns: 2;
+    column-gap: 32px;
+  }
   @media (max-width: 900px) {
     .layout {
       grid-template-columns: 1fr;
+    }
+    .toc ol {
+      columns: 1;
     }
   }
 </style>

@@ -2,7 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import PageTitle from '../../components/PageTitle.astro';
 import ScoreBar from '../../components/ScoreBar.astro';
-import { agencies, brief, url, REPO, fmtDate, weekStart, weekEnd, groupLabel, mdInline } from '../../lib/content';
+import { agencies, brief, url, REPO, fmtDate, weekStart, weekEnd, groupLabel, mdInline, hasPitch } from '../../lib/content';
 import { usd, weeksLabel } from '../../lib/format';
 import { findings, stageOverride } from '../../data/scorecard';
 
@@ -53,6 +53,11 @@ const factors = [
                   <span class="id-chip">{idea.id}</span>
                   <span set:html={mdInline(idea.text)} />
                   {n === 0 && <span class="badge planned">First prototype</span>}
+                  {hasPitch(idea.id) && (
+                    <a class="pitch-link" href={url(`pitches/${idea.id.toLowerCase()}/`)}>
+                      One-page pitch
+                    </a>
+                  )}
                 </li>
               ))
             }
@@ -194,6 +199,13 @@ const factors = [
   }
   .ideas li .id-chip {
     justify-self: start;
+  }
+  .pitch-link {
+    grid-column: 2;
+    justify-self: start;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    font-weight: 600;
   }
   .ideas li .badge {
     grid-column: 2;

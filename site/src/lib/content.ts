@@ -29,6 +29,11 @@ function rewriteHref(href: string, fromDir: string): string {
   const agency = rel.match(/^agencies\/([a-z]+)\.md$/);
   if (agency && agency[1] !== 'landscape') return url(`agencies/${agency[1]}/`) + anchor;
   if (rel === 'roadmap.md') return url('plan/') + anchor;
+  if (rel === 'pitches/README.md' || rel === 'pitches') return url('pitches/') + anchor;
+  const pitch = rel.match(/^pitches\/([a-z]+-\d+)\.md$/);
+  if (pitch) return url(`pitches/${pitch[1]}/`) + anchor;
+  if (rel === 'playbook/methodology.md') return url('library/methodology/') + anchor;
+  if (rel === 'playbook/sba-case-study.md') return url('case-study/sba/') + anchor;
   return `${BLOB}/${rel}${anchor}`;
 }
 
@@ -248,3 +253,50 @@ export function roadmap() {
 
 /** Prose before the first table in a markdown block. */
 export const proseOnly = (block: string) => block.split('\n|')[0].trim();
+
+// ---------------------------------------------------------------------------
+// Long-form documents: one-page pitches (docs/pitches/) and the playbook
+// (docs/playbook/). Each is split into its level-2 sections.
+// ---------------------------------------------------------------------------
+export interface Doc {
+  title: string;
+  /** Rendered paragraph(s) between the title and the first section. */
+  meta: string;
+  /** Plain-text status line, if the intro has one. */
+  status: string;
+  sections: { heading: string; id: string; html: string; src: string }[];
+}
+
+const slugify = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+export function doc(rel: string): Doc {
+  const src = read(rel);
+  const dir = path.posix.dirname(rel);
+  const title = src.match(/^# (.+)$/m)?.[1].trim() ?? rel;
+  const body = src.replace(/^# .+\n/, '');
+  const first = body.search(/^## /m);
+  const intro = (first < 0 ? body : body.slice(0, first)).trim();
+  const rest = first < 0 ? '' : body.slice(first);
+  const sections = rest
+    .split(/^## /m)
+    .filter(Boolean)
+    .map((chunk) => {
+      const nl = chunk.indexOf('\n');
+      const heading = chunk.slice(0, nl).trim();
+      const s = chunk.slice(nl + 1).trim();
+      return { heading, id: slugify(heading), html: md(s, dir), src: s };
+    });
+  return {
+    title,
+    meta: md(intro, dir),
+    status: intro.match(/\*\*Status:\*\* ([^\n]+(?:\n(?!\n)[^\n]+)*)/)?.[1].replace(/\n/g, ' ') ?? '',
+    sections,
+  };
+}
+
+export const docExists = (rel: string) => fs.existsSync(path.join(DOCS, rel));
+
+/** The one-page pitch for a roadmap idea, e.g. "HHS-1". */
+export const pitchPath = (id: string) => `pitches/${id.toLowerCase()}.md`;
+export const hasPitch = (id: string) => docExists(pitchPath(id));

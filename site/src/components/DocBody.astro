@@ -1,0 +1,72 @@
+---
+// Renders the level-2 sections of a docs/ Markdown file (see doc() in
+// lib/content.ts). Sections named in `callouts` get a highlighted panel.
+import type { Doc } from '../lib/content';
+interface Props {
+  sections: Doc['sections'];
+  callouts?: string[];
+  numbered?: boolean;
+}
+const { sections, callouts = [], numbered = false } = Astro.props;
+---
+
+<div class="doc-body">
+  {
+    sections.map((s, i) => (
+      <section id={s.id} class:list={['doc-sec', { callout: callouts.some((c) => s.heading.startsWith(c)) }]}>
+        <h2>
+          {numbered && <span class="num">{i + 1}</span>}
+          {s.heading.replace(/^\d+\.\s*/, '')}
+        </h2>
+        <div class="prose" set:html={s.html} />
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .doc-body {
+    display: grid;
+    gap: 30px;
+  }
+  .doc-sec h2 {
+    font-size: 1.45rem;
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .num {
+    font-family: var(--font-display);
+    color: var(--geogold);
+    font-size: 1.3rem;
+    min-width: 1.2em;
+  }
+  .callout {
+    background: var(--geomist);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--geogold);
+    border-radius: var(--radius);
+    padding: 18px 22px 6px;
+  }
+  .callout h2 {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 8px;
+    font-size: 1.25rem;
+  }
+  @media print {
+    .doc-body {
+      gap: 14px;
+    }
+    .doc-sec {
+      break-inside: avoid;
+    }
+    .doc-sec h2 {
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+    }
+  }
+</style>

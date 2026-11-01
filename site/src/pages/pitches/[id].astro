@@ -1,0 +1,170 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import DocBody from '../../components/DocBody.astro';
+import { roadmap, url, doc, hasPitch, pitchPath, agencies, fmtDate, weekEnd } from '../../lib/content';
+
+export function getStaticPaths() {
+  const list = roadmap().startFirst.filter((t) => hasPitch(t.id));
+  return list.map((t, i) => ({
+    params: { id: t.id.toLowerCase() },
+    props: { t, prev: list[i - 1], next: list[i + 1] },
+  }));
+}
+const { t, prev, next } = Astro.props;
+const d = doc(pitchPath(t.id));
+const a = agencies().find((x) => x.ideas.some((i) => i.id === t.id))!;
+const title = d.title.replace(/^[A-Z]+-\d+:\s*/, '');
+const endWeek = Number(t.weeks.split('-').pop());
+const forLine = d.meta.match(/<strong>For:<\/strong>\s*([^<]+?)\.\s*<strong>/)?.[1] ?? t.takeTo;
+const label = (x?: { id: string }) => (x ? `pitches/${x.id.toLowerCase()}/` : '');
+---
+
+<Base title={`${t.id}: ${title}`} section="pitches" description={`One-page pitch: ${t.title}. Targets ${t.scheme}.`}>
+  <PageTitle
+    eyebrow={`One-page pitch · ${t.n} of the first ten`}
+    title={title}
+    lead={`${t.title}. Targets ${t.scheme.charAt(0).toLowerCase()}${t.scheme.slice(1)}.`}
+    crumbs={[
+      { label: 'Scorecard', href: url() },
+      { label: 'Pitches', href: url('pitches/') },
+    ]}
+  >
+    <button class="btn no-print" type="button" onclick="window.print()">Print or save as PDF</button>
+  </PageTitle>
+
+  <section class="section">
+    <div class="container layout">
+      <article>
+        <DocBody sections={d.sections} callouts={['Exposure', 'What we ask for']} />
+      </article>
+
+      <aside>
+        <div class="facts">
+          <h3>At a glance</h3>
+          <dl>
+            <div>
+              <dt>Investigation</dt>
+              <dd><span class="id-chip">{t.id}</span></dd>
+            </div>
+            <div>
+              <dt>Agency</dt>
+              <dd><a href={url(`agencies/${a.slug}/`)}>{a.name}</a> · priority {a.rank} of 33</dd>
+            </div>
+            <div>
+              <dt>Phase 1 weeks</dt>
+              <dd>Weeks {t.weeks} · results by {fmtDate(weekEnd(endWeek))}</dd>
+            </div>
+            <div>
+              <dt>Leads go to</dt>
+              <dd>{forLine}</dd>
+            </div>
+            <div>
+              <dt>Fraud savings identified</dt>
+              <dd><span class="badge pending">Pending</span></dd>
+            </div>
+          </dl>
+        </div>
+        <div class="facts method no-print">
+          <h3>Behind every pitch</h3>
+          <p>
+            The <a href={url('case-study/sba/')}>SBA case study</a> shows the method on real federal money. The{' '}
+            <a href={url('library/methodology/')}>methodology</a> explains scoring, validation and how a figure moves from
+            Pending to confirmed savings.
+          </p>
+        </div>
+      </aside>
+    </div>
+
+    <nav class="container pager no-print" aria-label="Other pitches">
+      {prev ? <a href={url(label(prev))}>← {prev.id}</a> : <span />}
+      <a href={url('pitches/')}>All ten pitches</a>
+      {next ? <a href={url(label(next))}>{next.id} →</a> : <span />}
+    </nav>
+  </section>
+</Base>
+
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 40px;
+    align-items: start;
+  }
+  aside {
+    display: grid;
+    gap: 18px;
+    position: sticky;
+    top: 20px;
+  }
+  .method p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  button.btn {
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-weight: 600;
+  }
+  .pager a {
+    text-decoration: none;
+  }
+  @media (max-width: 900px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+    aside {
+      position: static;
+    }
+  }
+  @media print {
+    @page {
+      size: letter;
+      margin: 0.45in 0.5in;
+    }
+    :global(body) {
+      font-size: 10.5px;
+      line-height: 1.4;
+    }
+    :global(.title-band) {
+      padding: 6px 0 10px !important;
+    }
+    :global(.title-band h1) {
+      font-size: 1.7rem !important;
+      max-width: none !important;
+    }
+    :global(.title-band .lead) {
+      font-size: 0.95rem !important;
+      margin-top: 4px !important;
+    }
+    :global(.crumbs),
+    :global(.footer),
+    :global(.site-header) {
+      display: none !important;
+    }
+    .section {
+      padding: 10px 0 0;
+    }
+    .layout {
+      grid-template-columns: minmax(0, 1fr) 190px;
+      gap: 18px;
+    }
+    aside {
+      position: static;
+    }
+    :global(.prose p),
+    :global(.prose ul),
+    :global(.prose ol) {
+      margin: 0 0 4px !important;
+    }
+  }
+</style>

@@ -12,7 +12,7 @@ const list = agencies();
   <PageTitle
     eyebrow="Section 4 · Research library"
     title="Research, detailed plans, results and methodology"
-    lead="The long-form documents behind the scorecard. Each is a placeholder with its planned outline and due date, and will be filled in as Phase 1 work is completed."
+    lead="The long-form documents behind the scorecard. Documents not yet written show their planned outline and due date, and are filled in as Phase 1 work is completed."
     crumbs={[{ label: 'Scorecard', href: url() }]}
   />
 
@@ -28,8 +28,12 @@ const list = agencies();
                 .map((d) => (
                   <a class="doc" href={url(`library/${d.slug}/`)}>
                     <div class="top">
-                      <span class="badge placeholder">Placeholder</span>
-                      <span class="due">Due {fmtDate(weekEnd(d.dueWeek))}</span>
+                      {d.status ? (
+                        <span class="badge planned">{d.status}</span>
+                      ) : (
+                        <span class="badge placeholder">Placeholder</span>
+                      )}
+                      <span class="due">{d.status ? 'Written' : `Due ${fmtDate(weekEnd(d.dueWeek))}`}</span>
                     </div>
                     <h3>{d.title}</h3>
                     <p>{d.summary}</p>

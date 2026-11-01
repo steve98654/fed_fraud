@@ -1,0 +1,156 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import { roadmap, url, doc, hasPitch, pitchPath, agencies } from '../../lib/content';
+
+const r = roadmap();
+const intro = doc('pitches/README.md');
+const agencyOf = (id: string) => agencies().find((a) => a.ideas.some((i) => i.id === id));
+const items = r.startFirst
+  .filter((t) => hasPitch(t.id))
+  .map((t) => ({ ...t, doc: doc(pitchPath(t.id)), agency: agencyOf(t.id) }));
+const forLine = (d: ReturnType<typeof doc>) =>
+  d.meta.match(/<strong>For:<\/strong>\s*([^<]+?)\.\s*<strong>/)?.[1] ?? '';
+---
+
+<Base
+  title="One-page pitches"
+  section="pitches"
+  description="One-page pitches for the ten investigations to start first, written to take to the receiving office."
+>
+  <PageTitle
+    eyebrow="Pitches · The ten to start first"
+    title="One-page pitches for agency leaders"
+    lead="Each pitch states the problem, the public data, the detection method, the program's exposure from public sources, what we ask the agency for and what it gets back."
+    crumbs={[{ label: 'Scorecard', href: url() }]}
+  >
+    <div class="title-actions">
+      <a class="btn" href={url('case-study/sba/')}>SBA case study</a>
+      <a class="btn" href={url('library/methodology/')}>Methodology</a>
+    </div>
+  </PageTitle>
+
+  <section class="section">
+    <div class="container">
+      <div class="notice" role="note">
+        <span aria-hidden="true">⚑</span>
+        <span>
+          <strong>Exposure is not savings.</strong> Exposure figures are public program-level numbers such as GAO improper
+          payment estimates, which include errors as well as fraud. Savings from this work read <em>Pending</em> until a
+          screen passes validation and a lead package clears counsel review.
+        </span>
+      </div>
+
+      <ol class="pitches">
+        {
+          items.map((t) => (
+            <li>
+              <a href={url(`pitches/${t.id.toLowerCase()}/`)}>
+                <span class="n">{t.n}</span>
+                <span class="body">
+                  <span class="row1">
+                    <span class="id-chip">{t.id}</span>
+                    {t.agency && <span class="agency">{t.agency.short}</span>}
+                    <span class="weeks">Weeks {t.weeks}</span>
+                    <span class="badge pending">Savings pending</span>
+                  </span>
+                  <span class="title">{t.doc.title.replace(/^[A-Z]+-\d+:\s*/, '')}</span>
+                  <span class="scheme">
+                    <strong>Targets:</strong> {t.scheme}.
+                  </span>
+                  <span class="for">
+                    <strong>For:</strong> {forLine(t.doc) || t.takeTo}.
+                  </span>
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .title-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .notice {
+    margin-bottom: 28px;
+  }
+  .pitches {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr));
+    gap: 14px;
+  }
+  .pitches a {
+    display: flex;
+    gap: 16px;
+    height: 100%;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    background: #fff;
+    text-decoration: none;
+    color: var(--ink);
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .pitches a:hover {
+    box-shadow: 0 10px 28px rgba(0, 46, 99, 0.08);
+    transform: translateY(-2px);
+    color: var(--ink);
+  }
+  .n {
+    flex: none;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--geogold);
+    width: 1.4em;
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+  }
+  .row1 {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .agency {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--geomid);
+  }
+  .weeks {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .row1 .badge {
+    margin-left: auto;
+  }
+  .title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--coolblack);
+    line-height: 1.25;
+  }
+  .scheme,
+  .for {
+    font-size: 0.86rem;
+    color: var(--muted);
+  }
+  .body strong {
+    color: var(--coolblack);
+    font-weight: 600;
+  }
+</style>

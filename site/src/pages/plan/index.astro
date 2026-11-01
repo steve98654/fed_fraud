@@ -1,6 +1,6 @@
 ---
 import PlanShell from '../../components/PlanShell.astro';
-import { roadmap, md, url, agencies } from '../../lib/content';
+import { roadmap, md, url, agencies, hasPitch } from '../../lib/content';
 
 const r = roadmap();
 const slugOf = (id: string) => agencies().find((a) => a.ideas.some((i) => i.id === id))?.slug;
@@ -44,6 +44,11 @@ const slugOf = (id: string) => agencies().find((a) => a.ideas.some((i) => i.id =
             <p>
               <strong>Targets:</strong> {t.scheme}. <strong>Take to:</strong> {t.takeTo}.
             </p>
+            {hasPitch(t.id) && (
+              <a class="pitch" href={url(`pitches/${t.id.toLowerCase()}/`)}>
+                Read the one-page pitch →
+              </a>
+            )}
           </div>
         </li>
       ))
@@ -114,6 +119,13 @@ const slugOf = (id: string) => agencies().find((a) => a.ideas.some((i) => i.id =
   .body strong {
     color: var(--coolblack);
     font-weight: 600;
+  }
+  .pitch {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-decoration: none;
   }
   @media (max-width: 960px) {
     .two {
