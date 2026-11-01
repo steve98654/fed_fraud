@@ -13,13 +13,13 @@ interface Props {
   description?: string;
   section?: 'scorecard' | 'agencies' | 'plan' | 'library';
 }
-const SITE = 'Federal Fraud Scorecard';
+const SITE = 'The Geodesic Accountability Office';
 const {
   title,
   section,
-  description = 'Geodesic Solutions scorecard and plans for finding fraud across the 33 largest federal agencies, extending the SBA work.',
+  description = 'The Geodesic Accountability Office: fraud savings scorecard and plans for finding fraud across the 33 largest federal agencies, extending the SBA work.',
 } = Astro.props;
-const fullTitle = title ? `${title} | ${SITE}` : `${SITE} | Geodesic Solutions`;
+const fullTitle = title ? `${title} | ${SITE}` : `${SITE} | Federal fraud scorecard`;
 ---
 
 <!doctype html>
@@ -33,6 +33,7 @@ const fullTitle = title ? `${title} | ${SITE}` : `${SITE} | Geodesic Solutions`;
     <link rel="icon" type="image/png" href={url('favicon.png')} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
+    <meta property="og:site_name" content={SITE} />
   </head>
   <body>
     <a class="sr-only" href="#main">Skip to content</a>
