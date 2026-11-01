@@ -1,0 +1,455 @@
+---
+// Printable agency leave-behind, built from the same sources as the agency
+// page. scripts/briefs.mjs prints each one to public/downloads/briefs/<slug>.pdf.
+import '@fontsource/trirong/300.css';
+import '@fontsource/trirong/400.css';
+import '@fontsource-variable/inter';
+import '../../styles/global.css';
+import {
+  agencies, briefSections, md, mdInline, url, fmtDate, weekStart, weekEnd, groupLabel, phase2Ask, deliverable, hasPitch,
+} from '../../lib/content';
+import { usd, weeksLabel } from '../../lib/format';
+import { toolsFor } from '../../data/tools';
+
+export function getStaticPaths() {
+  return agencies().map((a) => ({ params: { slug: a.slug } }));
+}
+
+const a = agencies().find((x) => x.slug === Astro.params.slug)!;
+const s = briefSections(a.slug);
+const intro = s.get('_intro') ?? '';
+const asOf = intro.match(/\*\*As of:\*\* (\d{4}-\d{2}-\d{2})/)?.[1] ?? '2026-11-01';
+const bottom = (s.get('Bottom line') ?? '').split('\n\n')[0].replace(/\n/g, ' ');
+const pick = (k: string) => md(s.get(k) ?? '', 'agencies');
+const ask = phase2Ask(a.slug);
+const deliver = deliverable(a.slug);
+const tool = toolsFor(a.slug)[0];
+const factors = [
+  ['Exposure', a.factors.exposure],
+  ['Public data', a.factors.data],
+  ['SBA method fit', a.factors.fit],
+  ['Actionability', a.factors.action],
+] as const;
+const title = `${a.short} fraud brief | The Geodesic Accountability Office`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{title}</title>
+    <link rel="icon" type="image/png" href={url('favicon.png')} />
+  </head>
+  <body>
+    <div class="toolbar no-print">
+      <a href={url(`agencies/${a.slug}/`)}>← Back to the {a.short} plan</a>
+      <span>
+        <a class="btn" href={url(`downloads/briefs/${a.slug}.pdf`)}>Download PDF</a>
+        <button class="btn primary" type="button" onclick="window.print()">Print</button>
+      </span>
+    </div>
+
+    <article class="sheet">
+      <header class="mast">
+        <div class="brand">
+          <img src={url('images/icon.png')} alt="" width="388" height="353" />
+          <span>The Geodesic Accountability Office</span>
+        </div>
+        <div class="tag">Agency brief · {fmtDate(asOf)}<br />Draft for discussion · Public data only</div>
+      </header>
+
+      <div class="head">
+        <span class="eyebrow">Priority {a.rank} of 33 · score {a.score.toFixed(1)}</span>
+        <h1>{a.name}</h1>
+        <p class="lead" set:html={mdInline(bottom, 'agencies')} />
+      </div>
+
+      <div class="grid">
+        <div class="main">
+          <section class="ideas">
+            <h2>Investigations we propose</h2>
+            <ol>
+              {
+                a.ideas.map((idea, n) => (
+                  <li>
+                    <span class="id-chip">{idea.id}</span>
+                    <span>
+                      <span set:html={mdInline(idea.text)} />
+                      {n === 0 && <em> First prototype.</em>}
+                      {hasPitch(idea.id) && <em class="pitch"> One-page pitch available.</em>}
+                    </span>
+                  </li>
+                ))
+              }
+            </ol>
+          </section>
+
+          <section><h2>Exposure</h2><div class="prose" set:html={pick('Exposure')} /></section>
+          <section><h2>Public data we use</h2><div class="prose" set:html={pick('Public data we can use')} /></section>
+          <section><h2>How we detect it</h2><div class="prose" set:html={pick('Detection plays')} /></section>
+          <section><h2>First prototype</h2><div class="prose" set:html={pick('First prototype')} /></section>
+        </div>
+
+        <aside>
+          <div class="facts">
+            <h3>Scorecard</h3>
+            <dl>
+              <div><dt>Fraud savings identified</dt><dd><span class="badge pending">Pending</span></dd></div>
+              <div>
+                <dt>Phase 1 window</dt>
+                <dd>{weeksLabel(a.startWeek, a.endWeek)}<br /><span class="soft">{fmtDate(weekStart(a.startWeek))} to {fmtDate(weekEnd(a.endWeek))}</span></dd>
+              </div>
+              <div><dt>Workstream</dt><dd>{groupLabel(a.group)}</dd></div>
+              <div><dt>FY2026 outlays</dt><dd>{usd(a.outlaysUsd)} <span class="soft">· budget rank {a.budgetRank}</span></dd></div>
+              <div><dt>Leads go to</dt><dd class="soft-strong">{a.takeTo}</dd></div>
+            </dl>
+          </div>
+          <div class="facts">
+            <h3>Why priority {a.rank}</h3>
+            <dl class="factors">
+              {
+                factors.map(([k, v]) => (
+                  <div>
+                    <dt>{k}</dt>
+                    <dd><span class="dots" aria-label={`${v} of 5`}>{[1, 2, 3, 4, 5].map((n) => <i class={n <= v ? 'on' : ''} />)}</span></dd>
+                  </div>
+                ))
+              }
+            </dl>
+          </div>
+          {
+            tool && (
+              <div class="facts tool">
+                <h3>Tool preview</h3>
+                <p>
+                  <strong>{tool.title}.</strong> See the wireframe of the screen {a.short} would receive.
+                </p>
+                <p class="soft">On the site: Tool previews, {tool.short}.</p>
+              </div>
+            )
+          }
+        </aside>
+      </div>
+
+      <section class="asks">
+        <div class="ask deliver">
+          <h2>Our review, delivered {deliver?.when || `week ${a.endWeek}`}</h2>
+          <p set:html={mdInline(deliver?.text ?? `A ranked lead list or a reasoned "nothing actionable from public data" by week ${a.endWeek}, plus a review memo.`)} />
+          <p class="soft">Every lead goes to an Inspector General or DOJ as a referral package with sources and caveats. Nothing is published.</p>
+        </div>
+        <div class="ask request">
+          <h2>What we ask of {a.short}</h2>
+          {
+            ask ? (
+              <>
+                <p><strong>Phase 2 data:</strong> <span set:html={mdInline(ask.data)} />.</p>
+                <p><strong>What it enables:</strong> <span set:html={mdInline(ask.enables)} />.</p>
+                <p><strong>Access route:</strong> <span set:html={mdInline(ask.route)} />.</p>
+              </>
+            ) : (
+              <p>
+                A named contact to receive leads, and a short review of the Phase 1 results to agree which internal records would
+                confirm or rule them out.
+              </p>
+            )
+          }
+        </div>
+      </section>
+
+      <section class="small">
+        <div><h2>Limits</h2><div class="prose" set:html={pick('Limits')} /></div>
+        <div><h2>Sources</h2><div class="prose" set:html={pick('Sources')} /></div>
+      </section>
+
+      <footer class="foot">
+        <span>Scores and plans are our judgment from public sources. Risk indicators are leads for Inspectors General or DOJ, not accusations.</span>
+        <span>Steve Taylor, Managing Partner, Geodesic Solutions · taylor@geodesic.pro</span>
+      </footer>
+    </article>
+  </body>
+</html>
+
+<style>
+  @page {
+    size: letter;
+    margin: 0.5in 0.55in 0.6in;
+  }
+  body {
+    background: #e9edf2;
+    font-size: 10.5pt;
+    line-height: 1.45;
+  }
+  .toolbar {
+    max-width: 8.5in;
+    margin: 18px auto 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    font-size: 0.9rem;
+  }
+  .toolbar span {
+    display: flex;
+    gap: 8px;
+  }
+  .toolbar button {
+    font: inherit;
+    cursor: pointer;
+  }
+  .sheet {
+    max-width: 8.5in;
+    margin: 0 auto 40px;
+    background: #fff;
+    padding: 0.5in 0.55in;
+    box-shadow: 0 10px 40px rgba(20, 40, 70, 0.18);
+  }
+  .mast {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    background: var(--navy);
+    color: #cdd3e0;
+    border-bottom: 3px solid var(--geogold);
+    padding: 10px 16px;
+    margin: -0.5in -0.55in 18px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    color: #fff;
+    font-size: 14pt;
+    font-weight: 300;
+  }
+  .brand img {
+    height: 30px;
+    width: auto;
+  }
+  .tag {
+    font-size: 8pt;
+    text-align: right;
+    line-height: 1.35;
+  }
+  .head h1 {
+    font-size: 22pt;
+    font-weight: 300;
+    margin: 6px 0 6px;
+  }
+  .lead {
+    font-size: 11.5pt;
+    color: var(--ink);
+    margin: 0 0 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 2.15in;
+    gap: 0.28in;
+    align-items: start;
+  }
+  h2 {
+    font-family: var(--font-sans);
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--geomid);
+    margin: 0 0 5px;
+  }
+  section {
+    margin-bottom: 11px;
+    break-inside: avoid;
+  }
+  .prose {
+    max-width: none;
+  }
+  .prose :global(p),
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin: 0 0 5px;
+  }
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.1rem;
+  }
+  .prose :global(li) {
+    margin: 2px 0;
+  }
+  .prose :global(a) {
+    color: var(--geomid);
+    text-decoration: none;
+  }
+  .ideas {
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--geogold);
+    border-radius: var(--radius);
+    padding: 9px 12px;
+  }
+  .ideas ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 5px;
+  }
+  .ideas li {
+    display: grid;
+    grid-template-columns: 62px 1fr;
+    gap: 8px;
+    align-items: baseline;
+  }
+  .ideas em.pitch {
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .ideas em {
+    color: var(--geomid);
+    font-style: normal;
+    font-weight: 600;
+  }
+  .id-chip {
+    font-size: 7.5pt;
+    justify-self: start;
+  }
+  aside {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .facts {
+    padding: 11px 13px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .facts h3 {
+    font-size: 7.5pt;
+    margin-bottom: 7px;
+  }
+  .facts dl {
+    gap: 7px;
+  }
+  .facts dt {
+    font-size: 7.5pt;
+  }
+  .facts dd {
+    font-size: 9pt;
+  }
+  .facts p {
+    margin: 0 0 4px;
+    font-size: 9pt;
+  }
+  .factors div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .dots {
+    display: inline-flex;
+    gap: 3px;
+  }
+  .dots i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--georule);
+  }
+  .dots i.on {
+    background: var(--geomid);
+  }
+  .soft {
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 8pt;
+  }
+  .soft-strong {
+    font-weight: 500;
+  }
+  .badge {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .asks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.2in;
+  }
+  .ask {
+    border-radius: var(--radius);
+    padding: 10px 13px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .ask p {
+    margin: 0 0 5px;
+  }
+  .deliver {
+    background: var(--geomist);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--geomid);
+  }
+  .request {
+    background: var(--gold-soft);
+    border: 1px solid #e8d9b8;
+    border-top: 3px solid var(--geogold);
+  }
+  .request h2 {
+    color: #7a5a1e;
+  }
+  .small {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.2in;
+    font-size: 8.5pt;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top: 9px;
+  }
+  .small .prose :global(a) {
+    word-break: break-word;
+  }
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 7.5pt;
+    color: var(--muted);
+    border-top: 2px solid var(--geogold);
+    padding-top: 6px;
+    break-inside: avoid;
+  }
+  @media print {
+    body {
+      background: #fff;
+    }
+    .sheet {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+    }
+    .mast {
+      margin: 0 0 16px;
+    }
+  }
+  @media (max-width: 700px) {
+    .sheet {
+      padding: 20px 16px;
+    }
+    .mast {
+      margin: -20px -16px 16px;
+    }
+    .grid,
+    .asks,
+    .small {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

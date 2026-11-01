@@ -1,0 +1,87 @@
+---
+// App window chrome for a tool wireframe, followed by the numbered notes that
+// explain each callout in it.
+interface Props {
+  app: string;
+  ideas: string[];
+  notes: { title: string; text: string }[];
+  foot: string;
+}
+const { app, ideas, notes, foot } = Astro.props;
+---
+
+<figure class="wf">
+  <div class="wf-window" role="img" aria-label={`Wireframe of the ${app} screen, with sample data`}>
+    <div class="wf-chrome">
+      <span class="wf-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="app">{app}</span>
+      <span class="ideas">{ideas.join(' · ')}</span>
+      <span class="ribbon">Wireframe · sample data</span>
+    </div>
+    <slot />
+    <div class="wf-foot">
+      <span>{foot}</span>
+      <span>Sample records only. No real provider, store or vendor is shown.</span>
+    </div>
+  </div>
+  <figcaption>
+    <ol class="notes">
+      {
+        notes.map((n, i) => (
+          <li>
+            <span class="n">{i + 1}</span>
+            <div>
+              <strong>{n.title}.</strong> {n.text}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </figcaption>
+</figure>
+
+<style>
+  figure {
+    margin: 0;
+  }
+  .ideas {
+    color: #9fb0c9;
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    font-size: 0.72rem;
+  }
+  .notes {
+    list-style: none;
+    margin: 28px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px 28px;
+    font-size: 0.92rem;
+  }
+  .notes li {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    gap: 10px;
+    align-items: start;
+  }
+  .n {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--geogold);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.78rem;
+    display: grid;
+    place-items: center;
+    margin-top: 1px;
+  }
+  .notes strong {
+    color: var(--coolblack);
+  }
+  @media (max-width: 640px) {
+    .ideas {
+      display: none;
+    }
+  }
+</style>

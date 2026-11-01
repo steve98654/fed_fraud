@@ -25,8 +25,29 @@ with `SITE_BASE=/fed_fraud/ npm run build`.
 2. **Agency plans** (`/agencies/<slug>/`): one page per agency, rendered from
    the briefs in `docs/agencies/` plus that agency's roadmap ideas.
 3. **Roadmap** (`/plan/`): the five-page roadmap from `docs/roadmap.md`.
-4. **Research library** (`/library/`): placeholder pages for methodology,
+4. **Tool previews** (`/tools/`): wireframes of the detection screens for
+   three of the first ten investigations (HHS-1 hospice, DOD-1 set-asides,
+   USDA-1 SNAP retailers). Sample records only; defined in `src/data/tools.ts`
+   and `src/components/tools/`.
+5. **Research library** (`/library/`): placeholder pages for methodology,
    research, detailed plans and per-agency results, to be filled in later.
+6. **Downloads** (`/downloads/`): a PDF brief per agency plus the roadmap,
+   review plan, ranking and working plan PDFs (served from `../docs`).
+
+## Agency brief PDFs
+
+Each agency has a printable leave-behind at `/briefs/<slug>/`, built from its
+brief, roadmap ideas and review plan (including the Phase 2 data request).
+The PDFs in `public/downloads/briefs/` are generated from those pages with
+the Chromium that Playwright provides:
+
+```sh
+npm run build      # without SITE_BASE
+npm run briefs     # all agencies, or: npm run briefs hhs dod
+```
+
+Rerun both after editing a brief, `docs/roadmap.md` or `docs/review_plan.md`,
+and commit the updated PDFs.
 
 ## Where the content comes from
 

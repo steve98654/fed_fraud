@@ -1,0 +1,323 @@
+/* Shared look for the detection tool wireframes: an app window drawn in the
+   site palette, with numbered gold callouts that the notes below explain. */
+.wf {
+  --wf-bg: #f3f6fa;
+  --wf-panel: #ffffff;
+  --wf-line: #d5deea;
+  --wf-ink: #263043;
+  --wf-soft: #6b7587;
+  --risk-hi: #b5473a;
+  --risk-md: #c98a2e;
+  --risk-lo: #5f8fbf;
+  font-size: 0.86rem;
+  color: var(--wf-ink);
+}
+.wf-window {
+  border: 1px solid #b9c6d8;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--wf-bg);
+  box-shadow: 0 18px 40px -24px rgba(20, 40, 70, 0.45);
+}
+.wf-chrome {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--navy);
+  color: #dfe5ef;
+  padding: 9px 14px;
+  font-size: 0.8rem;
+}
+.wf-dots {
+  display: flex;
+  gap: 6px;
+}
+.wf-dots i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4a5470;
+}
+.wf-chrome .app {
+  font-weight: 600;
+  color: #fff;
+}
+.wf-chrome .ribbon {
+  margin-left: auto;
+  background: var(--geogold);
+  color: #1d1708;
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.wf-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 14px;
+  background: #fff;
+  border-bottom: 1px solid var(--wf-line);
+}
+.wf-select {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  border: 1px solid var(--wf-line);
+  border-radius: 5px;
+  padding: 4px 10px;
+  background: #fff;
+  white-space: nowrap;
+}
+.wf-select b {
+  font-weight: 600;
+}
+.wf-select::after {
+  content: '▾';
+  color: var(--wf-soft);
+  font-size: 0.7rem;
+}
+.wf-select.plain::after {
+  content: none;
+}
+.wf-toolbar .spacer {
+  flex: 1;
+}
+.wf-btn {
+  border: 1px solid var(--geomid);
+  color: var(--geomid);
+  border-radius: 5px;
+  padding: 4px 11px;
+  font-weight: 600;
+  background: #fff;
+  white-space: nowrap;
+}
+.wf-btn.solid {
+  background: var(--geomid);
+  color: #fff;
+}
+.wf-body {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+}
+.wf-cols {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+}
+.wf-panel {
+  position: relative;
+  background: var(--wf-panel);
+  border: 1px solid var(--wf-line);
+  border-radius: 7px;
+  padding: 12px 14px;
+  min-width: 0;
+}
+.wf-panel h4 {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--geomid);
+  margin: 0 0 10px;
+  padding-right: 28px;
+}
+.wf-panel .sub {
+  color: var(--wf-soft);
+  font-size: 0.78rem;
+  margin: -6px 0 10px;
+}
+/* Numbered callout pinned to a panel corner */
+.co {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--geogold);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.78rem;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 0 3px #fff;
+  z-index: 2;
+}
+.wf svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.wf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.wf-table th {
+  background: #eef3f9;
+  color: var(--wf-soft);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  padding: 6px 8px;
+}
+.wf-table td {
+  padding: 6px 8px;
+  border-top: 1px solid #edf1f6;
+  vertical-align: middle;
+}
+.wf-table tbody tr:nth-child(even) td {
+  background: transparent;
+}
+.wf-table tr.sel td {
+  background: #fdf7ea !important;
+}
+.wf-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.wf-table td.mono {
+  white-space: nowrap;
+}
+.wf-table td .sub2 {
+  display: block;
+  color: var(--wf-soft);
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+}
+.mono {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 0.76rem;
+}
+.score {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.score i {
+  display: inline-block;
+  width: 46px;
+  height: 6px;
+  border-radius: 3px;
+  background: #e7ecf3;
+  overflow: hidden;
+}
+.score i::before {
+  content: '';
+  display: block;
+  height: 100%;
+  width: var(--w);
+  background: var(--c, var(--risk-hi));
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.chip {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: #eef3f9;
+  color: var(--geodark);
+  border: 1px solid var(--wf-line);
+  white-space: nowrap;
+}
+.chip.hot {
+  background: #f9e9e6;
+  border-color: #ecc8c1;
+  color: #8c3328;
+}
+.chip.warn {
+  background: #fbf1df;
+  border-color: #ecd7ae;
+  color: #7a5414;
+}
+/* Peer comparison rows: label, bar with peer marker, value */
+.peer {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr) 4.2rem;
+  gap: 8px;
+  align-items: center;
+  margin: 7px 0;
+  font-size: 0.78rem;
+}
+.peer .bar {
+  position: relative;
+  height: 8px;
+  background: #e7ecf3;
+  border-radius: 4px;
+}
+.peer .bar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--w);
+  background: var(--c, var(--risk-hi));
+  border-radius: 4px;
+}
+.peer .bar em {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  left: var(--p);
+  width: 2px;
+  background: var(--wf-ink);
+}
+.peer b {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--wf-soft);
+  font-size: 0.72rem;
+  margin-top: 8px;
+}
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.wf-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 14px;
+  border-top: 1px solid var(--wf-line);
+  background: #fff;
+  color: var(--wf-soft);
+  font-size: 0.74rem;
+}
+
+@media (max-width: 860px) {
+  .wf-cols {
+    grid-template-columns: 1fr;
+  }
+  .wf-table .hide-sm {
+    display: none;
+  }
+  .wf-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
