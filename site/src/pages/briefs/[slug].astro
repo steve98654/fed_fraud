@@ -113,7 +113,7 @@ const title = `${a.short} fraud brief | The Geodesic Accountability Office`;
                 factors.map(([k, v]) => (
                   <div>
                     <dt>{k}</dt>
-                    <dd><span class="dots" aria-label={`${v} of 5`}>{[1, 2, 3, 4, 5].map((n) => <i class={n <= v ? 'on' : ''} />)}</span></dd>
+                    <dd><span class="dots" role="img" aria-label={`${v} of 5`}>{[1, 2, 3, 4, 5].map((n) => <i class={n <= v ? 'on' : ''} />)}</span></dd>
                   </div>
                 ))
               }
@@ -285,7 +285,9 @@ const title = `${a.short} fraud brief | The Geodesic Accountability Office`;
   }
   .prose :global(a) {
     color: var(--geomid);
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
   }
   .ideas {
     border: 1px solid var(--line);
