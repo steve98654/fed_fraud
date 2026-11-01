@@ -1,0 +1,46 @@
+---
+// Small 1-to-5 meter used for priority factors.
+interface Props {
+  value: number;
+  max?: number;
+  label?: string;
+  decimals?: number;
+}
+const { value, max = 5, label, decimals = 0 } = Astro.props;
+const pct = Math.max(0, Math.min(100, (value / max) * 100));
+---
+
+<span class="meter" role="img" aria-label={`${label ?? 'Score'}: ${value} of ${max}`}>
+  <span class="track"><span class="fill" style={`width:${pct}%`}></span></span>
+  <span class="num">{value.toFixed(decimals)}</span>
+</span>
+
+<style>
+  .meter {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 96px;
+  }
+  .track {
+    flex: 1;
+    height: 6px;
+    background: var(--geolight);
+    border-radius: 3px;
+    overflow: hidden;
+    min-width: 56px;
+  }
+  .fill {
+    display: block;
+    height: 100%;
+    background: var(--geomid);
+    border-radius: 3px;
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--coolblack);
+    min-width: 2ch;
+  }
+</style>

@@ -1,0 +1,177 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import { library } from '../../data/library';
+import { agencies, url, fmtDate, weekEnd } from '../../lib/content';
+
+const kinds = ['Methodology', 'Research', 'Plan', 'Results'] as const;
+const list = agencies();
+---
+
+<Base title="Research library" section="library">
+  <PageTitle
+    eyebrow="Section 4 · Research library"
+    title="Research, detailed plans, results and methodology"
+    lead="The long-form documents behind the scorecard. Each is a placeholder with its planned outline and due date, and will be filled in as Phase 1 work is completed."
+    crumbs={[{ label: 'Scorecard', href: url() }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="grid">
+        {
+          kinds.map((k) => (
+            <div class="col">
+              <h2 class="kind">{k}</h2>
+              {library
+                .filter((d) => d.kind === k)
+                .map((d) => (
+                  <a class="doc" href={url(`library/${d.slug}/`)}>
+                    <div class="top">
+                      <span class="badge placeholder">Placeholder</span>
+                      <span class="due">Due {fmtDate(weekEnd(d.dueWeek))}</span>
+                    </div>
+                    <h3>{d.title}</h3>
+                    <p>{d.summary}</p>
+                    <div class="ids">
+                      {d.planIds.map((id) => (
+                        <span class="id-chip">{id}</span>
+                      ))}
+                    </div>
+                  </a>
+                ))}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Results</span>
+          <h2>Detailed results by agency</h2>
+          <p>One results document per agency, filled in when its review memo is written (by week 15, February 26, 2027).</p>
+        </div>
+      </div>
+      <ul class="agencies">
+        {
+          list.map((a) => (
+            <li>
+              <a href={url(`library/results/${a.slug}/`)}>
+                <span class="rank">#{a.rank}</span>
+                <span class="name">{a.name}</span>
+                <span class="badge placeholder">Placeholder</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .kind {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--geomid);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--geogold);
+  }
+  .doc {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    text-decoration: none;
+    color: var(--ink);
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .doc:hover {
+    box-shadow: 0 10px 28px rgba(0, 46, 99, 0.08);
+    transform: translateY(-2px);
+    color: var(--ink);
+  }
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .due {
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+  h3 {
+    font-size: 1.08rem;
+  }
+  .doc p {
+    margin: 0;
+    font-size: 0.86rem;
+    color: var(--muted);
+  }
+  .ids {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .agencies {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 8px;
+  }
+  .agencies a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 0.9rem;
+  }
+  .agencies a:hover {
+    background: var(--geomist);
+  }
+  .rank {
+    font-weight: 700;
+    color: var(--geogold);
+    min-width: 2.4em;
+  }
+  .name {
+    flex: 1;
+  }
+  @media (max-width: 1000px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 600px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

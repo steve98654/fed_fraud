@@ -1,0 +1,72 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import Placeholder from '../../components/Placeholder.astro';
+import { library } from '../../data/library';
+import { url, fmtDate, weekEnd, REPO } from '../../lib/content';
+
+export function getStaticPaths() {
+  return library.map((d) => ({ params: { slug: d.slug }, props: { d } }));
+}
+const { d } = Astro.props;
+---
+
+<Base title={d.title} section="library" description={d.summary}>
+  <PageTitle
+    eyebrow={`Section 4 · ${d.kind}`}
+    title={d.title}
+    lead={d.summary}
+    crumbs={[
+      { label: 'Scorecard', href: url() },
+      { label: 'Research library', href: url('library/') },
+    ]}
+  />
+  <section class="section">
+    <div class="container layout">
+      <Placeholder outline={d.outline} />
+      <aside class="facts">
+        <h3>Document status</h3>
+        <dl>
+          <div>
+            <dt>Status</dt>
+            <dd><span class="badge placeholder">Placeholder</span></dd>
+          </div>
+          <div>
+            <dt>Due</dt>
+            <dd>Week {d.dueWeek} · {fmtDate(weekEnd(d.dueWeek))}</dd>
+          </div>
+          <div>
+            <dt>Review plan items</dt>
+            <dd>{d.planIds.join(', ')}</dd>
+          </div>
+          <div>
+            <dt>Source file (when written)</dt>
+            <dd><code>{d.source}</code></dd>
+          </div>
+          <div>
+            <dt>Planned in</dt>
+            <dd><a href={`${REPO}/blob/main/docs/review_plan.md`} target="_blank" rel="noopener">Review plan</a></dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 40px;
+    align-items: start;
+  }
+  code {
+    font-size: 0.82rem;
+    word-break: break-all;
+  }
+  @media (max-width: 900px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,107 @@
+---
+// Body of a section 4 placeholder document: planned outline, every section
+// marked "to be written".
+interface Props {
+  outline: { heading: string; note: string }[];
+}
+const { outline } = Astro.props;
+---
+
+<div class="ph">
+  <div class="stamp" aria-hidden="true">Placeholder</div>
+  <p class="intro">
+    This document has not been written yet. The outline below is what it will cover; each section is filled in as the
+    work is done and committed to the repository.
+  </p>
+  <ol>
+    {
+      outline.map((o, i) => (
+        <li>
+          <div class="h">
+            <span class="num">{i + 1}</span>
+            <h2>{o.heading}</h2>
+            <span class="badge placeholder">To be written</span>
+          </div>
+          <p class="note">{o.note}</p>
+          <div class="lines" aria-hidden="true">
+            <span />
+            <span />
+            <span class="short" />
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  .ph {
+    position: relative;
+  }
+  .stamp {
+    position: absolute;
+    right: 0;
+    top: -10px;
+    transform: rotate(-4deg);
+    border: 2px solid var(--georule);
+    color: var(--georule);
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 4px;
+  }
+  .intro {
+    color: var(--muted);
+    max-width: 64ch;
+    margin: 0 0 28px;
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+  }
+  li {
+    border: 1px dashed var(--georule);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    background: var(--geomist);
+  }
+  .h {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .num {
+    font-family: var(--font-display);
+    color: var(--geogold);
+    font-size: 1.3rem;
+  }
+  h2 {
+    font-size: 1.2rem;
+  }
+  .h .badge {
+    margin-left: auto;
+  }
+  .note {
+    margin: 6px 0 12px;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .lines {
+    display: grid;
+    gap: 7px;
+  }
+  .lines span {
+    height: 8px;
+    border-radius: 4px;
+    background: #e3e9f1;
+  }
+  .lines .short {
+    width: 55%;
+  }
+</style>

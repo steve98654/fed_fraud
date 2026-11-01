@@ -1,0 +1,129 @@
+---
+// Card grid of roadmap investigations for one workstream group.
+import { agencies, url, mdInline, weekStart, weekEnd, fmtDate } from '../lib/content';
+import { weeksLabel } from '../lib/format';
+interface Props {
+  group: string;
+}
+const list = agencies().filter((a) => a.group === Astro.props.group);
+---
+
+<div class="cards">
+  {
+    list.map((a) => (
+      <article class="card">
+        <header>
+          <div>
+            <span class="rank">#{a.rank}</span>
+            <h3>
+              <a href={url(`agencies/${a.slug}/`)}>{a.name}</a>
+            </h3>
+          </div>
+          <span class="when">
+            {weeksLabel(a.startWeek, a.endWeek)}
+            <span>
+              {fmtDate(weekStart(a.startWeek))} – {fmtDate(weekEnd(a.endWeek))}
+            </span>
+          </span>
+        </header>
+        <ul>
+          {a.ideas.map((i) => (
+            <li>
+              <span class="id-chip">{i.id}</span>
+              <span set:html={mdInline(i.text)} />
+            </li>
+          ))}
+        </ul>
+        <footer>
+          <span>
+            <strong>Take to:</strong> {a.takeTo}
+          </span>
+          <span class="badge pending">Results pending</span>
+        </footer>
+      </article>
+    ))
+  }
+</div>
+
+<style>
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr));
+    gap: 18px;
+    margin-bottom: 40px;
+  }
+  .card {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--line);
+    background: var(--geomist);
+  }
+  .rank {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--geogold);
+  }
+  h3 {
+    font-size: 1.15rem;
+  }
+  h3 a {
+    text-decoration: none;
+    color: var(--coolblack);
+  }
+  h3 a:hover {
+    text-decoration: underline;
+  }
+  .when {
+    text-align: right;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--geomid);
+    white-space: nowrap;
+  }
+  .when span {
+    display: block;
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 14px 20px;
+    display: grid;
+    gap: 10px;
+    font-size: 0.9rem;
+  }
+  li {
+    display: grid;
+    grid-template-columns: 82px 1fr;
+    gap: 10px;
+    align-items: baseline;
+  }
+  li .id-chip {
+    justify-self: start;
+  }
+  footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px 16px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    border-top: 1px dashed var(--line);
+  }
+  footer strong {
+    color: var(--coolblack);
+  }
+</style>

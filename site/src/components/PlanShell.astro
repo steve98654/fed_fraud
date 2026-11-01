@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import PageTitle from './PageTitle.astro';
+import PlanPager from './PlanPager.astro';
+import { planPages } from '../data/plan';
+import { roadmap, url, REPO } from '../lib/content';
+
+interface Props {
+  page: number;
+  lead: string;
+  resultsDue: string;
+  resultsText: string;
+}
+const { page, lead, resultsDue, resultsText } = Astro.props;
+const p = planPages[page - 1];
+const { status } = roadmap();
+---
+
+<Base title={`Roadmap ${page} of 5: ${p.short}`} section="plan">
+  <PageTitle
+    eyebrow={`Section 3 · Roadmap page ${page} of 5`}
+    title={p.title}
+    lead={lead}
+    crumbs={[
+      { label: 'Scorecard', href: url() },
+      { label: 'Roadmap', href: url('plan/') },
+    ]}
+  >
+    <div class="meta">
+      <span class="badge planned">{status.replace(/\.$/, '')}</span>
+      <a href={`${REPO}/blob/main/docs/roadmap.pdf`} target="_blank" rel="noopener">PDF version</a>
+    </div>
+  </PageTitle>
+  <div class="container pager-top no-print"><PlanPager current={page} /></div>
+
+  <section class="section">
+    <div class="container">
+      <div class="results" role="note">
+        <div>
+          <span class="label">Results on this page</span>
+          <span class="badge pending">Pending</span>
+        </div>
+        <p>{resultsText} <strong>Due {resultsDue}.</strong></p>
+      </div>
+      <slot />
+    </div>
+  </section>
+
+  <div class="container no-print bottom"><PlanPager current={page} /></div>
+</Base>
+
+<style>
+  .meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    font-size: 0.86rem;
+  }
+  .pager-top {
+    margin-top: -22px;
+    position: relative;
+  }
+  .results {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+    border: 1px solid #e8d9b8;
+    background: var(--gold-soft);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 40px;
+  }
+  .results div {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8a6a2c;
+  }
+  .results p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: #4d3f22;
+    flex: 1;
+    min-width: 260px;
+  }
+  .bottom {
+    padding-bottom: 32px;
+  }
+</style>
