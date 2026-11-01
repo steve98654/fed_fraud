@@ -1,0 +1,147 @@
+---
+// "What's new": a dated log of changes to the plans and the site, built from
+// the repository's git history at build time.
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import { changes, url, REPO, fmtDate, SHORT } from '../../lib/content';
+
+const log = changes();
+const DOC_PAGES: Record<string, { label: string; href: string }> = {
+  'roadmap.md': { label: 'Roadmap', href: 'plan/' },
+  'review_plan.md': { label: 'Review plan', href: 'downloads/' },
+  'plan.md': { label: 'Working plan', href: 'downloads/' },
+  'agencies/top33.md': { label: 'Top 33 ranking', href: 'agencies/' },
+  'playbook/methodology.md': { label: 'Methodology', href: 'library/methodology/' },
+  'playbook/sba-case-study.md': { label: 'SBA case study', href: 'case-study/sba/' },
+  'pitches/README.md': { label: 'Pitches', href: 'pitches/' },
+};
+const docLink = (d: string) => {
+  if (DOC_PAGES[d]) return DOC_PAGES[d];
+  const p = d.match(/^pitches\/([a-z]+-\d+)\.md$/);
+  if (p) return { label: `${p[1].toUpperCase()} pitch`, href: `pitches/${p[1]}/` };
+  return undefined;
+};
+const byDate = [...new Set(log.map((c) => c.date))].map((d) => ({ d, items: log.filter((c) => c.date === d) }));
+---
+
+<Base title="What's new" section="updates" description="A dated log of changes to the plans, agency briefs and this site.">
+  <PageTitle
+    eyebrow="Reference · Change log"
+    title="What's new"
+    lead="Every change to the plans, agency briefs and this site, newest first, taken from the project's history. Use it to see what moved since your last visit."
+    crumbs={[{ label: 'Scorecard', href: url() }]}
+  />
+  <section class="section">
+    <div class="container">
+      {
+        log.length === 0 ? (
+          <p class="notice" role="note">
+            The change history is not available in this build. Build from a full clone of the repository to show it.
+          </p>
+        ) : (
+          byDate.map(({ d, items }) => (
+            <section class="day" aria-labelledby={`d-${d}`}>
+              <h2 id={`d-${d}`}>
+                <time datetime={d}>{fmtDate(d)}</time>
+              </h2>
+              <ol>
+                {items.map((c) => (
+                  <li>
+                    <p class="title">
+                      {c.title}
+                      {c.pr && (
+                        <>
+                          {' '}
+                          <a href={`${REPO}/pull/${c.pr}`} target="_blank" rel="noopener" class="pr">
+                            #{c.pr}
+                          </a>
+                        </>
+                      )}
+                    </p>
+                    <p class="touched">
+                      {c.site && <span class="badge planned">Website</span>}
+                      {c.docs.map((x) => {
+                        const l = docLink(x);
+                        return l ? <a class="badge planned" href={url(l.href)}>{l.label}</a> : null;
+                      })}
+                      {c.agencies.length > 0 && (
+                        <span class="ags">
+                          Agency briefs:{' '}
+                          {c.agencies.length > 12
+                            ? `all ${c.agencies.length}`
+                            : c.agencies.map((s, i) => (
+                                <>
+                                  {i > 0 && ', '}
+                                  <a href={url(`agencies/${s}/`)}>{SHORT[s]}</a>
+                                </>
+                              ))}
+                        </span>
+                      )}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))
+        )
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .day {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: 24px;
+    padding: 18px 0;
+    border-top: 1px solid var(--line);
+  }
+  .day:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .day h2 {
+    font-size: 1.1rem;
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 16px;
+  }
+  li {
+    border-left: 3px solid var(--georule);
+    padding-left: 14px;
+  }
+  .title {
+    margin: 0;
+    font-weight: 600;
+    color: var(--coolblack);
+  }
+  .pr {
+    font-weight: 400;
+    font-size: 0.85rem;
+  }
+  .touched {
+    margin: 6px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+  a.badge {
+    text-decoration: none;
+  }
+  .ags {
+    color: var(--muted);
+  }
+  @media (max-width: 640px) {
+    .day {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
+</style>

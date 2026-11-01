@@ -65,6 +65,37 @@ const plans = [
     <div class="container">
       <div class="section-head">
         <div>
+          <span class="eyebrow">Data</span>
+          <h2>Scorecard data</h2>
+          <p>
+            The 33-agency scorecard for spreadsheets and scripts: rank, outlays, priority factors, investigations, Phase 1
+            window, stage and savings. Savings columns read <em>Pending</em> until findings are recorded.
+          </p>
+        </div>
+      </div>
+      <div class="plans">
+        <a class="plan" href={url('downloads/scorecard.csv')} download>
+          <span class="pdf">CSV</span>
+          <div>
+            <h3>Scorecard (CSV)</h3>
+            <p>One row per agency. Opens in Excel, Numbers or Google Sheets.</p>
+          </div>
+        </a>
+        <a class="plan" href={url('downloads/scorecard.json')}>
+          <span class="pdf">JSON</span>
+          <div>
+            <h3>Scorecard (JSON)</h3>
+            <p>The same rows with an as-of date and the savings rule, for dashboards and scripts.</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
           <span class="eyebrow">Agency briefs</span>
           <h2>One brief per agency</h2>
           <p>

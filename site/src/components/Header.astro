@@ -13,6 +13,15 @@ const nav = [
   { key: 'tools', label: 'Tools', href: url('tools/') },
   { key: 'library', label: 'Research library', href: url('library/') },
 ];
+const more = [
+  { key: 'investigations', label: 'All investigations', href: url('investigations/') },
+  { key: 'schedule', label: 'Phase 1 schedule', href: url('schedule/') },
+  { key: 'matrix', label: 'Priority matrix', href: url('agencies/matrix/') },
+  { key: 'compare', label: 'Compare agencies', href: url('agencies/compare/') },
+  { key: 'glossary', label: 'Glossary', href: url('glossary/') },
+  { key: 'updates', label: "What's new", href: url('updates/') },
+];
+const inMore = more.some((m) => m.key === current);
 ---
 
 <div class="utility">
@@ -51,10 +60,37 @@ const nav = [
             </li>
           ))
         }
+        <li class="more">
+          <details>
+            <summary aria-current={inMore ? 'page' : undefined}>More</summary>
+            <ul class="menu">
+              {more.map((m) => (
+                <li>
+                  <a href={m.href} aria-current={current === m.key ? 'page' : undefined}>{m.label}</a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        </li>
       </ul>
     </nav>
   </div>
 </header>
+
+<script>
+  const d = document.querySelector<HTMLDetailsElement>('.site-header .more details');
+  if (d) {
+    document.addEventListener('click', (e) => {
+      if (d.open && !d.contains(e.target as Node)) d.open = false;
+    });
+    d.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && d.open) {
+        d.open = false;
+        d.querySelector('summary')!.focus();
+      }
+    });
+  }
+</script>
 
 <style>
   .utility {
@@ -137,6 +173,60 @@ const nav = [
     color: #fff;
     background: rgba(255, 255, 255, 0.04);
   }
+  .more {
+    position: relative;
+  }
+  summary {
+    display: block;
+    padding: 30px 13px 27px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #cdd3e0;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::after {
+    content: ' ▾';
+    font-size: 0.8em;
+  }
+  summary:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  summary[aria-current='page'] {
+    color: #fff;
+    border-bottom-color: var(--geoblue);
+  }
+  .menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 60;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    min-width: 220px;
+    background: var(--navy);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: 3px solid var(--geogold);
+    border-radius: 0 0 6px 6px;
+    padding: 6px 0;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  }
+  .menu a {
+    padding: 8px 16px;
+    border-bottom: 0;
+    margin: 0;
+    white-space: nowrap;
+  }
+  .menu a[aria-current='page'] {
+    border-left: 3px solid var(--geoblue);
+    padding-left: 13px;
+  }
   nav a[aria-current='page'] {
     color: #fff;
     border-bottom-color: var(--geoblue);
@@ -193,14 +283,16 @@ const nav = [
     }
     nav {
       width: 100%;
-      overflow-x: auto;
     }
-    ul {
-      flex-wrap: nowrap;
-    }
-    nav a {
+    nav a,
+    summary {
       padding: 10px 12px;
       white-space: nowrap;
+    }
+    .menu {
+      position: absolute;
+      right: auto;
+      left: 0;
     }
     .utility .draft {
       display: none;

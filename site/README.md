@@ -36,6 +36,12 @@ Private hosting (Cloudflare Pages behind Cloudflare Access) is set out in
 - **Accessibility**: skip link, visible keyboard focus, reduced-motion
   support, and AA color contrast (`--gold-ink` is the gold for text).
 
+- **Scorecard table**: click a column header to sort, type to filter, and
+  the workstream filter is kept in the link (`/?group=contained-pilots`).
+- **Keyboard**: press `/` to jump to search. Long pages get a back-to-top
+  link, and headings in long-form pages get a copy-link `#` anchor.
+- **On this page** contents on agency plans and the SBA case study.
+
 To host under a subpath (for example GitHub Pages at `/fed_fraud/`), build
 with `SITE_BASE=/fed_fraud/ npm run build`.
 
@@ -50,10 +56,19 @@ with `SITE_BASE=/fed_fraud/ npm run build`.
    three of the first ten investigations (HHS-1 hospice, DOD-1 set-asides,
    USDA-1 SNAP retailers). Sample records only; defined in `src/data/tools.ts`
    and `src/components/tools/`.
-5. **Research library** (`/library/`): placeholder pages for methodology,
+5. **Explore** (header "More" menu): `/investigations/` (all 86 ideas plus
+   the six cross-agency ideas, filterable), `/schedule/` (Gantt view of
+   Phase 1 by agency), `/agencies/matrix/` (agencies by any two priority
+   factors), `/agencies/compare/?a=hhs,dod,usda` (side-by-side comparison),
+   `/glossary/` (terms, in `src/data/glossary.ts`) and `/updates/` (what's
+   new, from git history; needs a full clone to show anything).
+6. **Research library** (`/library/`): placeholder pages for methodology,
    research, detailed plans and per-agency results, to be filled in later.
-6. **Downloads** (`/downloads/`): a PDF brief per agency plus the roadmap,
-   review plan, ranking and working plan PDFs (served from `../docs`).
+7. **Downloads** (`/downloads/`): a PDF brief per agency, the roadmap,
+   review plan, ranking and working plan PDFs (served from `../docs`), and
+   the scorecard as `/downloads/scorecard.csv` and `.json`, built from
+   `src/lib/scorecard.ts`. Savings columns read `Pending` until findings
+   are recorded.
 
 ## Agency brief PDFs
 

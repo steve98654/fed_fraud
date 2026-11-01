@@ -43,6 +43,9 @@ export function lastUpdated(...rels: string[]): string {
 // ---------------------------------------------------------------------------
 const marked = new Marked({ gfm: true });
 
+export const slugify = (s: string) =>
+  s.toLowerCase().replace(/&[a-z]+;/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
 /** Map a relative .md link found in `fromDir` (relative to docs/) to a URL. */
 function rewriteHref(href: string, fromDir: string): string {
   if (/^(https?:|mailto:|#)/.test(href)) return href;
@@ -62,6 +65,7 @@ function rewriteHref(href: string, fromDir: string): string {
 }
 
 export function md(src: string, fromDir = ''): string {
+  const seen = new Set<string>();
   const html = marked.parse(src, { async: false }) as string;
   return html
     .replace(/href="([^"]+)"/g, (_, h) => {
@@ -71,7 +75,22 @@ export function md(src: string, fromDir = ''): string {
     })
     .replace(/>([a-z]+)\.md<\/a>/g, (all, slug) => (SHORT[slug] ? `>${SHORT[slug]}</a>` : all))
     .replace(/<table>/g, '<div class="table-wrap"><table>')
-    .replace(/<\/table>/g, '</table></div>');
+    .replace(/<\/table>/g, '</table></div>')
+    .replace(/<h([23])>([\s\S]*?)<\/h\1>/g, (_, lvl, inner) => {
+      const base = slugify(inner.replace(/<[^>]+>/g, '')) || 'section';
+      let id = base;
+      for (let n = 2; seen.has(id); n++) id = `${base}-${n}`;
+      seen.add(id);
+      return `<h${lvl} id="${id}">${inner}</h${lvl}>`;
+    });
+}
+
+/** Level-2 headings (with ids) in rendered HTML, for an "On this page" list. */
+export function toc(html: string): { id: string; label: string }[] {
+  return [...html.matchAll(/<h2 id="([^"]+)">([\s\S]*?)<\/h2>/g)].map((m) => ({
+    id: m[1],
+    label: m[2].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/^\d+\.\s*/, ''),
+  }));
 }
 
 export const mdInline = (src: string, fromDir = '') =>
@@ -291,9 +310,6 @@ export interface Doc {
   sections: { heading: string; id: string; html: string; src: string }[];
 }
 
-const slugify = (s: string) =>
-  s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-
 export function doc(rel: string): Doc {
   const src = read(rel);
   const dir = path.posix.dirname(rel);
@@ -393,3 +409,56 @@ export function briefSections(slug: string): Map<string, string> {
 
 /** Absolute path of a file in ../docs, for endpoints that serve it. */
 export const docPath = (rel: string) => path.join(DOCS, rel);
+
+// ---------------------------------------------------------------------------
+// Change log for the "What's new" page, from git history of docs/ and site/.
+// Empty when git history is missing (e.g. a shallow clone without history).
+// ---------------------------------------------------------------------------
+export interface Change {
+  hash: string;
+  date: string;
+  title: string;
+  pr?: number;
+  /** Agency slugs whose brief changed. */
+  agencies: string[];
+  docs: string[];
+  site: boolean;
+}
+
+export function changes(limit = 60): Change[] {
+  let out = '';
+  try {
+    out = execFileSync('git', ['log', `-${limit}`, '--format=@@%h|%cs|%s', '--name-only', '--', 'docs', 'site'], {
+      cwd: path.resolve(DOCS, '..'),
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+  } catch {
+    return [];
+  }
+  return out
+    .split('@@')
+    .filter(Boolean)
+    .map((chunk) => {
+      const [head, ...files] = chunk.trim().split('\n').filter(Boolean);
+      const [hash, date, ...rest] = head.split('|');
+      const subject = rest.join('|');
+      const pr = subject.match(/\(#(\d+)\)\s*$/)?.[1];
+      const agencySet = new Set<string>();
+      const docSet = new Set<string>();
+      for (const f of files) {
+        const ag = f.match(/^docs\/agencies\/([a-z]+)\.md$/);
+        if (ag && SHORT[ag[1]]) agencySet.add(ag[1]);
+        else if (/^docs\/.+\.md$/.test(f) && !f.startsWith('docs/agencies/')) docSet.add(f.replace(/^docs\//, ''));
+      }
+      return {
+        hash,
+        date,
+        title: subject.replace(/\s*\(#\d+\)\s*$/, ''),
+        pr: pr ? Number(pr) : undefined,
+        agencies: [...agencySet],
+        docs: [...docSet],
+        site: files.some((f) => f.startsWith('site/')),
+      };
+    });
+}

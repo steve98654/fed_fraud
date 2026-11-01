@@ -54,9 +54,17 @@ const slugOf = (id: string) => agencies().find((a) => a.ideas.some((i) => i.id =
       ))
     }
   </ol>
+  <p class="more-links no-print">
+    See <a href={url('investigations/')}>every investigation in the roadmap</a> or the
+    <a href={url('schedule/')}>agency-by-agency Phase 1 schedule</a>.
+  </p>
 </PlanShell>
 
 <style>
+  .more-links {
+    margin-top: 24px;
+    font-size: 0.95rem;
+  }
   .two {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 360px;

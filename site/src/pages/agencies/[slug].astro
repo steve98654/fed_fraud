@@ -2,7 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import PageTitle from '../../components/PageTitle.astro';
 import ScoreBar from '../../components/ScoreBar.astro';
-import { agencies, brief, url, REPO, fmtDate, weekStart, weekEnd, groupLabel, mdInline, hasPitch, lastUpdated } from '../../lib/content';
+import { agencies, brief, url, REPO, fmtDate, weekStart, weekEnd, groupLabel, mdInline, hasPitch, lastUpdated, toc } from '../../lib/content';
+import OnThisPage from '../../components/OnThisPage.astro';
 import { usd, weeksLabel } from '../../lib/format';
 import { findings, stageOverride } from '../../data/scorecard';
 import { toolsFor } from '../../data/tools';
@@ -48,7 +49,7 @@ const factors = [
   <section class="section">
     <div class="container layout">
       <article>
-        <div class="ideas-block">
+        <div class="ideas-block" id="investigations">
           <div class="ideas-head">
             <span class="eyebrow">Roadmap investigations</span>
             {a.startFirst && <span class="badge first">In the first ten</span>}
@@ -74,6 +75,7 @@ const factors = [
       </article>
 
       <aside>
+        <OnThisPage items={[{ id: 'investigations', label: 'Roadmap investigations' }, ...toc(b.html)]} />
         <div class="facts">
           <h3>Scorecard</h3>
           <dl>
@@ -169,8 +171,6 @@ const factors = [
     display: flex;
     flex-direction: column;
     gap: 18px;
-    position: sticky;
-    top: 20px;
   }
   .soft {
     font-weight: 400;
