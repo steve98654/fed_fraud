@@ -1,6 +1,7 @@
-# Federal Fraud Scorecard site
+# The Geodesic Accountability Office (site)
 
-Astro site that presents the fraud work: a GAO-style report layout with
+Astro site for The Geodesic Accountability Office, which presents the
+federal fraud work: a GAO-style report layout with
 Geodesic Solutions branding (palette and house footer from
 `latex/geodesic_brand/geodesicbrand.sty`, logo and wordmark from the
 Geodesic website).

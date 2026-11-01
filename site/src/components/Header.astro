@@ -14,17 +14,15 @@ const nav = [
 
 <div class="utility">
   <div class="container">
-    <span>An independent analysis by Geodesic Solutions</span>
+    <span>The Geodesic Accountability Office · an independent analysis by Geodesic Solutions</span>
     <span class="draft">Draft for discussion · Public data only · No findings yet</span>
   </div>
 </div>
 <header class="site-header">
   <div class="container bar">
-    <a href={url()} class="logo" aria-label="Federal Fraud Scorecard home">
+    <a href={url()} class="logo" aria-label="The Geodesic Accountability Office home">
       <img class="icon" src={url('images/icon.png')} alt="" width="388" height="353" />
-      <img class="wordmark" src={url('images/wordmark.png')} alt="Geodesic Solutions" width="1286" height="273" />
-      <span class="divider" aria-hidden="true"></span>
-      <span class="product">Federal Fraud<br />Scorecard</span>
+      <span class="product"><span class="the">The</span> Geodesic<br />Accountability Office</span>
     </a>
     <nav aria-label="Main">
       <ul>
@@ -81,22 +79,17 @@ const nav = [
     height: 44px;
     width: auto;
   }
-  .wordmark {
-    height: 30px;
-    width: auto;
-  }
-  .divider {
-    width: 1px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.22);
-    margin: 0 4px;
-  }
   .product {
     font-family: var(--font-display);
     color: #fff;
-    font-size: 1.02rem;
-    line-height: 1.15;
+    font-size: 1.32rem;
+    font-weight: 300;
+    line-height: 1.1;
     letter-spacing: 0.01em;
+  }
+  .the {
+    font-size: 0.8em;
+    color: #cdd3e0;
   }
   ul {
     display: flex;
@@ -143,9 +136,8 @@ const nav = [
     }
   }
   @media (max-width: 520px) {
-    .wordmark,
-    .divider {
-      display: none;
+    .product {
+      font-size: 1.1rem;
     }
   }
 </style>

@@ -8,13 +8,14 @@ import { url, REPO } from '../lib/content';
       <div class="brand">
         <img class="icon" src={url('images/icon.png')} alt="" width="388" height="353" />
         <img class="wordmark" src={url('images/wordmark.png')} alt="Geodesic Solutions" width="1286" height="273" />
+        <p class="name">The Geodesic Accountability Office</p>
         <p>
           Quantitative analysis of capital markets, strategy and policy decisions. This site extends the SBA fraud work to the
           33 largest federal agencies, using public data in Phase 1.
         </p>
       </div>
       <div class="col">
-        <h4>This site</h4>
+        <h4>The Office</h4>
         <a href={url()}>Scorecard</a>
         <a href={url('agencies/')}>Agency plans</a>
         <a href={url('plan/')}>Five-page roadmap</a>
@@ -32,7 +33,7 @@ import { url, REPO } from '../lib/content';
       leads for Inspectors General or DOJ, not accusations, and no entity is named outside a referral.
     </p>
     <div class="house">
-      <span>Geodesic Solutions: geodesic.pro</span>
+      <span>The Geodesic Accountability Office · Geodesic Solutions: geodesic.pro</span>
       <span>Contact: Steve Taylor, Managing Partner: taylor@geodesic.pro</span>
     </div>
   </div>
@@ -64,6 +65,13 @@ import { url, REPO } from '../lib/content';
   .brand .wordmark {
     height: 28px;
     width: auto;
+  }
+  .brand p.name {
+    font-family: var(--font-display);
+    font-style: normal;
+    font-size: 1.2rem;
+    color: #fff;
+    margin-top: 16px;
   }
   .brand p {
     grid-column: 1 / -1;
