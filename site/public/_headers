@@ -1,0 +1,8 @@
+# Cloudflare Pages response headers. The site is private: keep it out of
+# search engines even if the access gate is ever misconfigured.
+/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Referrer-Policy: no-referrer
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()

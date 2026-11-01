@@ -1,0 +1,74 @@
+---
+// Site search, powered by Pagefind. `npm run build` indexes dist/ after the
+// Astro build, so search works on built and deployed sites, not `astro dev`.
+import Base from '../layouts/Base.astro';
+import PageTitle from '../components/PageTitle.astro';
+import { url } from '../lib/content';
+
+const base = url('pagefind/');
+---
+
+<Base title="Search" section="search" searchable={false} description="Search agency plans, pitches, the roadmap and the research library.">
+  <link slot="head" rel="stylesheet" href={`${base}pagefind-ui.css`} />
+  <PageTitle
+    eyebrow="Search"
+    title="Search the Office"
+    lead="Search the 33 agency plans, the pitches, the SBA case study, the roadmap and the research library. Try an idea ID such as HHS-1, a scheme such as hospice, or an agency name."
+    crumbs={[{ label: 'Scorecard', href: url() }]}
+  />
+  <section class="section">
+    <div class="container">
+      <div id="search"></div>
+      <noscript><p class="notice">Search needs JavaScript. Use the <a href={url('agencies/')}>agency plans</a> list instead.</p></noscript>
+    </div>
+  </section>
+</Base>
+
+<script is:inline define:vars={{ base }}>
+  const s = document.createElement('script');
+  s.src = `${base}pagefind-ui.js`;
+  s.onload = () => {
+    const ui = new PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+      resetStyles: false,
+      translations: { placeholder: 'Search plans, ideas and agencies' },
+    });
+    const q = new URLSearchParams(location.search).get('q');
+    if (q) ui.triggerSearch(q);
+    // Move focus into the search field so keyboard users can type straight away.
+    document.querySelector('#search input')?.focus();
+  };
+  s.onerror = () => {
+    document.getElementById('search').innerHTML =
+      '<p class="notice">The search index is built by <code>npm run build</code>. It is not available in <code>astro dev</code>.</p>';
+  };
+  document.head.append(s);
+</script>
+
+<style is:global>
+  #search {
+    --pagefind-ui-scale: 0.9;
+    --pagefind-ui-primary: var(--geomid);
+    --pagefind-ui-text: var(--ink);
+    --pagefind-ui-background: #fff;
+    --pagefind-ui-border: var(--georule);
+    --pagefind-ui-tag: var(--geolight);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 6px;
+    --pagefind-ui-font: var(--font-sans);
+    max-width: 860px;
+  }
+  #search .pagefind-ui__result-link {
+    color: var(--geomid);
+  }
+  #search .pagefind-ui__result-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+  }
+  #search mark {
+    background: var(--gold-soft);
+    color: inherit;
+  }
+</style>

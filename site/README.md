@@ -12,8 +12,29 @@ Geodesic website).
 cd site
 npm install
 npm run dev      # http://localhost:4321
-npm run build    # static output in site/dist/
+npm run build    # static output in site/dist/, plus the search index
+npx astro preview   # serve dist/ to try search and print
+npm run test:a11y   # axe-core WCAG 2.1 AA check of every built page
 ```
+
+Search is built by [Pagefind](https://pagefind.app) after the Astro build, so
+it works on built and deployed sites but not under `npm run dev`. The
+accessibility check needs a Playwright Chromium (`npx playwright install
+chromium`, once). Pull requests run both through `.github/workflows/site-check.yml`.
+
+Private hosting (Cloudflare Pages behind Cloudflare Access) is set out in
+[HOSTING.md](HOSTING.md). Nothing deploys automatically.
+
+## Polish
+
+- **Search** (`/search/`, plus the box in the header) indexes page content,
+  not the header or footer.
+- **Print**: every page prints as a clean brief; agency pages have a "Print
+  this plan" button. External links print with their URL.
+- **Last updated** on each agency page is the newest git commit date of its
+  brief, `docs/roadmap.md` and `docs/agencies/top33.md`.
+- **Accessibility**: skip link, visible keyboard focus, reduced-motion
+  support, and AA color contrast (`--gold-ink` is the gold for text).
 
 To host under a subpath (for example GitHub Pages at `/fed_fraud/`), build
 with `SITE_BASE=/fed_fraud/ npm run build`.
