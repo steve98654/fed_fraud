@@ -1,0 +1,215 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import ScoreBar from '../../components/ScoreBar.astro';
+import { agencies, brief, url, REPO, fmtDate, weekStart, weekEnd, groupLabel, mdInline } from '../../lib/content';
+import { usd, weeksLabel } from '../../lib/format';
+import { findings, stageOverride } from '../../data/scorecard';
+
+export function getStaticPaths() {
+  return agencies().map((a) => ({ params: { slug: a.slug } }));
+}
+
+const { slug } = Astro.params;
+const list = agencies();
+const i = list.findIndex((a) => a.slug === slug);
+const a = list[i];
+const b = brief(a.slug);
+const prev = list[i - 1];
+const next = list[i + 1];
+const mine = findings.filter((f) => f.agency === a.slug);
+const stage = stageOverride[a.slug] ?? (mine.length ? 'Leads delivered' : 'Planned');
+const factors = [
+  { k: 'Exposure', w: '30%', v: a.factors.exposure },
+  { k: 'Public data', w: '30%', v: a.factors.data },
+  { k: 'SBA method fit', w: '20%', v: a.factors.fit },
+  { k: 'Actionability', w: '20%', v: a.factors.action },
+];
+---
+
+<Base title={`${a.short} fraud plan`} section="agencies" description={b.bottomLine}>
+  <PageTitle
+    eyebrow={`Agency plan · Priority ${a.rank} of 33`}
+    title={a.name}
+    lead={b.bottomLine}
+    crumbs={[
+      { label: 'Scorecard', href: url() },
+      { label: 'Agency plans', href: url('agencies/') },
+    ]}
+  />
+
+  <section class="section">
+    <div class="container layout">
+      <article>
+        <div class="ideas-block">
+          <div class="ideas-head">
+            <span class="eyebrow">Roadmap investigations</span>
+            {a.startFirst && <span class="badge first">In the first ten</span>}
+          </div>
+          <ol class="ideas">
+            {
+              a.ideas.map((idea, n) => (
+                <li>
+                  <span class="id-chip">{idea.id}</span>
+                  <span set:html={mdInline(idea.text)} />
+                  {n === 0 && <span class="badge planned">First prototype</span>}
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+        <div class="prose" set:html={b.html} />
+      </article>
+
+      <aside>
+        <div class="facts">
+          <h3>Scorecard</h3>
+          <dl>
+            <div>
+              <dt>Fraud savings identified</dt>
+              <dd><span class="badge pending">Pending</span></dd>
+            </div>
+            <div>
+              <dt>Stage</dt>
+              <dd><span class="badge planned">{stage}</span></dd>
+            </div>
+            <div>
+              <dt>Lead packages delivered</dt>
+              <dd>{mine.reduce((n, f) => n + f.leads, 0)}</dd>
+            </div>
+            <div>
+              <dt>Phase 1 window</dt>
+              <dd>
+                {weeksLabel(a.startWeek, a.endWeek)}<br />
+                <span class="soft">{fmtDate(weekStart(a.startWeek))} to {fmtDate(weekEnd(a.endWeek))}</span>
+              </dd>
+            </div>
+            <div>
+              <dt>Workstream</dt>
+              <dd>{groupLabel(a.group)}<br /><span class="soft">{a.when}</span></dd>
+            </div>
+            <div>
+              <dt>Take leads to</dt>
+              <dd class="soft-strong">{a.takeTo}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="facts">
+          <h3>Priority score {a.score.toFixed(1)}</h3>
+          <dl>
+            {
+              factors.map((f) => (
+                <div>
+                  <dt>
+                    {f.k} · weight {f.w}
+                  </dt>
+                  <dd>
+                    <ScoreBar value={f.v} label={f.k} />
+                  </dd>
+                </div>
+              ))
+            }
+            <div>
+              <dt>FY2026 outlays (USAspending)</dt>
+              <dd>{usd(a.outlaysUsd)} <span class="soft">· budget rank {a.budgetRank}</span></dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="links">
+          <a class="btn" href={url(`library/results/${a.slug}/`)}>Detailed results (placeholder)</a>
+          <a class="btn" href={`${REPO}/blob/main/docs/agencies/${a.slug}.pdf`} target="_blank" rel="noopener">Brief as PDF</a>
+          <a class="btn" href={`${REPO}/blob/main/docs/agencies/${a.slug}.md`} target="_blank" rel="noopener">Source Markdown</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <nav class="container pn" aria-label="Other agencies">
+    {prev ? <a class="btn" href={url(`agencies/${prev.slug}/`)}>← #{prev.rank} {prev.short}</a> : <span />}
+    {next && <a class="btn" href={url(`agencies/${next.slug}/`)}>#{next.rank} {next.short} →</a>}
+  </nav>
+</Base>
+
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 48px;
+    align-items: start;
+  }
+  aside {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: sticky;
+    top: 20px;
+  }
+  .soft {
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .soft-strong {
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  .links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .links .btn {
+    justify-content: center;
+  }
+  .ideas-block {
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--geogold);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    margin-bottom: 36px;
+    background: #fff;
+  }
+  .ideas-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .ideas {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .ideas li {
+    display: grid;
+    grid-template-columns: 82px 1fr;
+    gap: 10px;
+    align-items: baseline;
+    font-size: 0.95rem;
+  }
+  .ideas li .id-chip {
+    justify-self: start;
+  }
+  .ideas li .badge {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .pn {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 24px;
+  }
+  @media (max-width: 960px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+    aside {
+      position: static;
+    }
+  }
+</style>

@@ -1,0 +1,41 @@
+---
+import PlanShell from '../../components/PlanShell.astro';
+import AgencyIdeas from '../../components/AgencyIdeas.astro';
+import { roadmap, md, proseOnly, GROUPS } from '../../lib/content';
+const r = roadmap();
+---
+
+<PlanShell
+  page={3}
+  lead="Five contained pilots (FCC, OPM, VA, Commerce, PBGC) and three shared screens that cover the next fifteen agencies at low cost by reusing one pipeline."
+  resultsDue="January 29, 2027 (pilots) and February 12, 2027 (shared screens)"
+  resultsText="Pilot findings and shared-screen results (contractor C1, research award C2, grantee C3) will be reported here."
+>
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Weeks 7 to 11</span>
+      <h2>Contained pilots</h2>
+    </div>
+  </div>
+  <AgencyIdeas group={GROUPS[1]} />
+
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Weeks 9 to 13</span>
+      <h2>Shared screens</h2>
+    </div>
+  </div>
+  <div class="screens prose" set:html={md(proseOnly(r.get(GROUPS[2])))} />
+  <AgencyIdeas group={GROUPS[2]} />
+</PlanShell>
+
+<style>
+  .screens {
+    max-width: none;
+    background: var(--geomist);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 22px 4px;
+    margin-bottom: 22px;
+  }
+</style>

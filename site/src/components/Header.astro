@@ -1,0 +1,151 @@
+---
+import { url } from '../lib/content';
+interface Props {
+  current?: string;
+}
+const { current } = Astro.props;
+const nav = [
+  { key: 'scorecard', label: 'Scorecard', href: url() },
+  { key: 'agencies', label: 'Agency plans', href: url('agencies/') },
+  { key: 'plan', label: 'Roadmap', href: url('plan/') },
+  { key: 'library', label: 'Research library', href: url('library/') },
+];
+---
+
+<div class="utility">
+  <div class="container">
+    <span>An independent analysis by Geodesic Solutions</span>
+    <span class="draft">Draft for discussion · Public data only · No findings yet</span>
+  </div>
+</div>
+<header class="site-header">
+  <div class="container bar">
+    <a href={url()} class="logo" aria-label="Federal Fraud Scorecard home">
+      <img class="icon" src={url('images/icon.png')} alt="" width="388" height="353" />
+      <img class="wordmark" src={url('images/wordmark.png')} alt="Geodesic Solutions" width="1286" height="273" />
+      <span class="divider" aria-hidden="true"></span>
+      <span class="product">Federal Fraud<br />Scorecard</span>
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} aria-current={current === item.key ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .utility {
+    background: var(--navy-deep);
+    color: #aeb6c8;
+    font-size: 0.78rem;
+  }
+  .utility .container {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+  .draft {
+    color: #d9c08e;
+  }
+  .site-header {
+    background: var(--navy);
+    border-bottom: 3px solid var(--geogold);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 84px;
+    flex-wrap: wrap;
+  }
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    padding: 14px 0;
+  }
+  .icon {
+    height: 44px;
+    width: auto;
+  }
+  .wordmark {
+    height: 30px;
+    width: auto;
+  }
+  .divider {
+    width: 1px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.22);
+    margin: 0 4px;
+  }
+  .product {
+    font-family: var(--font-display);
+    color: #fff;
+    font-size: 1.02rem;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+  }
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  nav a {
+    display: block;
+    padding: 30px 16px 27px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #cdd3e0;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+  }
+  nav a:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.04);
+  }
+  nav a[aria-current='page'] {
+    color: #fff;
+    border-bottom-color: var(--geoblue);
+  }
+  @media (max-width: 900px) {
+    .bar {
+      padding-bottom: 6px;
+    }
+    nav {
+      width: 100%;
+      overflow-x: auto;
+    }
+    ul {
+      flex-wrap: nowrap;
+    }
+    nav a {
+      padding: 10px 12px;
+      white-space: nowrap;
+    }
+    .utility .draft {
+      display: none;
+    }
+  }
+  @media (max-width: 520px) {
+    .wordmark,
+    .divider {
+      display: none;
+    }
+  }
+</style>

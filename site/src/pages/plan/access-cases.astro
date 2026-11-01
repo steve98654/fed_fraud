@@ -1,0 +1,99 @@
+---
+import PlanShell from '../../components/PlanShell.astro';
+import AgencyIdeas from '../../components/AgencyIdeas.astro';
+import { roadmap, md, proseOnly, GROUPS } from '../../lib/content';
+const r = roadmap();
+const phase2 = r.get('Phase 2: what internal data adds');
+const afterTable = phase2.split('\n').filter((l) => !l.startsWith('|')).join('\n');
+const [phase2Intro, phase2Outro] = afterTable.split(/\n\s*\n(?=The first internal)/);
+---
+
+<PlanShell
+  page={4}
+  lead="Where payee records are confidential, public data points to places, intermediaries and programs. Each of these ends with a Phase 2 access proposal, and Phase 2 adds the cross-agency investigations."
+  resultsDue="February 12, 2027 (aggregate screens and Treasury, SSA, Labor proposals)"
+  resultsText="Aggregate screen memos, access proposals sent and agreements signed will be reported here."
+>
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Weeks 10 to 14</span>
+      <h2>Aggregate screens and access cases</h2>
+    </div>
+  </div>
+  <div class="prose lead-in" set:html={md(proseOnly(r.get(GROUPS[3])))} />
+  <AgencyIdeas group={GROUPS[3]} />
+
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">2027 to 2028</span>
+      <h2>Phase 2: what internal data adds</h2>
+    </div>
+  </div>
+  <div class="prose lead-in" set:html={md(phase2Intro ?? '')} />
+  <div class="xgrid">
+    {
+      r.crossAgency.map((x) => (
+        <article>
+          <div class="top">
+            <span class="id-chip">{x.id}</span>
+            <span class="target">{x.target}</span>
+          </div>
+          <h3>{x.title}</h3>
+          <dl>
+            <dt>Internal data</dt>
+            <dd>{x.data}</dd>
+            <dt>Lead agencies</dt>
+            <dd>{x.lead}</dd>
+          </dl>
+        </article>
+      ))
+    }
+  </div>
+  <div class="prose" set:html={md(phase2Outro ?? '')} />
+</PlanShell>
+
+<style>
+  .lead-in {
+    margin-bottom: 20px;
+  }
+  .xgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .xgrid article {
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--geogold);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    background: #fff;
+  }
+  .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .target {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--geomid);
+  }
+  h3 {
+    font-size: 1.08rem;
+    margin: 10px 0 8px;
+  }
+  dl {
+    margin: 0;
+    font-size: 0.85rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 10px;
+  }
+  dt {
+    color: var(--muted);
+  }
+  dd {
+    margin: 0;
+  }
+</style>

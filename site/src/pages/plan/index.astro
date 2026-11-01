@@ -1,0 +1,123 @@
+---
+import PlanShell from '../../components/PlanShell.astro';
+import { roadmap, md, url, agencies } from '../../lib/content';
+
+const r = roadmap();
+const slugOf = (id: string) => agencies().find((a) => a.ideas.some((i) => i.id === id))?.slug;
+---
+
+<PlanShell
+  page={1}
+  lead="Eighty-six investigation ideas across 33 agencies reduce to a few patterns the SBA work already detects. This page gives the bottom line and the ten investigations to start first."
+  resultsDue="December 18, 2026 (Wave 1) and January 22, 2027 (Wave 2)"
+  resultsText="Lead lists for the first ten investigations will be reported here with their validation results."
+>
+  <div class="two">
+    <div class="prose" set:html={md(r.get('Bottom line'))} />
+    <aside class="facts">
+      <h3>How to read the roadmap</h3>
+      <div class="prose small" set:html={md(r.get('How to read the roadmap'))} />
+    </aside>
+  </div>
+
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Start here</span>
+      <h2>The ten investigations to start first</h2>
+      <p>Where the most fraud-prone money meets record-level public data.</p>
+    </div>
+  </div>
+  <ol class="ten">
+    {
+      r.startFirst.map((t) => (
+        <li>
+          <span class="n">{t.n}</span>
+          <div class="body">
+            <div class="row1">
+              <a class="id-chip" href={url(`agencies/${slugOf(t.id)}/`)}>
+                {t.id}
+              </a>
+              <span class="weeks">Weeks {t.weeks}</span>
+              <span class="badge pending">Pending</span>
+            </div>
+            <h3>{t.title}</h3>
+            <p>
+              <strong>Targets:</strong> {t.scheme}. <strong>Take to:</strong> {t.takeTo}.
+            </p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</PlanShell>
+
+<style>
+  .two {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 40px;
+    align-items: start;
+    margin-bottom: 48px;
+  }
+  .small {
+    font-size: 0.9rem;
+  }
+  .ten {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr));
+    gap: 14px;
+  }
+  .ten li {
+    display: flex;
+    gap: 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    background: #fff;
+  }
+  .n {
+    flex: none;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--geogold);
+    width: 1.6em;
+  }
+  .row1 {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .row1 .id-chip {
+    text-decoration: none;
+  }
+  .weeks {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .row1 .badge {
+    margin-left: auto;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin: 8px 0 6px;
+  }
+  .body p {
+    margin: 0;
+    font-size: 0.86rem;
+    color: var(--muted);
+  }
+  .body strong {
+    color: var(--coolblack);
+    font-weight: 600;
+  }
+  @media (max-width: 960px) {
+    .two {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

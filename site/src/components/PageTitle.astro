@@ -1,0 +1,83 @@
+---
+// GAO-style title band: breadcrumb, eyebrow, title and lead on a pale band.
+interface Props {
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  crumbs?: { label: string; href: string }[];
+}
+const { eyebrow, title, lead, crumbs = [] } = Astro.props;
+---
+
+<section class="title-band">
+  <div class="container">
+    {
+      crumbs.length > 0 && (
+        <nav class="crumbs" aria-label="Breadcrumb">
+          {crumbs.map((c) => (
+            <>
+              <a href={c.href}>{c.label}</a>
+              <span aria-hidden="true">/</span>
+            </>
+          ))}
+          <span>{title}</span>
+        </nav>
+      )
+    }
+    <span class="eyebrow">{eyebrow}</span>
+    <div class="row">
+      <div>
+        <h1>{title}</h1>
+        {lead && <p class="lead">{lead}</p>}
+      </div>
+      <div class="aside"><slot /></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .title-band {
+    background:
+      linear-gradient(180deg, rgba(235, 241, 248, 0.9), rgba(246, 249, 252, 0.9)),
+      var(--geomist);
+    border-bottom: 1px solid var(--line);
+    padding: 28px 0 40px;
+  }
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 22px;
+  }
+  .crumbs a {
+    color: var(--geomid);
+    text-decoration: none;
+  }
+  .crumbs a:hover {
+    text-decoration: underline;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-size: clamp(1.9rem, 4vw, 2.9rem);
+    font-weight: 300;
+    margin-top: 12px;
+    max-width: 26ch;
+  }
+  .lead {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 64ch;
+    margin: 14px 0 0;
+  }
+  .aside:empty {
+    display: none;
+  }
+</style>

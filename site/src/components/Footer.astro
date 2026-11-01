@@ -1,0 +1,124 @@
+---
+import { url, REPO } from '../lib/content';
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="top">
+      <div class="brand">
+        <img class="icon" src={url('images/icon.png')} alt="" width="388" height="353" />
+        <img class="wordmark" src={url('images/wordmark.png')} alt="Geodesic Solutions" width="1286" height="273" />
+        <p>
+          Quantitative analysis of capital markets, strategy and policy decisions. This site extends the SBA fraud work to the
+          33 largest federal agencies, using public data in Phase 1.
+        </p>
+      </div>
+      <div class="col">
+        <h4>This site</h4>
+        <a href={url()}>Scorecard</a>
+        <a href={url('agencies/')}>Agency plans</a>
+        <a href={url('plan/')}>Five-page roadmap</a>
+        <a href={url('library/')}>Research library</a>
+      </div>
+      <div class="col">
+        <h4>Sources</h4>
+        <a href={REPO} target="_blank" rel="noopener">Repository</a>
+        <a href={`${REPO}/blob/main/docs/review_plan.md`} target="_blank" rel="noopener">Review plan</a>
+        <a href={`${REPO}/blob/main/docs/agencies/top33.md`} target="_blank" rel="noopener">Top 33 ranking</a>
+      </div>
+    </div>
+    <p class="disclaimer">
+      Scores and plans are our judgment from public sources and are a starting point for discussion. Risk indicators are
+      leads for Inspectors General or DOJ, not accusations, and no entity is named outside a referral.
+    </p>
+    <div class="house">
+      <span>Geodesic Solutions: geodesic.pro</span>
+      <span>Contact: Steve Taylor, Managing Partner: taylor@geodesic.pro</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--navy);
+    color: #c9cedb;
+    padding: 56px 0 28px;
+    margin-top: 40px;
+    border-top: 3px solid var(--geogold);
+  }
+  .top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 40px;
+  }
+  .brand {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand .icon {
+    height: 40px;
+    width: auto;
+  }
+  .brand .wordmark {
+    height: 28px;
+    width: auto;
+  }
+  .brand p {
+    grid-column: 1 / -1;
+    max-width: 46ch;
+    margin: 12px 0 0;
+    color: #9aa1b4;
+    font-size: 0.92rem;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  h4 {
+    margin: 0 0 4px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    color: #fff;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .col a {
+    text-decoration: none;
+    color: #c9cedb;
+    font-size: 0.92rem;
+  }
+  .col a:hover {
+    color: #fff;
+  }
+  .disclaimer {
+    margin: 40px 0 0;
+    font-size: 0.82rem;
+    color: #8f97ab;
+    max-width: 90ch;
+  }
+  /* House footer from geodesicbrand.sty: rule, firm and contact line, italic. */
+  .house {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    font-size: 0.82rem;
+    font-style: italic;
+    color: #aeb6c8;
+  }
+  @media (max-width: 760px) {
+    .top {
+      grid-template-columns: 1fr 1fr;
+    }
+    .brand {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

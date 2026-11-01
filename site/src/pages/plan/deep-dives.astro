@@ -1,0 +1,23 @@
+---
+import PlanShell from '../../components/PlanShell.astro';
+import AgencyIdeas from '../../components/AgencyIdeas.astro';
+import { roadmap, md, GROUPS } from '../../lib/content';
+const r = roadmap();
+---
+
+<PlanShell
+  page={2}
+  lead="The seven agencies with full prototypes: HHS, DoD and SBA in Wave 1 (weeks 3 to 7), then DHS, USDA, DOT and GSA in Wave 2 (weeks 5 to 10)."
+  resultsDue="December 18, 2026 (Wave 1) and January 22, 2027 (Wave 2)"
+  resultsText="Each deep dive will report its validated lead list, review memo and referral status here."
+>
+  <div class="prose intro" set:html={md(r.get('Investigation ideas by agency'), '')} />
+  <AgencyIdeas group={GROUPS[0]} />
+</PlanShell>
+
+<style>
+  .intro {
+    margin-bottom: 20px;
+    color: var(--muted);
+  }
+</style>

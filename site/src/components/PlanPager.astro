@@ -1,0 +1,97 @@
+---
+import { url } from '../lib/content';
+import { planPages } from '../data/plan';
+interface Props {
+  current: number;
+}
+const { current } = Astro.props;
+const prev = planPages[current - 2];
+const next = planPages[current];
+---
+
+<nav class="pager" aria-label="Roadmap pages">
+  <ol>
+    {
+      planPages.map((p, i) => (
+        <li>
+          <a href={url(p.path)} aria-current={i + 1 === current ? 'page' : undefined}>
+            <span class="n">{i + 1}</span>
+            <span class="t">{p.short}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+  <div class="prevnext">
+    {prev ? <a class="btn" href={url(prev.path)}>← {prev.short}</a> : <span />}
+    {next && <a class="btn primary" href={url(next.path)}>{next.short} →</a>}
+  </div>
+</nav>
+
+<style>
+  .pager {
+    margin: 0;
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #fff;
+  }
+  li + li {
+    border-left: 1px solid var(--line);
+  }
+  ol a {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px 14px;
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 0.86rem;
+    line-height: 1.25;
+    height: 100%;
+  }
+  ol a:hover {
+    background: var(--geomist);
+  }
+  .n {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    background: var(--geolight);
+    color: var(--geomid);
+  }
+  ol a[aria-current='page'] {
+    background: var(--geodark);
+    color: #fff;
+  }
+  ol a[aria-current='page'] .n {
+    background: var(--geogold);
+    color: #fff;
+  }
+  .prevnext {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 28px;
+  }
+  @media (max-width: 760px) {
+    ol {
+      grid-template-columns: 1fr;
+    }
+    li + li {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+  }
+</style>

@@ -1,0 +1,568 @@
+---
+import Base from '../layouts/Base.astro';
+import PageTitle from '../components/PageTitle.astro';
+import ScoreBar from '../components/ScoreBar.astro';
+import { agencies, roadmap, url, fmtDate, weekStart, weekEnd, groupLabel, GROUPS } from '../lib/content';
+import { usd, weeksLabel } from '../lib/format';
+import { asOf, findings, stageOverride } from '../data/scorecard';
+
+const list = agencies();
+const road = roadmap();
+const ideaCount = list.reduce((n, a) => n + a.ideas.length, 0);
+const outlaysTotal = list.reduce((n, a) => n + a.outlaysUsd, 0);
+
+const identified = findings.reduce((n, f) => n + (f.identifiedUsd ?? 0), 0);
+const confirmed = findings.reduce((n, f) => n + (f.confirmedUsd ?? 0), 0);
+const leads = findings.reduce((n, f) => n + f.leads, 0);
+const referrals = findings.filter((f) => f.referredTo).length;
+const hasFindings = findings.length > 0;
+
+const stage = (slug: string) =>
+  stageOverride[slug] ??
+  (findings.some((f) => f.agency === slug && f.referredTo)
+    ? 'Referred'
+    : findings.some((f) => f.agency === slug)
+      ? 'Leads delivered'
+      : 'Planned');
+const savingsFor = (slug: string) => findings.filter((f) => f.agency === slug).reduce((n, f) => n + (f.identifiedUsd ?? 0), 0);
+
+const today = new Date(`${asOf}T12:00:00Z`);
+const next = road.milestones.find((m) => new Date(`${m.date}T12:00:00Z`) >= today);
+const phaseStart = weekStart(1);
+const phaseEnd = weekEnd(16);
+const progress = Math.max(0, Math.min(100, ((+today - +phaseStart) / (+phaseEnd - +phaseStart)) * 100));
+
+const byGroup = GROUPS.map((g) => ({ g, n: list.filter((a) => a.group === g).length }));
+---
+
+<Base section="scorecard">
+  <PageTitle
+    eyebrow={`Scorecard · as of ${fmtDate(asOf)}`}
+    title="Federal fraud savings scorecard"
+    lead="One page view of fraud savings found across the 33 largest federal agencies, extending the SBA work. Phase 1 uses public data only and starts November 2, 2026."
+  >
+    <div class="title-actions">
+      <a class="btn" href={url('plan/')}>Read the roadmap</a>
+      <a class="btn primary" href={url('agencies/')}>Agency plans</a>
+    </div>
+  </PageTitle>
+
+  <section class="section">
+    <div class="container">
+      {
+        !hasFindings && (
+          <div class="notice" role="note">
+            <span aria-hidden="true">⚑</span>
+            <span>
+              <strong>No fraud savings have been found yet.</strong> Work begins with Phase 1 on {fmtDate(phaseStart)}. Every
+              savings figure on this page reads <em>Pending</em> until a screen passes validation and its lead package clears
+              counsel review. Spending and priority figures below are context from public budget data, not findings.
+            </span>
+          </div>
+        )
+      }
+
+      <div class="headline">
+        <div class="savings" style={`--torus:url(${url('images/umbilic-torus.webp')})`}>
+          <span class="kicker">Fraud savings identified to date</span>
+          {
+            hasFindings ? (
+              <span class="big">{usd(identified)}</span>
+            ) : (
+              <span class="big pending">
+                Pending<span class="sr-only"> (no findings yet)</span>
+              </span>
+            )
+          }
+          <span class="sub">
+            {hasFindings ? `${usd(confirmed)} confirmed recovered or prevented` : '$0 confirmed. First results due with Wave 1 on Dec 18, 2026.'}
+          </span>
+          <div class="funnel" aria-label="Savings funnel">
+            <div>
+              <span class="step">Identified</span>
+              <span class="val">{hasFindings ? usd(identified) : 'Pending'}</span>
+              <span class="def">Improper payments tied to delivered leads</span>
+            </div>
+            <div>
+              <span class="step">Referred</span>
+              <span class="val">{hasFindings ? `${referrals} packages` : 'Pending'}</span>
+              <span class="def">Sent to an Inspector General or DOJ</span>
+            </div>
+            <div>
+              <span class="step">Confirmed</span>
+              <span class="val">{hasFindings ? usd(confirmed) : 'Pending'}</span>
+              <span class="def">Recovered or prevented, per the receiving office</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi">
+            <span class="num">{list.length}</span>
+            <span class="lbl">Agencies in scope</span>
+          </div>
+          <div class="kpi">
+            <span class="num">{ideaCount}</span>
+            <span class="lbl">Investigation ideas planned, plus {road.crossAgency.length} cross-agency for Phase 2</span>
+          </div>
+          <div class="kpi">
+            <span class="num">{leads}</span>
+            <span class="lbl">Lead packages delivered</span>
+          </div>
+          <div class="kpi">
+            <span class="num">{referrals}</span>
+            <span class="lbl">Referrals made</span>
+          </div>
+          <div class="kpi wide">
+            <span class="num">{usd(outlaysTotal)}</span>
+            <span class="lbl">FY2026 outlays across the 33 agencies (USAspending; context, not savings)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Phase 1 progress</span>
+          <h2>Where the program stands</h2>
+          <p>
+            Sixteen working weeks from {fmtDate(phaseStart)} to {fmtDate(phaseEnd)}, skipping the holiday break.
+            {next && <> Next milestone: <strong>{next.text}</strong> on {fmtDate(next.date)}.</>}
+          </p>
+        </div>
+      </div>
+      <div class="progress" role="img" aria-label={`Phase 1 is ${Math.round(progress)}% complete`}>
+        <div class="fill" style={`width:${progress}%`}></div>
+      </div>
+      <ol class="timeline">
+        {
+          road.milestones.map((m) => (
+            <li class={m === next ? 'next' : new Date(`${m.date}T12:00:00Z`) < today ? 'done' : ''}>
+              <span class="date">{fmtDate(m.date)}</span>
+              <span class="text">{m.text}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">By agency</span>
+          <h2>Agency scorecard</h2>
+          <p>
+            Ranked by priority score: exposure, public data, fit with the SBA method and actionability. Savings stay
+            pending until findings are delivered.
+          </p>
+        </div>
+        <div class="filters no-print" role="group" aria-label="Filter by workstream">
+          <button type="button" data-filter="all" aria-pressed="true">All 33</button>
+          {
+            byGroup.map(({ g, n }) => (
+              <button type="button" data-filter={g} aria-pressed="false">
+                {groupLabel(g)} ({n})
+              </button>
+            ))
+          }
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="scorecard">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Agency</th>
+              <th>FY26 outlays</th>
+              <th>Priority</th>
+              <th>First investigation</th>
+              <th>Phase 1 window</th>
+              <th>Stage</th>
+              <th>Savings</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              list.map((a) => (
+                <tr data-group={a.group}>
+                  <td class="rank">{a.rank}</td>
+                  <td>
+                    <a class="agency" href={url(`agencies/${a.slug}/`)}>
+                      {a.name}
+                    </a>
+                    <span class="group">{groupLabel(a.group)}</span>
+                  </td>
+                  <td class="num">{usd(a.outlaysUsd)}</td>
+                  <td>
+                    <ScoreBar value={a.score} label={`${a.short} priority score`} decimals={1} />
+                  </td>
+                  <td>
+                    {a.ideas[0] && <span class="id-chip">{a.ideas[0].id}</span>}{' '}
+                    <span class="proto">{a.firstPrototype}</span>
+                    {a.startFirst && <span class="badge first">Start first</span>}
+                  </td>
+                  <td class="when">
+                    {a.startWeek > 0 && (
+                      <>
+                        {weeksLabel(a.startWeek, a.endWeek)}
+                        <span>
+                          {fmtDate(weekStart(a.startWeek))} – {fmtDate(weekEnd(a.endWeek))}
+                        </span>
+                      </>
+                    )}
+                  </td>
+                  <td>
+                    <span class="badge planned">{stage(a.slug)}</span>
+                  </td>
+                  <td>{savingsFor(a.slug) > 0 ? usd(savingsFor(a.slug)) : <span class="badge pending">Pending</span>}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Findings log</span>
+          <h2>Delivered findings</h2>
+          <p>Each entry is a validated lead package sent to an Inspector General or DOJ, with its source and date.</p>
+        </div>
+      </div>
+      {
+        hasFindings ? (
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Idea</th>
+                  <th>Finding</th>
+                  <th>Leads</th>
+                  <th>Referred to</th>
+                  <th>Identified</th>
+                  <th>Confirmed</th>
+                </tr>
+              </thead>
+              <tbody>
+                {findings.map((f) => (
+                  <tr>
+                    <td>{fmtDate(f.date)}</td>
+                    <td>
+                      <span class="id-chip">{f.idea}</span>
+                    </td>
+                    <td>{f.title}</td>
+                    <td>{f.leads}</td>
+                    <td>{f.referredTo ?? '—'}</td>
+                    <td>{f.identifiedUsd ? usd(f.identifiedUsd) : '—'}</td>
+                    <td>{f.confirmedUsd ? usd(f.confirmedUsd) : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div class="empty">
+            <img src={url('images/icon-light.png')} alt="" width="479" height="431" />
+            <div>
+              <h3>No findings recorded yet</h3>
+              <p>
+                The first lead lists are due with Wave 1 (HHS-1, DOD-1, DOD-2 and SBA-1) on December 18, 2026. Findings are
+                added here only after validation and counsel review. See the{' '}
+                <a href={url('library/methodology/')}>methodology</a> for the release bar.
+              </p>
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </section>
+</Base>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+  const rows = document.querySelectorAll<HTMLTableRowElement>('table.scorecard tbody tr');
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      const f = b.dataset.filter;
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      rows.forEach((r) => (r.hidden = f !== 'all' && r.dataset.group !== f));
+    }),
+  );
+</script>
+
+<style>
+  .title-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .notice {
+    margin-bottom: 28px;
+  }
+  .headline {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 24px;
+  }
+  .savings {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--geodeep) 0%, var(--geodark) 50%, var(--geomid) 100%);
+    color: #fff;
+    border-radius: 10px;
+    padding: 32px 32px 28px;
+    display: flex;
+    flex-direction: column;
+  }
+  .savings::after {
+    content: '';
+    position: absolute;
+    right: -80px;
+    top: -60px;
+    width: 340px;
+    height: 260px;
+    background: var(--torus) center / contain no-repeat;
+    opacity: 0.18;
+    pointer-events: none;
+  }
+  .kicker {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #d9c08e;
+  }
+  .big {
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 6vw, 4.2rem);
+    font-weight: 300;
+    line-height: 1.05;
+    margin-top: 12px;
+  }
+  .big.pending {
+    font-style: italic;
+  }
+  .sub {
+    color: #c9d7ea;
+    margin-top: 8px;
+  }
+  .funnel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    margin-top: 28px;
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+  }
+  .funnel div {
+    background: rgba(20, 50, 68, 0.6);
+    padding: 14px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .step {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #9fb6d3;
+  }
+  .val {
+    font-weight: 650;
+    font-size: 1.05rem;
+  }
+  .def {
+    font-size: 0.78rem;
+    color: #b3c3d8;
+    line-height: 1.35;
+  }
+  .kpis {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .kpi {
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--geoblue);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: #fff;
+  }
+  .kpi.wide {
+    grid-column: 1 / -1;
+    border-top-color: var(--geogray);
+    background: var(--geomist);
+  }
+  .kpi .num {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    line-height: 1.1;
+    color: var(--coolblack);
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi .lbl {
+    font-size: 0.86rem;
+    color: var(--muted);
+  }
+
+  .progress {
+    height: 8px;
+    background: var(--geolight);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .progress .fill {
+    height: 100%;
+    min-width: 6px;
+    background: var(--geogold);
+  }
+  .timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+  .timeline li {
+    border-left: 3px solid var(--georule);
+    padding: 4px 0 4px 12px;
+    font-size: 0.86rem;
+  }
+  .timeline li.next {
+    border-left-color: var(--geogold);
+    background: var(--gold-soft);
+    border-radius: 0 6px 6px 0;
+  }
+  .timeline li.done {
+    border-left-color: var(--geomid);
+  }
+  .timeline .date {
+    display: block;
+    font-weight: 650;
+    color: var(--coolblack);
+  }
+  .timeline .text {
+    color: var(--muted);
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .filters button {
+    font: inherit;
+    font-size: 0.82rem;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--georule);
+    background: #fff;
+    color: var(--geomid);
+    cursor: pointer;
+  }
+  .filters button[aria-pressed='true'] {
+    background: var(--geomid);
+    border-color: var(--geomid);
+    color: #fff;
+  }
+  .scorecard td {
+    vertical-align: middle;
+  }
+  .rank {
+    font-weight: 700;
+    color: var(--geomid);
+    text-align: center;
+  }
+  .agency {
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--coolblack);
+  }
+  .agency:hover {
+    text-decoration: underline;
+  }
+  .group {
+    display: block;
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .proto {
+    font-size: 0.86rem;
+  }
+  .proto + .badge {
+    margin-left: 6px;
+  }
+  .when {
+    white-space: nowrap;
+    font-size: 0.86rem;
+  }
+  .when span {
+    display: block;
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+  .empty {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+    border: 1px dashed var(--georule);
+    border-radius: 10px;
+    padding: 28px;
+    background: var(--geomist);
+  }
+  .empty img {
+    width: 64px;
+    height: auto;
+    opacity: 0.85;
+  }
+  .empty h3 {
+    font-size: 1.25rem;
+  }
+  .empty p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    max-width: 75ch;
+  }
+  @media (max-width: 960px) {
+    .headline {
+      grid-template-columns: 1fr;
+    }
+    .timeline {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 560px) {
+    .funnel {
+      grid-template-columns: 1fr;
+    }
+    .timeline {
+      grid-template-columns: 1fr;
+    }
+    .empty {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

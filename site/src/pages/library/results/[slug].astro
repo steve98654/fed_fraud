@@ -1,0 +1,85 @@
+---
+import Base from '../../../layouts/Base.astro';
+import PageTitle from '../../../components/PageTitle.astro';
+import Placeholder from '../../../components/Placeholder.astro';
+import { resultsOutline } from '../../../data/library';
+import { agencies, url, fmtDate, weekEnd, weekStart, groupLabel } from '../../../lib/content';
+import { weeksLabel } from '../../../lib/format';
+
+export function getStaticPaths() {
+  return agencies().map((a) => ({ params: { slug: a.slug }, props: { a } }));
+}
+const { a } = Astro.props;
+---
+
+<Base title={`${a.short} detailed results`} section="library">
+  <PageTitle
+    eyebrow="Section 4 · Detailed results"
+    title={`${a.name}: detailed results`}
+    lead={`Results, methodology notes and lead outcomes for ${a.short}, written when its Phase 1 review is complete.`}
+    crumbs={[
+      { label: 'Scorecard', href: url() },
+      { label: 'Research library', href: url('library/') },
+    ]}
+  />
+  <section class="section">
+    <div class="container layout">
+      <Placeholder outline={resultsOutline} />
+      <aside class="facts">
+        <h3>Document status</h3>
+        <dl>
+          <div>
+            <dt>Status</dt>
+            <dd><span class="badge placeholder">Placeholder</span></dd>
+          </div>
+          <div>
+            <dt>Fraud savings identified</dt>
+            <dd><span class="badge pending">Pending</span></dd>
+          </div>
+          <div>
+            <dt>Review window</dt>
+            <dd>
+              {weeksLabel(a.startWeek, a.endWeek)}: {fmtDate(weekStart(a.startWeek))} to {fmtDate(weekEnd(a.endWeek))}
+            </dd>
+          </div>
+          <div>
+            <dt>Workstream</dt>
+            <dd>{groupLabel(a.group)}</dd>
+          </div>
+          <div>
+            <dt>Investigations</dt>
+            <dd>{a.ideas.map((i) => i.id).join(', ')}</dd>
+          </div>
+          <div>
+            <dt>Review memo due</dt>
+            <dd>{fmtDate(weekEnd(15))}</dd>
+          </div>
+          <div>
+            <dt>Source file (when written)</dt>
+            <dd><code>docs/reviews/{a.slug}.md</code></dd>
+          </div>
+        </dl>
+        <a class="btn" href={url(`agencies/${a.slug}/`)}>One-page plan →</a>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 40px;
+    align-items: start;
+  }
+  .facts .btn {
+    margin-top: 18px;
+    width: 100%;
+    justify-content: center;
+  }
+  @media (max-width: 900px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
