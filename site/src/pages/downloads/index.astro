@@ -1,0 +1,181 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import { agencies, url } from '../../lib/content';
+import { toolsFor } from '../../data/tools';
+
+const list = agencies();
+const plans = [
+  {
+    title: 'Five-page roadmap',
+    file: 'roadmap.pdf',
+    text: '86 investigation ideas across the 33 agencies, the ten to start first, and the cross-agency Phase 2 ideas.',
+  },
+  {
+    title: 'Detailed review plan',
+    file: 'review_plan.pdf',
+    text: 'Week-by-week Phase 1 plan: shared foundation, validation, lead packages and a review plan for every agency.',
+  },
+  {
+    title: 'Top 33 agency ranking',
+    file: 'agencies/top33.pdf',
+    text: 'How the 33 largest agencies were scored on exposure, public data, SBA method fit and actionability.',
+  },
+  {
+    title: 'Working plan',
+    file: 'plan.pdf',
+    text: 'The original plan for extending the SBA fraud work to the federal government.',
+  },
+];
+---
+
+<Base title="Downloads" section="downloads">
+  <PageTitle
+    eyebrow="Leave-behinds"
+    title="Downloads for agency meetings"
+    lead="A brief for each of the 33 agencies, built from its agency page, plus the planning documents behind the scorecard. Every file is a draft for discussion, uses public data only and reports no savings yet."
+    crumbs={[{ label: 'Scorecard', href: url() }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Plans</span>
+          <h2>Planning documents</h2>
+        </div>
+      </div>
+      <div class="plans">
+        {
+          plans.map((p) => (
+            <a class="plan" href={url(`downloads/docs/${p.file}`)}>
+              <span class="pdf">PDF</span>
+              <div>
+                <h3>{p.title}</h3>
+                <p>{p.text}</p>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Agency briefs</span>
+          <h2>One brief per agency</h2>
+          <p>
+            Each brief covers the investigations we propose, the public data and detection methods, what we deliver and what we
+            ask of the agency in Phase 2. Open the print view to adjust before printing.
+          </p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Agency</th>
+              <th>Investigations</th>
+              <th>Brief</th>
+              <th>Also</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              list.map((a) => {
+                const tool = toolsFor(a.slug)[0];
+                return (
+                  <tr>
+                    <td class="rank">{a.rank}</td>
+                    <td>
+                      <a href={url(`agencies/${a.slug}/`)}>{a.name}</a>
+                    </td>
+                    <td class="ids">
+                      {a.ideas.map((i) => (
+                        <span class="id-chip">{i.id}</span>
+                      ))}
+                    </td>
+                    <td class="nowrap">
+                      <a href={url(`downloads/briefs/${a.slug}.pdf`)}>PDF</a> ·{' '}
+                      <a href={url(`briefs/${a.slug}/`)}>Print view</a>
+                    </td>
+                    <td class="nowrap">
+                      <a href={url(`downloads/docs/agencies/${a.slug}.pdf`)}>One-pager</a>
+                      {tool && (
+                        <>
+                          {' '}· <a href={url(`tools/${tool.slug}/`)}>Tool preview</a>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .plans {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .plan {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 18px 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .plan:hover {
+    background: var(--geomist);
+    color: var(--ink);
+  }
+  .pdf {
+    flex: none;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background: var(--geomid);
+    border-radius: 4px;
+    padding: 6px 8px;
+  }
+  h3 {
+    font-size: 1.1rem;
+  }
+  .plan p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .rank {
+    font-weight: 700;
+    color: var(--geogold);
+  }
+  .ids {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .nowrap {
+    white-space: nowrap;
+  }
+  @media (max-width: 760px) {
+    .plans {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

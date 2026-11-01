@@ -1,0 +1,209 @@
+---
+// HHS-1 / HHS-2 wireframe: hospice and home health risk map. Sample data only.
+import Frame from './Frame.astro';
+
+// Deterministic scatter of sample providers over a schematic county.
+let seed = 7;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const dots = Array.from({ length: 70 }, () => {
+  const r = rnd();
+  return { x: 40 + rnd() * 380, y: 40 + rnd() * 210, risk: r > 0.9 ? 'hi' : r > 0.72 ? 'md' : 'lo' };
+});
+const cluster = Array.from({ length: 14 }, (_, i) => ({
+  x: 318 + Math.cos(i * 1.7) * (8 + (i % 4) * 5),
+  y: 112 + Math.sin(i * 1.7) * (7 + (i % 3) * 5),
+  risk: i < 9 ? 'hi' : 'md',
+}));
+const color = { hi: 'var(--risk-hi)', md: 'var(--risk-md)', lo: 'var(--risk-lo)' } as const;
+
+const rows = [
+  { id: 'H-0417', type: 'Hospice', enrolled: 'Mar 2023', score: 94, reasons: ['Shared address', 'Billing ramp', 'Owner tied to LEIE'] },
+  { id: 'H-0433', type: 'Hospice', enrolled: 'Apr 2023', score: 91, reasons: ['Shared address', 'Live discharges'] },
+  { id: 'A-1182', type: 'HHA', enrolled: 'Jan 2022', score: 87, reasons: ['Shared owner', 'Billing ramp'] },
+  { id: 'H-0398', type: 'Hospice', enrolled: 'Nov 2022', score: 83, reasons: ['Long stays', 'Dementia-only share'] },
+  { id: 'H-0451', type: 'Hospice', enrolled: 'Jun 2023', score: 79, reasons: ['Shared address', 'Ownership changes'] },
+  { id: 'A-1207', type: 'HHA', enrolled: 'Feb 2024', score: 72, reasons: ['Billing ramp'] },
+];
+
+const peers = [
+  { k: 'Payments, first 24 months', v: '3.4× peers', w: 88, p: 26 },
+  { k: 'Average length of stay', v: '2.1× peers', w: 64, p: 30 },
+  { k: 'Live discharge rate', v: '2.6× peers', w: 70, p: 27 },
+  { k: 'Dementia-only diagnoses', v: '1.8× peers', w: 52, p: 29, c: 'var(--risk-md)' },
+  { k: 'Providers at this address', v: '6', w: 75, p: 8 },
+];
+
+const notes = [
+  { title: 'Risk map', text: 'Every hospice and home health agency in the hot spot, colored by score. Clusters of new providers at shared addresses stand out at a glance.' },
+  { title: 'Ranked list', text: 'Providers ordered by score, with the top reasons shown as plain-language tags so an analyst can triage without opening each record.' },
+  { title: 'Why this score', text: 'Each signal compared with providers of the same type, county and enrollment year. The black tick marks the peer median.' },
+  { title: 'Owner network', text: 'Owners and managing employees from the CMS All Owners files, linked to providers, revocations and LEIE exclusions. Most schemes show up as networks, not single providers.' },
+  { title: 'Back-test', text: 'The share of top-ranked providers that CMS or DOJ have already suspended or charged. It is measured in week 6 and is pending until then.' },
+  { title: 'Lead package', text: 'Selected providers export to a referral packet with sources, reasons and caveats, ready for CMS CPI or HHS-OIG review.' },
+];
+---
+
+<Frame
+  app="Hospice and home health risk map"
+  ideas={['HHS-1', 'HHS-2']}
+  notes={notes}
+  foot="Sources: CMS enrollment, All Owners and Post-Acute Care files; NPPES; LEIE. Public files lag 1 to 2 years."
+>
+  <div class="wf-toolbar">
+    <span class="wf-select">Region <b>Los Angeles County</b></span>
+    <span class="wf-select">Type <b>Hospice + HHA</b></span>
+    <span class="wf-select">Enrolled <b>2021 to 2025</b></span>
+    <span class="wf-select">Score <b>60+</b></span>
+    <span class="spacer"></span>
+    <span class="wf-btn">Run back-test</span>
+    <span class="wf-btn solid">Export lead package</span>
+  </div>
+  <div class="wf-body">
+    <div class="wf-cols">
+      <div class="wf-panel">
+        <span class="co">1</span>
+        <h4>Risk map · 412 providers</h4>
+        <svg viewBox="0 0 460 290" aria-hidden="true">
+          <rect x="0" y="0" width="460" height="290" rx="6" fill="#eef3f8" />
+          <path d="M30 60 L120 28 L260 34 L420 22 L440 120 L425 262 L240 270 L60 258 L22 170 Z" fill="#f9fbfd" stroke="#c3cfdf" stroke-width="1.5" />
+          {[70, 130, 190, 240].map((y) => <line x1="30" x2="435" y1={y} y2={y} stroke="#e3e9f1" />)}
+          {[100, 180, 260, 340].map((x) => <line y1="30" y2="265" x1={x} x2={x} stroke="#e3e9f1" />)}
+          {dots.map((d) => <circle cx={d.x} cy={d.y} r="3.6" fill={color[d.risk as keyof typeof color]} opacity="0.85" />)}
+          <circle cx="318" cy="112" r="34" fill="rgba(181,71,58,0.08)" stroke="var(--risk-hi)" stroke-dasharray="4 3" />
+          {cluster.map((d) => <circle cx={d.x} cy={d.y} r="3.8" fill={color[d.risk as keyof typeof color]} stroke="#fff" stroke-width="0.8" />)}
+          <line x1="345" y1="92" x2="360" y2="64" stroke="var(--wf-ink)" />
+          <rect x="252" y="40" width="196" height="24" rx="4" fill="#fff" stroke="#c3cfdf" />
+          <text x="260" y="56" font-size="10.5" fill="#263043">Cluster C-07: 14 providers, 3 addresses</text>
+        </svg>
+        <div class="legend">
+          <span><i style="background:var(--risk-hi)"></i>Score 80+</span>
+          <span><i style="background:var(--risk-md)"></i>60 to 79</span>
+          <span><i style="background:var(--risk-lo)"></i>Below 60</span>
+        </div>
+      </div>
+      <div class="wf-panel">
+        <span class="co">2</span>
+        <h4>Ranked providers</h4>
+        <table class="wf-table">
+          <thead>
+            <tr><th>Provider</th><th class="hide-sm">Type</th><th class="hide-sm">Enrolled</th><th>Score</th><th>Top reasons</th></tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((r, i) => (
+                <tr class={i === 0 ? 'sel' : undefined}>
+                  <td class="mono">{r.id}</td>
+                  <td class="hide-sm">{r.type}</td>
+                  <td class="hide-sm">{r.enrolled}</td>
+                  <td>
+                    <span class="score" style={`--w:${r.score}%;--c:${r.score >= 80 ? 'var(--risk-hi)' : 'var(--risk-md)'}`}>
+                      {r.score}<i />
+                    </span>
+                  </td>
+                  <td>
+                    <div class="chips">
+                      {r.reasons.map((x) => (
+                        <span class={x.includes('LEIE') ? 'chip hot' : 'chip'}>{x}</span>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="wf-cols">
+      <div class="wf-panel">
+        <span class="co">3</span>
+        <h4>Why H-0417 scores 94</h4>
+        <p class="sub">Hospice · enrolled March 2023 · compared with 58 county peers enrolled the same year</p>
+        {
+          peers.map((p) => (
+            <div class="peer">
+              <span>{p.k}</span>
+              <span class="bar" style={`--w:${p.w}%;--p:${p.p}%;${p.c ? `--c:${p.c}` : ''}`}>
+                <span />
+                <em />
+              </span>
+              <b>{p.v}</b>
+            </div>
+          ))
+        }
+      </div>
+      <div class="wf-panel">
+        <span class="co">4</span>
+        <h4>Owner network</h4>
+        <svg viewBox="0 0 420 230" aria-hidden="true">
+          <g stroke="#9fb0c9" stroke-width="1.4">
+            <line x1="90" y1="70" x2="200" y2="40" /><line x1="90" y1="70" x2="210" y2="105" />
+            <line x1="90" y1="70" x2="190" y2="175" /><line x1="300" y1="80" x2="210" y2="105" />
+            <line x1="300" y1="80" x2="330" y2="170" /><line x1="300" y1="80" x2="200" y2="40" />
+            <line x1="90" y1="70" x2="50" y2="170" stroke="var(--risk-hi)" stroke-dasharray="4 3" />
+            <line x1="300" y1="80" x2="380" y2="30" stroke="var(--risk-hi)" stroke-dasharray="4 3" />
+          </g>
+          <g font-size="10" fill="#263043">
+            <rect x="72" y="56" width="36" height="28" rx="3" fill="var(--navy)" /><text x="78" y="74" fill="#fff">O-12</text>
+            <rect x="282" y="66" width="36" height="28" rx="3" fill="var(--navy)" /><text x="288" y="84" fill="#fff">O-31</text>
+            <circle cx="200" cy="40" r="15" fill="var(--risk-hi)" /><text x="182" y="20">H-0417</text>
+            <circle cx="210" cy="105" r="15" fill="var(--risk-hi)" /><text x="230" y="118">H-0433</text>
+            <circle cx="190" cy="175" r="13" fill="var(--risk-md)" /><text x="172" y="204">H-0451</text>
+            <circle cx="330" cy="170" r="13" fill="var(--risk-hi)" /><text x="312" y="199">A-1182</text>
+            <path d="M50 152 L66 170 L50 188 L34 170 Z" fill="#fff" stroke="var(--risk-hi)" stroke-width="2" />
+            <text x="10" y="208">LEIE exclusion</text>
+            <g stroke="var(--risk-hi)" stroke-width="2.5"><line x1="370" y1="20" x2="390" y2="40" /><line x1="390" y1="20" x2="370" y2="40" /></g>
+            <text x="330" y="58">Revoked 2021</text>
+          </g>
+        </svg>
+        <div class="legend">
+          <span><i style="background:var(--navy);border-radius:2px"></i>Owner or managing employee</span>
+          <span><i style="background:var(--risk-hi)"></i>Provider</span>
+          <span>- - - link to excluded or revoked party</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-panel strip">
+      <span class="co">5</span>
+      <h4>Back-test against known cases</h4>
+      <div class="bt">
+        <div><span class="k">Labels</span> Providers in the May 2026 moratorium materials, Los Angeles payment suspensions and DOJ Health Care Fraud Unit cases, 2020 to 2026</div>
+        <div><span class="k">Top 100 already acted on</span> <span class="badge pending">Pending · measured week 6</span></div>
+        <div class="pk"><span class="co in">6</span> 3 providers selected · <b>Add to lead package</b></div>
+      </div>
+    </div>
+  </div>
+</Frame>
+
+<style>
+  .bt {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: 16px;
+    align-items: center;
+  }
+  .k {
+    display: block;
+    color: var(--wf-soft);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .pk {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--geomid);
+  }
+  .co.in {
+    position: static;
+    box-shadow: none;
+  }
+  @media (max-width: 860px) {
+    .bt {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

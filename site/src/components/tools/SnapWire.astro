@@ -1,0 +1,207 @@
+---
+// USDA-1 / USDA-2 wireframe: SNAP retailer and meal sponsor risk map. Sample data only.
+import Frame from './Frame.astro';
+
+let seed = 11;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const stores = Array.from({ length: 80 }, () => {
+  const r = rnd();
+  return { x: 30 + rnd() * 400, y: 30 + rnd() * 220, risk: r > 0.92 ? 'hi' : r > 0.75 ? 'md' : 'lo' };
+});
+const hot = [
+  { x: 262, y: 142, risk: 'hi' }, { x: 274, y: 152, risk: 'hi' }, { x: 251, y: 156, risk: 'hi' },
+  { x: 268, y: 128, risk: 'md' }, { x: 286, y: 140, risk: 'md' },
+];
+const dq = [{ x: 266, y: 147 }, { x: 120, y: 90 }, { x: 360, y: 220 }];
+const color = { hi: 'var(--risk-hi)', md: 'var(--risk-md)', lo: 'var(--risk-lo)' } as const;
+
+const rows = [
+  { id: 'S-30418', type: 'Convenience', auth: 'Oct 2021', near: '0 ft', score: 95, sig: ['DQ store address', 'Owner reuse'] },
+  { id: 'S-30455', type: 'Convenience', auth: 'Jan 2022', near: '0.1 mi', score: 89, sig: ['Shared phone', 'Dense cluster'] },
+  { id: 'S-29107', type: 'Small grocery', auth: 'May 2020', near: '0.2 mi', score: 81, sig: ['Dense cluster', 'Short-lived owners'] },
+  { id: 'S-31260', type: 'Convenience', auth: 'Aug 2023', near: '0.4 mi', score: 74, sig: ['Opened after DQ nearby'] },
+  { id: 'S-27733', type: 'Gas station', auth: 'Mar 2019', near: '0.9 mi', score: 66, sig: ['3× store density'] },
+];
+
+const sites = [
+  { id: 'M-118', sponsor: 'SP-04', meals: 2400, kids: 310 },
+  { id: 'M-121', sponsor: 'SP-04', meals: 1900, kids: 280 },
+  { id: 'M-207', sponsor: 'SP-09', meals: 850, kids: 640 },
+  { id: 'M-330', sponsor: 'SP-12', meals: 420, kids: 900 },
+];
+const maxRatio = 8;
+
+const notes = [
+  { title: 'Retailer map', text: 'Every SNAP-authorized store, colored by score, with disqualified stores marked. Risky stores tend to cluster around past disqualifications.' },
+  { title: 'Ranked stores', text: 'Stores ordered by score, with distance to the nearest disqualified store and the reasons behind the score.' },
+  { title: 'Address history', text: 'Every store authorized at the same address over time. A new store opening where one was disqualified, often within weeks, is a classic re-entry pattern.' },
+  { title: 'Owner reuse', text: 'Links between disqualified owners and current stores through shared names, phones and addresses in public records and retailer appeal cases.' },
+  { title: 'Meal sponsor capacity', text: 'Meals claimed per site against the number of children living nearby (Census ACS). Sites claiming far more meals than local children is the Feeding Our Future pattern.' },
+  { title: 'Lead package', text: 'Selected stores and sites export with sources and caveats, for FNS Retailer Operations, USDA OIG or the state agency.' },
+];
+---
+
+<Frame
+  app="SNAP retailer and meal sponsor risk map"
+  ideas={['USDA-1', 'USDA-2']}
+  notes={notes}
+  foot="Sources: FNS historical retailer data and disqualifications; SNAP participation by county; ACS child population; state CACFP site lists."
+>
+  <div class="wf-toolbar">
+    <span class="wf-select">State <b>Pilot state A</b></span>
+    <span class="wf-select">Stores <b>Convenience, small grocery, gas</b></span>
+    <span class="wf-select">Authorized <b>2015 to 2026</b></span>
+    <span class="spacer"></span>
+    <span class="wf-select plain"><b>Retailers</b> · Meal sponsors</span>
+    <span class="wf-btn solid">Export lead package</span>
+  </div>
+  <div class="wf-body">
+    <div class="wf-cols">
+      <div class="wf-panel">
+        <span class="co">1</span>
+        <h4>Retailer map · 3,906 stores</h4>
+        <svg viewBox="0 0 460 280" aria-hidden="true">
+          <rect x="0" y="0" width="460" height="280" rx="6" fill="#eef3f8" />
+          <path d="M20 110 C120 90 200 140 300 120 S420 100 450 130" stroke="#d6e0ec" stroke-width="10" fill="none" />
+          <path d="M210 0 C200 90 240 180 230 280" stroke="#d6e0ec" stroke-width="7" fill="none" />
+          {stores.map((d) => <circle cx={d.x} cy={d.y} r="3.4" fill={color[d.risk as keyof typeof color]} opacity="0.8" />)}
+          <circle cx="266" cy="147" r="30" fill="rgba(181,71,58,0.08)" stroke="var(--risk-hi)" stroke-dasharray="4 3" />
+          {hot.map((d) => <circle cx={d.x} cy={d.y} r="4" fill={color[d.risk as keyof typeof color]} stroke="#fff" stroke-width="0.8" />)}
+          {
+            dq.map((d) => (
+              <g stroke="#263043" stroke-width="2.2">
+                <line x1={d.x - 5} y1={d.y - 5} x2={d.x + 5} y2={d.y + 5} />
+                <line x1={d.x + 5} y1={d.y - 5} x2={d.x - 5} y2={d.y + 5} />
+              </g>
+            ))
+          }
+          <rect x="276" y="182" width="176" height="24" rx="4" fill="#fff" stroke="#c3cfdf" />
+          <text x="284" y="198" font-size="10.5" fill="#263043">5 stores within 0.5 mi of a DQ</text>
+          <line x1="290" y1="166" x2="320" y2="182" stroke="var(--wf-ink)" />
+        </svg>
+        <div class="legend">
+          <span><i style="background:var(--risk-hi)"></i>Score 80+</span>
+          <span><i style="background:var(--risk-md)"></i>60 to 79</span>
+          <span><i style="background:var(--risk-lo)"></i>Below 60</span>
+          <span>✕ Disqualified store</span>
+        </div>
+      </div>
+      <div class="wf-panel">
+        <span class="co">2</span>
+        <h4>Ranked stores</h4>
+        <table class="wf-table">
+          <thead>
+            <tr><th>Store</th><th>Nearest DQ</th><th>Score</th><th>Signals</th></tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((r, i) => (
+                <tr class={i === 0 ? 'sel' : undefined}>
+                  <td class="mono">{r.id}<span class="sub2">{r.type} · {r.auth}</span></td>
+                  <td>{r.near}</td>
+                  <td>
+                    <span class="score" style={`--w:${r.score}%;--c:${r.score >= 80 ? 'var(--risk-hi)' : 'var(--risk-md)'}`}>
+                      {r.score}<i />
+                    </span>
+                  </td>
+                  <td>
+                    <div class="chips">
+                      {r.sig.map((x) => (
+                        <span class={/DQ|reuse/.test(x) ? 'chip hot' : 'chip'}>{x}</span>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="wf-cols">
+      <div class="wf-panel">
+        <span class="co">3</span>
+        <h4>Address history · S-30418</h4>
+        <svg viewBox="0 0 420 140" aria-hidden="true">
+          <g font-size="10" fill="#263043">
+            <text x="10" y="16" fill="#6b7587">Stores authorized at this address</text>
+            <rect x="20" y="30" width="230" height="24" rx="4" fill="#9fb0c9" />
+            <text x="28" y="46" fill="#fff" font-weight="600">S-22071 · 2016 to 2021</text>
+            <g stroke="#263043" stroke-width="2.2"><line x1="244" y1="36" x2="256" y2="48" /><line x1="256" y1="36" x2="244" y2="48" /></g>
+            <text x="200" y="72" fill="var(--risk-hi)" font-weight="600">Permanently disqualified, Aug 2021</text>
+            <rect x="268" y="86" width="140" height="24" rx="4" fill="var(--risk-hi)" />
+            <text x="276" y="102" fill="#fff" font-weight="600">S-30418 · Oct 2021 to now</text>
+            <line x1="20" y1="124" x2="410" y2="124" stroke="#c3cfdf" />
+            {['2016', '2018', '2020', '2022', '2024', '2026'].map((y, i) => <text x={20 + i * 72} y="137" fill="#6b7587" font-size="9">{y}</text>)}
+          </g>
+        </svg>
+        <div class="peer"><span>Gap after disqualification</span><span class="bar" style="--w:12%;--p:55%;--c:var(--risk-hi)"><span></span><em></em></span><b>7 weeks</b></div>
+      </div>
+      <div class="wf-panel">
+        <span class="co">4</span>
+        <h4>Owner reuse</h4>
+        <svg viewBox="0 0 420 140" aria-hidden="true">
+          <g stroke="#9fb0c9" stroke-width="1.4">
+            <line x1="70" y1="70" x2="190" y2="30" /><line x1="70" y1="70" x2="190" y2="110" stroke="var(--risk-hi)" stroke-dasharray="4 3" />
+            <line x1="190" y1="110" x2="320" y2="110" />
+          </g>
+          <g font-size="10" fill="#263043">
+            <rect x="48" y="56" width="44" height="28" rx="3" fill="var(--navy)" /><text x="56" y="74" fill="#fff">P-118</text>
+            <text x="22" y="48" fill="#6b7587">Owner of S-22071</text>
+            <circle cx="190" cy="30" r="13" fill="#9fb0c9" /><text x="210" y="34">S-22071 (DQ)</text>
+            <circle cx="190" cy="110" r="14" fill="var(--risk-hi)" /><text x="164" y="136">S-30418</text>
+            <circle cx="320" cy="110" r="13" fill="var(--risk-hi)" /><text x="300" y="136">S-30455</text>
+            <text x="112" y="104" fill="var(--risk-hi)">same phone</text>
+            <text x="232" y="104" fill="#6b7587">same manager</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="wf-panel">
+      <span class="co">5</span>
+      <h4>Meal sponsor capacity · CACFP sites</h4>
+      <table class="wf-table">
+        <thead>
+          <tr><th>Site</th><th>Sponsor</th><th class="num">Meals claimed per day</th><th class="num hide-sm">Children within 1 mile</th><th>Meals per child nearby</th></tr>
+        </thead>
+        <tbody>
+          {
+            sites.map((s) => {
+              const r = s.meals / s.kids;
+              return (
+                <tr class={r > 4 ? 'sel' : undefined}>
+                  <td class="mono">{s.id}</td>
+                  <td class="mono">{s.sponsor}</td>
+                  <td class="num">{s.meals.toLocaleString('en-US')}</td>
+                  <td class="num hide-sm">{s.kids.toLocaleString('en-US')}</td>
+                  <td>
+                    <span class="score" style={`--w:${Math.min(100, (r / maxRatio) * 100)}%;--c:${r > 4 ? 'var(--risk-hi)' : r > 1 ? 'var(--risk-md)' : 'var(--risk-lo)'}`}>
+                      {r.toFixed(1)}<i />
+                    </span>
+                  </td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+      <div class="pk"><span class="co in">6</span> 2 stores and 2 sites selected · <b>Add to lead package</b></div>
+    </div>
+  </div>
+</Frame>
+
+<style>
+  .pk {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--geomid);
+    margin-top: 10px;
+  }
+  .co.in {
+    position: static;
+    box-shadow: none;
+  }
+</style>

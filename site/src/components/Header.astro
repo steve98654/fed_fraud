@@ -10,6 +10,7 @@ const nav = [
   { key: 'plan', label: 'Roadmap', href: url('plan/') },
   { key: 'pitches', label: 'Pitches', href: url('pitches/') },
   { key: 'case-study', label: 'SBA case study', href: url('case-study/sba/') },
+  { key: 'tools', label: 'Tools', href: url('tools/') },
   { key: 'library', label: 'Research library', href: url('library/') },
 ];
 ---
@@ -17,7 +18,7 @@ const nav = [
 <div class="utility">
   <div class="container">
     <span>The Geodesic Accountability Office · an independent analysis by Geodesic Solutions</span>
-    <span class="draft">Draft for discussion · Public data only · No findings yet</span>
+    <span class="right"><span class="draft">Draft for discussion · Public data only · No findings yet</span><a class="dl" href={url('downloads/')} aria-current={current === 'downloads' ? 'page' : undefined}>Downloads</a></span>
   </div>
 </div>
 <header class="site-header">
@@ -57,6 +58,19 @@ const nav = [
   }
   .draft {
     color: #d9c08e;
+  }
+  .right {
+    display: inline-flex;
+    gap: 16px;
+  }
+  .dl {
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .dl:hover,
+  .dl[aria-current='page'] {
+    text-decoration: underline;
   }
   .site-header {
     background: var(--navy);
@@ -102,7 +116,7 @@ const nav = [
   }
   nav a {
     display: block;
-    padding: 30px 16px 27px;
+    padding: 30px 13px 27px;
     text-decoration: none;
     font-weight: 500;
     font-size: 0.95rem;

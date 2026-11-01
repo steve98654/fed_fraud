@@ -1,0 +1,130 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import HospiceWire from '../../components/tools/HospiceWire.astro';
+import SetAsideWire from '../../components/tools/SetAsideWire.astro';
+import SnapWire from '../../components/tools/SnapWire.astro';
+import '../../styles/wireframe.css';
+import { tools } from '../../data/tools';
+import { agencies, deliverable, hasPitch, url } from '../../lib/content';
+
+export function getStaticPaths() {
+  return tools.map((t) => ({ params: { slug: t.slug } }));
+}
+
+const views = { 'hhs-hospice': HospiceWire, 'dod-set-asides': SetAsideWire, 'snap-retailers': SnapWire };
+const t = tools.find((x) => x.slug === Astro.params.slug)!;
+const View = views[t.slug as keyof typeof views];
+const a = agencies().find((x) => x.slug === t.agency)!;
+const d = deliverable(t.agency);
+const pitch = t.ideas.find((id) => hasPitch(id));
+const i = tools.indexOf(t);
+const next = tools[(i + 1) % tools.length];
+---
+
+<Base title={`${t.title} (wireframe)`} section="tools" description={t.summary}>
+  <PageTitle
+    eyebrow={`Tool preview · ${a.short} · ${t.ideas.join(', ')}`}
+    title={t.title}
+    lead={t.summary}
+    crumbs={[
+      { label: 'Scorecard', href: url() },
+      { label: 'Tool previews', href: url('tools/') },
+    ]}
+  >
+    <div class="actions">
+      <a class="btn" href={url(`agencies/${a.slug}/`)}>{a.short} agency plan</a>
+      {pitch && <a class="btn" href={url(`pitches/${pitch.toLowerCase()}/`)}>{pitch} pitch</a>}
+      <a class="btn primary" href={url(`downloads/briefs/${a.slug}.pdf`)}>{a.short} brief (PDF)</a>
+    </div>
+  </PageTitle>
+
+  <section class="section">
+    <div class="container">
+      <p class="notice no-print">
+        <span>
+          <strong>This is a wireframe, not a result.</strong> It shows the screen {a.short} would receive from this
+          prototype. Every record on it is made up for illustration; scores, counts and dollar amounts are sample values,
+          not findings. Real results appear on the scorecard only after validation and counsel review.
+        </span>
+      </p>
+      <div class="frame-wrap">
+        <View />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container cols">
+      <div>
+        <span class="eyebrow">What {a.short} gets</span>
+        <h2>Delivered {d?.when ? `in ${d.when}` : `by week ${a.endWeek}`}</h2>
+        <ul>
+          {t.delivers.map((x) => <li>{x}</li>)}
+        </ul>
+        <p class="soft">Used by {t.users}.</p>
+      </div>
+      <div>
+        <span class="eyebrow">Data behind it</span>
+        <h2>Public data in Phase 1</h2>
+        <ul>
+          {t.data.map((x) => <li>{x}</li>)}
+        </ul>
+        <p class="soft"><strong>Phase 2.</strong> {t.phase2}</p>
+      </div>
+    </div>
+  </section>
+
+  <nav class="container pn" aria-label="Other tool previews">
+    <a class="btn" href={url('tools/')}>← All tool previews</a>
+    <a class="btn" href={url(`tools/${next.slug}/`)}>{next.short} →</a>
+  </nav>
+</Base>
+
+<style>
+  .actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .notice {
+    margin: 0 0 28px;
+  }
+  .frame-wrap {
+    overflow-x: auto;
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+  h2 {
+    font-size: 1.5rem;
+    margin: 10px 0 14px;
+  }
+  ul {
+    margin: 0 0 14px;
+    padding-left: 1.2rem;
+  }
+  li {
+    margin: 0.35rem 0;
+  }
+  li::marker {
+    color: var(--geoblue);
+  }
+  .soft {
+    color: var(--muted);
+    font-size: 0.94rem;
+  }
+  .pn {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 24px;
+  }
+  @media (max-width: 860px) {
+    .cols {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+</style>

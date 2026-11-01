@@ -300,3 +300,72 @@ export const docExists = (rel: string) => fs.existsSync(path.join(DOCS, rel));
 /** The one-page pitch for a roadmap idea, e.g. "HHS-1". */
 export const pitchPath = (id: string) => `pitches/${id.toLowerCase()}.md`;
 export const hasPitch = (id: string) => docExists(pitchPath(id));
+
+// ---------------------------------------------------------------------------
+// Review plan pieces used by the agency leave-behinds: what each agency's
+// Phase 1 review delivers, and what we ask the agency for in Phase 2.
+// ---------------------------------------------------------------------------
+export interface Ask {
+  /** Agencies the row covers, as written in the review plan. */
+  label: string;
+  data: string;
+  enables: string;
+  route: string;
+}
+
+/** Phase 2 table labels to brief slugs (rows can cover several agencies). */
+const ASK_LABEL: Record<string, string> = {
+  ...ROADMAP_LABEL,
+  DOE: 'doe', DOL: 'dol', ED: 'ed', 'DOJ grants': 'doj',
+};
+
+let askCache: Map<string, Ask> | undefined;
+
+/** The Phase 2 internal data request for an agency ("Agency ideas" table). */
+export function phase2Ask(slug: string): Ask | undefined {
+  if (!askCache) {
+    askCache = new Map();
+    const src = read('review_plan.md');
+    const start = src.indexOf('#### Agency ideas');
+    const block = src.slice(start, src.indexOf('\n#### ', start + 1));
+    for (const [label, data, enables, route] of tableRows(block)) {
+      for (const part of label.split(',').map((s) => s.trim())) {
+        const s = ASK_LABEL[part];
+        if (s) askCache.set(s, { label, data, enables, route });
+      }
+    }
+  }
+  return askCache.get(slug);
+}
+
+/**
+ * What an agency's Phase 1 review delivers: the "Deliver" bullet for the deep
+ * dives, or the short review plan paragraph (without its "Take to" line) for
+ * the pilots and shared screens.
+ */
+export function deliverable(slug: string): { when: string; text: string } | undefined {
+  const src = read('review_plan.md');
+  const at = src.indexOf(`[Brief](agencies/${slug}.md)`);
+  if (at < 0) return undefined;
+  const end = src.slice(at).search(/\n#{2,5} /);
+  const part = src.slice(at, end < 0 ? undefined : at + end).trim();
+  const bold = part.replace(/\n(?!- )/g, ' ').match(/\*\*Deliver \(([^)]+)\)\.\*\*\s*(.+)/);
+  if (bold) return { when: bold[1], text: bold[2].replace(/\s+/g, ' ').trim() };
+  const body = part
+    .replace(/\s+/g, ' ')
+    .replace(/^\[Brief\]\([^)]+\)\.\s*Rank \d+, score [\d.]+\.\s*(?:[^.]*?weeks? [\d-]+\.\s*)?/, '')
+    .replace(/^Weeks? [\d-]+\.\s*/, '')
+    .replace(/\s*Take to [^.]+\.\s*$/, '')
+    .trim();
+  if (!body || body.startsWith('-')) return undefined;
+  const when = body.match(/\b(?:Deliver(?:ed)?|delivered)\b[^.]*?\b(weeks? \d+(?:-\d+)?)/)?.[1] ?? '';
+  return { when, text: body.replace(/\s*Deliver in weeks? \d+(?:-\d+)?\.$/, '') };
+}
+
+/** Brief sections by heading, for layouts that pick sections individually. */
+export function briefSections(slug: string): Map<string, string> {
+  return sections(read(`agencies/${slug}.md`).replace(/^# .+\n/, ''));
+}
+
+/** Absolute path of a file in ../docs, for endpoints that serve it. */
+export const docPath = (rel: string) => path.join(DOCS, rel);
