@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import PageTitle from '../../components/PageTitle.astro';
 import DocBody from '../../components/DocBody.astro';
+import OnThisPage from '../../components/OnThisPage.astro';
 import { url, doc, REPO } from '../../lib/content';
 
 const d = doc('playbook/sba-case-study.md');
@@ -30,6 +31,7 @@ const rest = d.sections.filter((s) => s !== bottom);
         <DocBody sections={rest} callouts={['Results']} />
       </article>
       <aside>
+        <OnThisPage items={rest.map((s) => ({ id: s.id, label: s.heading.replace(/^\d+\.\s*/, '') }))} />
         <div class="facts">
           <h3>Case study status</h3>
           <dl>

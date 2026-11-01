@@ -1,0 +1,211 @@
+---
+// Side-by-side comparison of two or three agencies. All 33 are rendered at
+// build time as table columns; the selectors show the chosen ones, and the
+// choice is kept in the URL (?a=hhs,dod,usda) so a comparison can be shared.
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import ScoreBar from '../../components/ScoreBar.astro';
+import { agencies, brief, url, mdInline, phase2Ask, fmtDate, weekStart, weekEnd, groupLabel } from '../../lib/content';
+import { usd, weeksLabel } from '../../lib/format';
+import { stageOf } from '../../lib/scorecard';
+
+const list = agencies();
+const DEFAULT = ['hhs', 'dod', 'usda'];
+const rowsDef: { label: string; cell: (a: (typeof list)[0]) => string; html?: boolean; bar?: (a: (typeof list)[0]) => number }[] = [
+  { label: 'Priority rank', cell: (a) => `${a.rank} of 33` },
+  { label: 'Priority score', cell: (a) => a.score.toFixed(1), bar: (a) => a.score },
+  { label: 'Exposure', cell: (a) => String(a.factors.exposure), bar: (a) => a.factors.exposure },
+  { label: 'Public data', cell: (a) => String(a.factors.data), bar: (a) => a.factors.data },
+  { label: 'SBA method fit', cell: (a) => String(a.factors.fit), bar: (a) => a.factors.fit },
+  { label: 'Actionability', cell: (a) => String(a.factors.action), bar: (a) => a.factors.action },
+  { label: 'FY2026 outlays', cell: (a) => `${usd(a.outlaysUsd)} (budget rank ${a.budgetRank})` },
+  { label: 'Bottom line', cell: (a) => brief(a.slug).bottomLine, html: false },
+  { label: 'Workstream', cell: (a) => groupLabel(a.group) },
+  {
+    label: 'Phase 1 window',
+    cell: (a) => (a.startWeek ? `${weeksLabel(a.startWeek, a.endWeek)}: ${fmtDate(weekStart(a.startWeek))} to ${fmtDate(weekEnd(a.endWeek))}` : ''),
+  },
+  {
+    label: 'Investigations',
+    cell: (a) => a.ideas.map((i) => `<p><span class="id-chip">${i.id}</span> ${mdInline(i.text)}</p>`).join(''),
+    html: true,
+  },
+  { label: 'Take leads to', cell: (a) => a.takeTo },
+  { label: 'Phase 2 data ask', cell: (a) => (phase2Ask(a.slug) ? mdInline(phase2Ask(a.slug)!.data) : 'Not in the Phase 2 request'), html: true },
+  { label: 'Stage', cell: (a) => stageOf(a.slug) },
+  { label: 'Fraud savings', cell: () => '<span class="badge pending">Pending</span>', html: true },
+];
+---
+
+<Base
+  title="Compare agencies"
+  section="compare"
+  description="Compare two or three of the 33 agencies side by side: priority factors, outlays, investigations, schedule and Phase 2 data ask."
+>
+  <PageTitle
+    eyebrow="Agency plans · Compare"
+    title="Compare agencies side by side"
+    lead="Pick up to three agencies to compare their priority factors, spending, investigations, Phase 1 window and what we would ask them for in Phase 2. The link updates so you can share a comparison."
+    crumbs={[{ label: 'Scorecard', href: url() }, { label: 'Agency plans', href: url('agencies/') }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="pickers no-print">
+        {
+          [0, 1, 2].map((n) => (
+            <div class="field">
+              <label for={`cmp-${n}`}>Agency {n + 1}</label>
+              <select id={`cmp-${n}`} data-pick>
+                {n === 2 && <option value="">None</option>}
+                {list.map((a) => (
+                  <option value={a.slug} selected={a.slug === DEFAULT[n]}>
+                    #{a.rank} {a.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="table-wrap">
+        <table class="cmp">
+          <caption class="sr-only">Comparison of the selected agencies</caption>
+          <thead>
+            <tr>
+              <td class="blank"></td>
+              {
+                list.map((a) => (
+                  <th scope="col" data-col={a.slug} hidden={!DEFAULT.includes(a.slug)}>
+                    <a href={url(`agencies/${a.slug}/`)}>{a.name}</a>
+                  </th>
+                ))
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rowsDef.map((r) => (
+                <tr>
+                  <th scope="row">{r.label}</th>
+                  {list.map((a) => (
+                    <td data-col={a.slug} hidden={!DEFAULT.includes(a.slug)}>
+                      {r.bar ? (
+                        <ScoreBar value={r.bar(a)} label={`${a.short} ${r.label}`} decimals={r.label === 'Priority score' ? 1 : 0} />
+                      ) : r.html ? (
+                        <Fragment set:html={r.cell(a)} />
+                      ) : (
+                        r.cell(a)
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        Savings stay <em>Pending</em> for every agency until a finding is delivered and validated. Outlays are context, not
+        findings.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const picks = [...document.querySelectorAll<HTMLSelectElement>('[data-pick]')];
+  const cols = [...document.querySelectorAll<HTMLElement>('[data-col]')];
+  const fromUrl = (new URL(location.href).searchParams.get('a') ?? '').split(',').filter(Boolean);
+  fromUrl.slice(0, 3).forEach((s, i) => {
+    if ([...picks[i].options].some((o) => o.value === s)) picks[i].value = s;
+  });
+  function show(push: boolean) {
+    const chosen = [...new Set(picks.map((p) => p.value).filter(Boolean))];
+    cols.forEach((c) => (c.hidden = !chosen.includes(c.dataset.col!)));
+    // Keep the chosen columns in selector order.
+    document.querySelectorAll('table.cmp tr').forEach((tr) => {
+      chosen.forEach((s) => {
+        const cell = tr.querySelector(`[data-col="${s}"]`);
+        if (cell) tr.append(cell);
+      });
+    });
+    if (push) {
+      const u = new URL(location.href);
+      u.searchParams.set('a', chosen.join(','));
+      history.replaceState(null, '', u);
+    }
+  }
+  picks.forEach((p) => p.addEventListener('change', () => show(true)));
+  show(false);
+</script>
+
+<style>
+  .pickers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 22px;
+    margin-bottom: 18px;
+    font-size: 0.9rem;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .field label {
+    font-weight: 600;
+    color: var(--coolblack);
+  }
+  .field select {
+    font: inherit;
+    padding: 6px 10px;
+    border: 1px solid var(--georule);
+    border-radius: var(--radius);
+    background: #fff;
+    max-width: 320px;
+  }
+  .cmp {
+    table-layout: fixed;
+  }
+  .cmp thead th {
+    white-space: normal;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.95rem;
+  }
+  .cmp thead th a {
+    color: #fff;
+  }
+  .cmp thead .blank {
+    width: 170px;
+    background: var(--geodark);
+  }
+  .cmp tbody th {
+    background: var(--geolight);
+    color: var(--coolblack);
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.85rem;
+    white-space: normal;
+    vertical-align: top;
+    border-top: 1px solid var(--line);
+  }
+  .cmp td {
+    font-size: 0.9rem;
+  }
+  .cmp td :global(p) {
+    margin: 0 0 6px;
+  }
+  .note {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  @media (max-width: 720px) {
+    .cmp {
+      table-layout: auto;
+      min-width: 640px;
+    }
+  }
+</style>

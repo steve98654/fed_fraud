@@ -1,0 +1,251 @@
+---
+// Every roadmap investigation idea in one filterable list, plus the
+// cross-agency Phase 2 ideas. Built from docs/roadmap.md.
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import { agencies, roadmap, url, mdInline, hasPitch, GROUPS, groupLabel, fmtDate, weekStart, weekEnd } from '../../lib/content';
+import { weeksLabel } from '../../lib/format';
+
+const list = agencies();
+const road = roadmap();
+const first = new Set(road.startFirst.map((t) => t.id));
+const ideas = list.flatMap((a) =>
+  a.ideas.map((idea, n) => ({ ...idea, a, prototype: n === 0, first: first.has(idea.id), pitch: hasPitch(idea.id) })),
+);
+const plain = (s: string) => s.replace(/\*\*|\*|`/g, '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+---
+
+<Base
+  title="Investigations"
+  section="investigations"
+  description="Every investigation idea in the roadmap, across the 33 agencies, with its workstream, Phase 1 window and pitch."
+>
+  <PageTitle
+    eyebrow="Roadmap · All ideas"
+    title="Every investigation in the roadmap"
+    lead={`${ideas.length} investigation ideas across ${list.length} agencies, plus ${road.crossAgency.length} cross-agency ideas for Phase 2. Each has an ID that later prototypes, memos and proposals use.`}
+    crumbs={[{ label: 'Scorecard', href: url() }, { label: 'Roadmap', href: url('plan/') }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="tools no-print">
+        <div class="field">
+          <label for="inv-q">Search ideas</label>
+          <input id="inv-q" type="search" placeholder="e.g. hospice, shell, SNAP" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="inv-group">Workstream</label>
+          <select id="inv-group">
+            <option value="">All workstreams</option>
+            {GROUPS.map((g) => <option value={g}>{groupLabel(g)}</option>)}
+          </select>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="inv-first" /> Start first only</label>
+          <label><input type="checkbox" id="inv-pitch" /> Has a one-page pitch</label>
+        </div>
+        <p id="inv-count" class="count" role="status" aria-live="polite">Showing all {ideas.length} ideas</p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="inv">
+          <caption class="sr-only">Investigation ideas by agency</caption>
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Investigation</th>
+              <th scope="col">Agency</th>
+              <th scope="col">Phase 1 window</th>
+              <th scope="col">Take leads to</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              ideas.map((i) => (
+                <tr
+                  data-group={i.a.group}
+                  data-first={String(i.first)}
+                  data-pitch={String(i.pitch)}
+                  data-text={`${i.id} ${plain(i.text)} ${i.a.name} ${i.a.short}`.toLowerCase()}
+                >
+                  <td>
+                    <span class="id-chip">{i.id}</span>
+                  </td>
+                  <td>
+                    <span set:html={mdInline(i.text)} />
+                    <span class="tags">
+                      {i.first && <span class="badge first">Start first</span>}
+                      {i.prototype && <span class="badge planned">First prototype</span>}
+                      {i.pitch && (
+                        <a href={url(`pitches/${i.id.toLowerCase()}/`)}>
+                          One-page pitch<span class="sr-only"> for {i.id}</span>
+                        </a>
+                      )}
+                    </span>
+                  </td>
+                  <td>
+                    <a href={url(`agencies/${i.a.slug}/`)}>{i.a.short}</a>
+                    <span class="soft">{groupLabel(i.a.group)}</span>
+                  </td>
+                  <td class="when">
+                    {i.a.startWeek > 0 && (
+                      <>
+                        {weeksLabel(i.a.startWeek, i.a.endWeek)}
+                        <span class="soft">
+                          {fmtDate(weekStart(i.a.startWeek))} – {fmtDate(weekEnd(i.a.endWeek))}
+                        </span>
+                      </>
+                    )}
+                  </td>
+                  <td class="take">{i.a.takeTo}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p id="inv-empty" class="empty" hidden>No ideas match. Clear the search or filters to see all of them.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Phase 2</span>
+          <h2>Cross-agency investigations</h2>
+          <p>These need internal data that Phase 1 leads open the door to. Targets are from the roadmap.</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Investigation</th>
+              <th scope="col">Internal data</th>
+              <th scope="col">Lead agencies</th>
+              <th scope="col">Target</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              road.crossAgency.map((x) => (
+                <tr>
+                  <td>
+                    <span class="id-chip">{x.id}</span>
+                  </td>
+                  <td set:html={mdInline(x.title)} />
+                  <td set:html={mdInline(x.data)} />
+                  <td>{x.lead}</td>
+                  <td class="when">{x.target}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const q = document.querySelector<HTMLInputElement>('#inv-q')!;
+  const g = document.querySelector<HTMLSelectElement>('#inv-group')!;
+  const f = document.querySelector<HTMLInputElement>('#inv-first')!;
+  const p = document.querySelector<HTMLInputElement>('#inv-pitch')!;
+  const count = document.querySelector<HTMLElement>('#inv-count')!;
+  const empty = document.querySelector<HTMLElement>('#inv-empty')!;
+  const rows = [...document.querySelectorAll<HTMLTableRowElement>('table.inv tbody tr')];
+  const params = new URL(location.href).searchParams;
+  if (params.get('q')) q.value = params.get('q')!;
+  function apply() {
+    const term = q.value.trim().toLowerCase();
+    let n = 0;
+    rows.forEach((r) => {
+      const ok =
+        (!term || r.dataset.text!.includes(term)) &&
+        (!g.value || r.dataset.group === g.value) &&
+        (!f.checked || r.dataset.first === 'true') &&
+        (!p.checked || r.dataset.pitch === 'true');
+      r.hidden = !ok;
+      if (ok) n++;
+    });
+    count.textContent = n === rows.length ? `Showing all ${rows.length} ideas` : `Showing ${n} of ${rows.length} ideas`;
+    empty.hidden = n > 0;
+  }
+  [q, g, f, p].forEach((el) => el.addEventListener('input', apply));
+  apply();
+</script>
+
+<style>
+  .tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px 22px;
+    margin-bottom: 18px;
+    font-size: 0.9rem;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .field label {
+    font-weight: 600;
+    color: var(--coolblack);
+  }
+  .field input,
+  .field select {
+    font: inherit;
+    padding: 6px 10px;
+    border: 1px solid var(--georule);
+    border-radius: var(--radius);
+    background: #fff;
+    min-width: 230px;
+  }
+  .checks {
+    display: flex;
+    gap: 16px;
+    padding-bottom: 6px;
+  }
+  .checks label {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .count {
+    margin: 0 0 6px auto;
+    color: var(--muted);
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    align-items: center;
+    margin-top: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .tags:empty {
+    display: none;
+  }
+  .soft {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .when {
+    white-space: nowrap;
+    font-size: 0.86rem;
+  }
+  .take {
+    font-size: 0.86rem;
+    min-width: 160px;
+  }
+  .empty {
+    color: var(--muted);
+  }
+</style>

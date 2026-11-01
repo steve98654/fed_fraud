@@ -1,0 +1,119 @@
+---
+// Site-wide progressive enhancements, loaded once from the base layout:
+// - a copy-link anchor after each long-form heading that has an id,
+// - "/" focuses the header search box (unless typing in a field),
+// - a back-to-top link on long pages,
+// - the "On this page" list highlights the section in view.
+---
+
+<a href="#main" class="to-top no-print" hidden>Back to top</a>
+<p class="sr-only" role="status" aria-live="polite" id="copy-status"></p>
+
+<script>
+  const status = document.getElementById('copy-status')!;
+  document.querySelectorAll<HTMLElement>('.prose h2[id], .prose h3[id], .doc-sec[id] > h2, .term[id] > dt').forEach((h) => {
+    const id = h.id || h.parentElement!.id;
+    const label = (h.textContent ?? '').trim();
+    const a = document.createElement('a');
+    a.href = `#${id}`;
+    a.className = 'h-anchor no-print';
+    a.setAttribute('aria-label', `Copy link to “${label}”`);
+    a.textContent = '#';
+    a.addEventListener('click', async (e) => {
+      const link = new URL(`#${id}`, location.href).href;
+      try {
+        await navigator.clipboard.writeText(link);
+        e.preventDefault();
+        history.replaceState(null, '', `#${id}`);
+        document.getElementById(id)?.scrollIntoView();
+        status.textContent = 'Link copied';
+        a.dataset.copied = '';
+        setTimeout(() => delete a.dataset.copied, 1500);
+      } catch {
+        /* fall back to normal navigation */
+      }
+    });
+    h.append(' ', a);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+    const t = e.target as HTMLElement;
+    if (t.closest('input, textarea, select, [contenteditable="true"]')) return;
+    const box = document.getElementById('site-search') as HTMLInputElement | null;
+    if (!box) return;
+    e.preventDefault();
+    box.focus();
+  });
+
+  const top = document.querySelector<HTMLAnchorElement>('.to-top')!;
+  const tall = () => document.documentElement.scrollHeight > window.innerHeight * 2.5;
+  const onScroll = () => (top.hidden = !tall() || window.scrollY < window.innerHeight);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.otp a')];
+  if (links.length && 'IntersectionObserver' in window) {
+    const byId = new Map(links.map((l) => [decodeURIComponent(l.hash.slice(1)), l]));
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const en of entries) {
+          if (!en.isIntersecting) continue;
+          links.forEach((l) => l.removeAttribute('aria-current'));
+          byId.get(en.target.id)?.setAttribute('aria-current', 'true');
+        }
+      },
+      { rootMargin: '0px 0px -70% 0px' },
+    );
+    byId.forEach((_, id) => {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    });
+  }
+</script>
+
+<style is:global>
+  .h-anchor {
+    margin-left: 0.25em;
+    font-family: var(--font-sans);
+    font-size: 0.8em;
+    font-weight: 400;
+    color: var(--geogray);
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  :is(h2, h3, dt):hover > .h-anchor,
+  .h-anchor:focus-visible,
+  .h-anchor[data-copied] {
+    opacity: 1;
+  }
+  .h-anchor[data-copied]::after {
+    content: ' copied';
+    font-size: 0.75em;
+    color: var(--gold-ink);
+  }
+  @media (hover: none) {
+    .h-anchor {
+      opacity: 0.6;
+    }
+  }
+  .to-top {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 50;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--geomid);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  .to-top:hover {
+    background: var(--geodark);
+    color: #fff;
+  }
+</style>

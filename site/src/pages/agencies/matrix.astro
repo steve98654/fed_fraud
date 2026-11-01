@@ -1,0 +1,296 @@
+---
+// Priority matrix: agencies placed by two of the four scoring factors
+// (default exposure against public data), as an accessible table grid.
+// Dot size follows FY2026 outlays. Factors come from docs/agencies/top33.md.
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import { agencies, url, GROUPS, groupLabel } from '../../lib/content';
+import { usd } from '../../lib/format';
+
+const list = agencies();
+const FACTORS = [
+  { k: 'exposure', label: 'Exposure', hint: 'improper payments and fraud-prone spend' },
+  { k: 'data', label: 'Public data', hint: 'record-level data we can use in Phase 1' },
+  { k: 'fit', label: 'SBA method fit', hint: 'how well the SBA screens carry over' },
+  { k: 'action', label: 'Actionability', hint: 'enforcement priority and a clear owner' },
+] as const;
+const levels = [5, 4, 3, 2, 1];
+const maxOut = Math.max(...list.map((a) => a.outlaysUsd));
+const dot = (n: number) => Math.round(6 + 16 * Math.sqrt(n / maxOut));
+const groupIndex = (g: string) => GROUPS.indexOf(g);
+const inCell = (y: number, x: number) => list.filter((a) => a.factors.exposure === y && a.factors.data === x);
+---
+
+<Base
+  title="Priority matrix"
+  section="matrix"
+  description="Where each of the 33 agencies sits on the four priority factors: exposure, public data, SBA method fit and actionability."
+>
+  <PageTitle
+    eyebrow="Agency plans · Priority matrix"
+    title="Where the exposure meets the data"
+    lead="Each agency placed by two of its four priority factors (1 low, 5 high). The top right is where fraud-prone money meets record-level public data, which is where Phase 1 starts. Dot size shows FY2026 outlays."
+    crumbs={[{ label: 'Scorecard', href: url() }, { label: 'Agency plans', href: url('agencies/') }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="controls no-print">
+        <div class="field">
+          <label for="mx-y">Up the side</label>
+          <select id="mx-y">
+            {FACTORS.map((f) => <option value={f.k} selected={f.k === 'exposure'}>{f.label}</option>)}
+          </select>
+        </div>
+        <div class="field">
+          <label for="mx-x">Along the bottom</label>
+          <select id="mx-x">
+            {FACTORS.map((f) => <option value={f.k} selected={f.k === 'data'}>{f.label}</option>)}
+          </select>
+        </div>
+        <ul class="legend" aria-label="Workstreams">
+          {GROUPS.map((g, i) => <li><span class={`sw g${i}`} aria-hidden="true" />{groupLabel(g)}</li>)}
+        </ul>
+      </div>
+
+      <div class="scroll" tabindex="0" role="region" aria-label="Priority matrix">
+        <table class="matrix">
+          <caption id="mx-cap">
+            Agencies by <span data-ylabel>Exposure</span> (rows, 5 at top) and <span data-xlabel>Public data</span> (columns,
+            5 at right)
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col" class="corner"><span data-ylabel>Exposure</span> ↓ / <span data-xlabel>Public data</span> →</th>
+              {levels.slice().reverse().map((x) => <th scope="col">{x}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {
+              levels.map((y) => (
+                <tr>
+                  <th scope="row">{y}</th>
+                  {levels
+                    .slice()
+                    .reverse()
+                    .map((x) => (
+                      <td data-y={y} data-x={x} class:list={{ hot: x + y >= 9, warm: x + y === 8 }}>
+                        {inCell(y, x).map((a) => (
+                          <a
+                            class="chip"
+                            href={url(`agencies/${a.slug}/`)}
+                            data-exposure={a.factors.exposure}
+                            data-data={a.factors.data}
+                            data-fit={a.factors.fit}
+                            data-action={a.factors.action}
+                            title={`${a.name}: score ${a.score.toFixed(1)}, ${usd(a.outlaysUsd)} FY26 outlays`}
+                          >
+                            <span class={`dot g${groupIndex(a.group)}`} style={`width:${dot(a.outlaysUsd)}px;height:${dot(a.outlaysUsd)}px`} aria-hidden="true" />
+                            {a.short}
+                            <span class="sr-only">, priority {a.score.toFixed(1)}, {usd(a.outlaysUsd)}</span>
+                          </a>
+                        ))}
+                      </td>
+                    ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="note">
+        Scores are our judgment from public sources (see <a href={url('agencies/')}>agency plans</a> and the{' '}
+        <a href={url('glossary/#priority-score')}>glossary</a>). Shaded cells mark the strongest combinations.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">The four factors</span>
+          <h2>What each axis means</h2>
+        </div>
+      </div>
+      <dl class="factors">
+        {
+          FACTORS.map((f, i) => (
+            <div>
+              <dt>
+                {f.label} <span class="w">weight {i < 2 ? '30%' : '20%'}</span>
+              </dt>
+              <dd>Scored 1 to 5 for {f.hint}.</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const ys = document.querySelector<HTMLSelectElement>('#mx-y')!;
+  const xs = document.querySelector<HTMLSelectElement>('#mx-x')!;
+  const chips = [...document.querySelectorAll<HTMLAnchorElement>('.matrix .chip')];
+  const cells = new Map([...document.querySelectorAll<HTMLTableCellElement>('.matrix td')].map((td) => [`${td.dataset.y},${td.dataset.x}`, td]));
+  function place() {
+    const ly = ys.selectedOptions[0].text;
+    const lx = xs.selectedOptions[0].text;
+    document.querySelectorAll('[data-ylabel]').forEach((e) => (e.textContent = ly));
+    document.querySelectorAll('[data-xlabel]').forEach((e) => (e.textContent = lx));
+    chips.forEach((c) => cells.get(`${c.dataset[ys.value]},${c.dataset[xs.value]}`)!.append(c));
+  }
+  ys.addEventListener('change', place);
+  xs.addEventListener('change', place);
+</script>
+
+<style>
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px 22px;
+    margin-bottom: 18px;
+    font-size: 0.9rem;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .field label {
+    font-weight: 600;
+    color: var(--coolblack);
+  }
+  .field select {
+    font: inherit;
+    padding: 6px 10px;
+    border: 1px solid var(--georule);
+    border-radius: var(--radius);
+    background: #fff;
+  }
+  .legend {
+    list-style: none;
+    margin: 0 0 6px auto;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sw {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  .g0 { background: var(--geomid); }
+  .g1 { background: var(--geoblue); }
+  .g2 { background: #4f6b52; }
+  .g3 { background: var(--geogray); }
+  .scroll {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+  .matrix {
+    min-width: 720px;
+    table-layout: fixed;
+  }
+  .matrix caption {
+    caption-side: bottom;
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .matrix th {
+    text-align: center;
+  }
+  .matrix th.corner {
+    width: 150px;
+    font-size: 0.68rem;
+    white-space: normal;
+    text-align: left;
+  }
+  .matrix tbody th {
+    background: var(--geolight);
+    color: var(--coolblack);
+    border-top: 1px solid var(--line);
+    font-size: 1rem;
+    vertical-align: middle;
+  }
+  .matrix td {
+    height: 92px;
+    vertical-align: middle;
+    border-left: 1px solid var(--line);
+    background: #fff !important;
+  }
+  .matrix td.warm {
+    background: var(--geomist) !important;
+  }
+  .matrix td.hot {
+    background: var(--gold-soft) !important;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 3px 6px 3px 0;
+    padding: 2px 8px 2px 4px;
+    border: 1px solid var(--georule);
+    border-radius: 999px;
+    background: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--coolblack);
+    white-space: nowrap;
+  }
+  .chip:hover {
+    border-color: var(--geoblue);
+    background: var(--geolight);
+  }
+  .dot {
+    border-radius: 50%;
+    flex: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .note {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .factors {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 0;
+  }
+  .factors div {
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--geoblue);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .factors dt {
+    font-weight: 650;
+    color: var(--coolblack);
+  }
+  .factors .w {
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .factors dd {
+    margin: 4px 0 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+</style>

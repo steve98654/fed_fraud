@@ -18,7 +18,12 @@ const groups = GROUPS.map((g) => ({
     title="Fraud plans for the 33 largest agencies"
     lead="One page per agency: where the fraud exposure is, what public data can see, the detection plays and first prototype, the roadmap investigations and who receives the leads."
     crumbs={[{ label: 'Scorecard', href: url() }]}
-  />
+  >
+    <div class="title-actions no-print">
+      <a class="btn" href={url('agencies/matrix/')}>Priority matrix</a>
+      <a class="btn" href={url('agencies/compare/')}>Compare agencies</a>
+    </div>
+  </PageTitle>
 
   {
     groups.map(({ g, items }) => (
@@ -59,6 +64,11 @@ const groups = GROUPS.map((g) => ({
 </Base>
 
 <style>
+  .title-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

@@ -27,6 +27,16 @@ import { url, REPO } from '../lib/content';
         <a href={url('downloads/')}>Downloads</a>
       </div>
       <div class="col">
+        <h4>Explore</h4>
+        <a href={url('investigations/')}>All investigations</a>
+        <a href={url('schedule/')}>Phase 1 schedule</a>
+        <a href={url('agencies/matrix/')}>Priority matrix</a>
+        <a href={url('agencies/compare/')}>Compare agencies</a>
+        <a href={url('glossary/')}>Glossary</a>
+        <a href={url('updates/')}>What's new</a>
+        <a href={url('downloads/scorecard.csv')}>Scorecard data (CSV)</a>
+      </div>
+      <div class="col">
         <h4>Sources</h4>
         <a href={REPO} target="_blank" rel="noopener">Repository</a>
         <a href={`${REPO}/blob/main/docs/review_plan.md`} target="_blank" rel="noopener">Review plan</a>
@@ -54,7 +64,7 @@ import { url, REPO } from '../lib/content';
   }
   .top {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 40px;
   }
   .brand {

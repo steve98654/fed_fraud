@@ -1,0 +1,131 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import { url } from '../../lib/content';
+import { glossary, GLOSSARY_GROUPS } from '../../data/glossary';
+
+const groups = GLOSSARY_GROUPS.map((g) => ({ g, items: glossary.filter((t) => t.group === g) }));
+const gid = (g: string) => g.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+---
+
+<Base title="Glossary" section="glossary" description="Plain definitions of the terms used on the scorecard, roadmap and agency plans.">
+  <PageTitle
+    eyebrow="Reference"
+    title="Glossary"
+    lead="Plain definitions of the terms used across the scorecard, roadmap and agency plans, with links to where each is set out in full."
+    crumbs={[{ label: 'Scorecard', href: url() }]}
+  />
+  <section class="section">
+    <div class="container layout">
+      <nav class="jump no-print" aria-label="Glossary sections">
+        <h2>Sections</h2>
+        <ul>
+          {groups.map(({ g, items }) => <li><a href={`#${gid(g)}`}>{g}</a> <span>({items.length})</span></li>)}
+        </ul>
+      </nav>
+      <div>
+        {
+          groups.map(({ g, items }) => (
+            <section class="grp" aria-labelledby={gid(g)}>
+              <h2 id={gid(g)}>{g}</h2>
+              <dl>
+                {items.map((t) => (
+                  <div class="term" id={t.id}>
+                    <dt>{t.term}</dt>
+                    <dd>
+                      {t.def}
+                      {t.see && (
+                        <>
+                          {' '}
+                          <a class="see" href={url(t.see.href)}>
+                            See: {t.see.label}
+                          </a>
+                        </>
+                      )}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 48px;
+    align-items: start;
+  }
+  .jump {
+    position: sticky;
+    top: 20px;
+  }
+  .jump h2 {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--geomid);
+    margin-bottom: 8px;
+  }
+  .jump ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+  }
+  .jump span {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .grp + .grp {
+    margin-top: 40px;
+  }
+  .grp h2 {
+    font-size: 1.45rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 8px;
+  }
+  dl {
+    margin: 0;
+  }
+  .term {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    max-width: 78ch;
+  }
+  .term:target {
+    background: var(--gold-soft);
+    box-shadow: -12px 0 0 var(--gold-soft), 12px 0 0 var(--gold-soft);
+  }
+  dt {
+    font-weight: 650;
+    color: var(--coolblack);
+    font-size: 1.02rem;
+  }
+  dd {
+    margin: 4px 0 0;
+  }
+  .see {
+    font-size: 0.86rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  @media (max-width: 860px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .jump {
+      position: static;
+    }
+  }
+</style>

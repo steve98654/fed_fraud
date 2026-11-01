@@ -4,7 +4,8 @@ import PageTitle from '../components/PageTitle.astro';
 import ScoreBar from '../components/ScoreBar.astro';
 import { agencies, roadmap, url, fmtDate, weekStart, weekEnd, groupLabel, GROUPS } from '../lib/content';
 import { usd, weeksLabel } from '../lib/format';
-import { asOf, findings, stageOverride } from '../data/scorecard';
+import { asOf, findings } from '../data/scorecard';
+import { stageOf } from '../lib/scorecard';
 
 const list = agencies();
 const road = roadmap();
@@ -17,13 +18,17 @@ const leads = findings.reduce((n, f) => n + f.leads, 0);
 const referrals = findings.filter((f) => f.referredTo).length;
 const hasFindings = findings.length > 0;
 
-const stage = (slug: string) =>
-  stageOverride[slug] ??
-  (findings.some((f) => f.agency === slug && f.referredTo)
-    ? 'Referred'
-    : findings.some((f) => f.agency === slug)
-      ? 'Leads delivered'
-      : 'Planned');
+const groupKey = (g: string) => groupLabel(g).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-$/, '');
+const cols = [
+  { label: 'Rank', key: 'rank', type: 'num' },
+  { label: 'Agency', key: 'agency', type: 'text' },
+  { label: 'FY26 outlays', key: 'outlays', type: 'num' },
+  { label: 'Priority', key: 'score', type: 'num' },
+  { label: 'First investigation' },
+  { label: 'Phase 1 window', key: 'week', type: 'num' },
+  { label: 'Stage' },
+  { label: 'Savings' },
+];
 const savingsFor = (slug: string) => findings.filter((f) => f.agency === slug).reduce((n, f) => n + (f.identifiedUsd ?? 0), 0);
 
 const today = new Date(`${asOf}T12:00:00Z`);
@@ -133,6 +138,7 @@ const byGroup = GROUPS.map((g) => ({ g, n: list.filter((a) => a.group === g).len
             {next && <> Next milestone: <strong>{next.text}</strong> on {fmtDate(next.date)}.</>}
           </p>
         </div>
+        <a class="btn no-print" href={url('schedule/')}>Agency-by-agency schedule</a>
       </div>
       <div class="progress" role="img" aria-label={`Phase 1 is ${Math.round(progress)}% complete`}>
         <div class="fill" style={`width:${progress}%`}></div>
@@ -162,34 +168,55 @@ const byGroup = GROUPS.map((g) => ({ g, n: list.filter((a) => a.group === g).len
           </p>
         </div>
         <div class="filters no-print" role="group" aria-label="Filter by workstream">
-          <button type="button" data-filter="all" aria-pressed="true">All 33</button>
+          <button type="button" data-filter="all" data-key="all" aria-pressed="true">All 33</button>
           {
             byGroup.map(({ g, n }) => (
-              <button type="button" data-filter={g} aria-pressed="false">
+              <button type="button" data-filter={g} data-key={groupKey(g)} aria-pressed="false">
                 {groupLabel(g)} ({n})
               </button>
             ))
           }
         </div>
       </div>
+      <div class="table-tools no-print">
+        <label for="sc-filter">Find an agency or investigation</label>
+        <input id="sc-filter" type="search" placeholder="e.g. Medicare, HHS-1, Treasury" autocomplete="off" />
+        <span id="sc-count" class="count" role="status" aria-live="polite">Showing all {list.length} agencies</span>
+        <a class="dl-link" href={url('downloads/scorecard.csv')} download>Download CSV</a>
+      </div>
       <div class="table-wrap">
         <table class="scorecard">
+          <caption class="sr-only">Agency scorecard. Column headers with buttons sort the table.</caption>
           <thead>
             <tr>
-              <th>Rank</th>
-              <th>Agency</th>
-              <th>FY26 outlays</th>
-              <th>Priority</th>
-              <th>First investigation</th>
-              <th>Phase 1 window</th>
-              <th>Stage</th>
-              <th>Savings</th>
+              {
+                cols.map((c) =>
+                  c.key ? (
+                    <th scope="col" aria-sort={c.key === 'rank' ? 'ascending' : undefined}>
+                      <button type="button" class="sort" data-sort={c.key} data-type={c.type}>
+                        {c.label}
+                        <span class="arrow" aria-hidden="true" />
+                      </button>
+                    </th>
+                  ) : (
+                    <th scope="col">{c.label}</th>
+                  ),
+                )
+              }
             </tr>
           </thead>
           <tbody>
             {
               list.map((a) => (
-                <tr data-group={a.group}>
+                <tr
+                  data-group={a.group}
+                  data-rank={a.rank}
+                  data-agency={a.name}
+                  data-outlays={a.outlaysUsd}
+                  data-score={a.score}
+                  data-week={a.startWeek * 100 + a.endWeek}
+                  data-text={[a.name, a.short, a.firstPrototype, groupLabel(a.group), a.takeTo, ...a.ideas.flatMap((i) => [i.id, i.text])].join(' ').toLowerCase()}
+                >
                   <td class="rank">{a.rank}</td>
                   <td>
                     <a class="agency" href={url(`agencies/${a.slug}/`)}>
@@ -217,7 +244,7 @@ const byGroup = GROUPS.map((g) => ({ g, n: list.filter((a) => a.group === g).len
                     )}
                   </td>
                   <td>
-                    <span class="badge planned">{stage(a.slug)}</span>
+                    <span class="badge planned">{stageOf(a.slug)}</span>
                   </td>
                   <td>{savingsFor(a.slug) > 0 ? usd(savingsFor(a.slug)) : <span class="badge pending">Pending</span>}</td>
                 </tr>
@@ -289,13 +316,57 @@ const byGroup = GROUPS.map((g) => ({ g, n: list.filter((a) => a.group === g).len
 </Base>
 
 <script>
-  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
-  const rows = document.querySelectorAll<HTMLTableRowElement>('table.scorecard tbody tr');
-  buttons.forEach((b) =>
-    b.addEventListener('click', () => {
-      const f = b.dataset.filter;
-      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      rows.forEach((r) => (r.hidden = f !== 'all' && r.dataset.group !== f));
+  // Workstream filter (kept in the URL as ?group=), text filter and column sort.
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+  const table = document.querySelector<HTMLTableElement>('table.scorecard')!;
+  const tbody = table.tBodies[0];
+  const rows = [...tbody.rows];
+  const input = document.querySelector<HTMLInputElement>('#sc-filter')!;
+  const count = document.querySelector<HTMLElement>('#sc-count')!;
+  let group = 'all';
+
+  function apply() {
+    const q = input.value.trim().toLowerCase();
+    let shown = 0;
+    rows.forEach((r) => {
+      const ok = (group === 'all' || r.dataset.group === group) && (!q || r.dataset.text!.includes(q));
+      r.hidden = !ok;
+      if (ok) shown++;
+    });
+    count.textContent = shown === rows.length ? `Showing all ${rows.length} agencies` : `Showing ${shown} of ${rows.length} agencies`;
+  }
+
+  function setGroup(b: HTMLButtonElement, push: boolean) {
+    group = b.dataset.filter!;
+    buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    if (push) {
+      const u = new URL(location.href);
+      if (b.dataset.key === 'all') u.searchParams.delete('group');
+      else u.searchParams.set('group', b.dataset.key!);
+      history.replaceState(null, '', u);
+    }
+    apply();
+  }
+  buttons.forEach((b) => b.addEventListener('click', () => setGroup(b, true)));
+  const initial = new URL(location.href).searchParams.get('group');
+  const match = buttons.find((b) => b.dataset.key === initial);
+  if (match) setGroup(match, false);
+  input.addEventListener('input', apply);
+
+  table.querySelectorAll<HTMLButtonElement>('button.sort').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const th = btn.closest('th')!;
+      const asc = th.getAttribute('aria-sort') !== 'ascending';
+      table.querySelectorAll('th[aria-sort]').forEach((x) => x.removeAttribute('aria-sort'));
+      th.setAttribute('aria-sort', asc ? 'ascending' : 'descending');
+      const k = btn.dataset.sort!;
+      const num = btn.dataset.type === 'num';
+      const sorted = [...rows].sort((a, b) => {
+        const x = a.dataset[k]!, y = b.dataset[k]!;
+        const d = num ? Number(x) - Number(y) : x.localeCompare(y);
+        return (asc ? d : -d) || Number(a.dataset.rank) - Number(b.dataset.rank);
+      });
+      tbody.append(...sorted);
     }),
   );
 </script>
@@ -482,6 +553,69 @@ const byGroup = GROUPS.map((g) => ({ g, n: list.filter((a) => a.group === g).len
     background: var(--geomid);
     border-color: var(--geomid);
     color: #fff;
+  }
+  .table-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    margin-bottom: 14px;
+    font-size: 0.88rem;
+  }
+  .table-tools label {
+    font-weight: 600;
+    color: var(--coolblack);
+  }
+  .table-tools input {
+    font: inherit;
+    padding: 6px 10px;
+    border: 1px solid var(--georule);
+    border-radius: var(--radius);
+    min-width: 260px;
+  }
+  .table-tools .count {
+    color: var(--muted);
+  }
+  .table-tools .dl-link {
+    margin-left: auto;
+    font-weight: 600;
+  }
+  th:has(.sort) {
+    padding: 0;
+  }
+  @media print {
+    .arrow {
+      display: none;
+    }
+  }
+  .sort {
+    all: unset;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+  .sort:focus-visible {
+    outline: 3px solid var(--geogold);
+    outline-offset: -3px;
+  }
+  .sort:hover {
+    background: var(--geomid);
+  }
+  .arrow::after {
+    content: '↕';
+    opacity: 0.5;
+  }
+  th[aria-sort='ascending'] .arrow::after {
+    content: '▲';
+    opacity: 1;
+  }
+  th[aria-sort='descending'] .arrow::after {
+    content: '▼';
+    opacity: 1;
   }
   .scorecard td {
     vertical-align: middle;
