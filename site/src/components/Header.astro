@@ -18,7 +18,20 @@ const nav = [
 <div class="utility">
   <div class="container">
     <span>The Geodesic Accountability Office · an independent analysis by Geodesic Solutions</span>
-    <span class="right"><span class="draft">Draft for discussion · Public data only · No findings yet</span><a class="dl" href={url('downloads/')} aria-current={current === 'downloads' ? 'page' : undefined}>Downloads</a></span>
+    <div class="right">
+      <span class="draft">Draft for discussion · Public data only · No findings yet</span>
+      <form class="search" role="search" action={url('search/')} method="get">
+        <label class="sr-only" for="site-search">Search the site</label>
+        <input id="site-search" type="search" name="q" placeholder="Search" autocomplete="off" />
+        <button type="submit" aria-label="Search">
+          <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
+            <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+            <path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+          </svg>
+        </button>
+      </form>
+      <a class="dl" href={url('downloads/')} aria-current={current === 'downloads' ? 'page' : undefined}>Downloads</a>
+    </div>
   </div>
 </div>
 <header class="site-header">
@@ -40,16 +53,6 @@ const nav = [
         }
       </ul>
     </nav>
-    <form class="search" role="search" action={url('search/')} method="get">
-      <label class="sr-only" for="site-search">Search the site</label>
-      <input id="site-search" type="search" name="q" placeholder="Search" autocomplete="off" />
-      <button type="submit" aria-label="Search">
-        <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
-          <circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
-          <path d="M13 13l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-        </svg>
-      </button>
-    </form>
   </div>
 </header>
 
@@ -68,10 +71,6 @@ const nav = [
   }
   .draft {
     color: #d9c08e;
-  }
-  .right {
-    display: inline-flex;
-    gap: 16px;
   }
   .dl {
     color: #fff;
@@ -142,21 +141,29 @@ const nav = [
     color: #fff;
     border-bottom-color: var(--geoblue);
   }
+  .utility .container {
+    align-items: center;
+  }
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
   .search {
     display: flex;
     align-items: center;
     background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 4px;
   }
   .search input {
-    width: 150px;
+    width: 170px;
     background: transparent;
     border: 0;
     color: #fff;
     font: inherit;
-    font-size: 0.9rem;
-    padding: 7px 4px 7px 12px;
+    font-size: 0.8rem;
+    padding: 3px 4px 3px 10px;
   }
   .search input::placeholder {
     color: #aeb6c8;
@@ -174,20 +181,13 @@ const nav = [
     background: transparent;
     border: 0;
     color: #cdd3e0;
-    padding: 7px 10px;
+    padding: 3px 8px;
     cursor: pointer;
   }
   .search button:hover {
     color: #fff;
   }
   @media (max-width: 900px) {
-    .search {
-      width: 100%;
-      order: 2;
-    }
-    .search input {
-      flex: 1;
-    }
     .bar {
       padding-bottom: 6px;
     }
@@ -204,6 +204,19 @@ const nav = [
     }
     .utility .draft {
       display: none;
+    }
+    .utility .container > span {
+      display: none;
+    }
+    .right,
+    .search {
+      flex: 1;
+    }
+    .search input {
+      flex: 1;
+      width: auto;
+      font-size: 0.9rem;
+      padding: 6px 4px 6px 10px;
     }
   }
   @media (max-width: 520px) {
