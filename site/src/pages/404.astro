@@ -4,7 +4,7 @@ import PageTitle from '../components/PageTitle.astro';
 import { url } from '../lib/content';
 ---
 
-<Base title="Page not found">
+<Base title="Page not found" searchable={false}>
   <PageTitle eyebrow="404" title="Page not found" lead="That page does not exist. Try the scorecard or the agency plans." />
   <section class="section">
     <div class="container"><a class="btn primary" href={url()}>Back to the scorecard</a></div>

@@ -1,0 +1,28 @@
+# Builds the site and runs the accessibility check on every pull request that
+# touches the site or the docs it reads. Nothing is deployed.
+name: Site check
+
+on:
+  pull_request:
+    paths: ['site/**', 'docs/**', '.github/workflows/site-*.yml']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history for the "Last updated" stamps
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:a11y

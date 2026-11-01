@@ -2,7 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import PageTitle from '../../components/PageTitle.astro';
 import ScoreBar from '../../components/ScoreBar.astro';
-import { agencies, brief, url, REPO, fmtDate, weekStart, weekEnd, groupLabel, mdInline, hasPitch } from '../../lib/content';
+import { agencies, brief, url, REPO, fmtDate, weekStart, weekEnd, groupLabel, mdInline, hasPitch, lastUpdated } from '../../lib/content';
 import { usd, weeksLabel } from '../../lib/format';
 import { findings, stageOverride } from '../../data/scorecard';
 import { toolsFor } from '../../data/tools';
@@ -21,6 +21,9 @@ const next = list[i + 1];
 const mine = findings.filter((f) => f.agency === a.slug);
 const tools = toolsFor(a.slug);
 const stage = stageOverride[a.slug] ?? (mine.length ? 'Leads delivered' : 'Planned');
+// Newest change to anything this page is built from: the brief, the roadmap
+// row (ideas, weeks) and the ranking.
+const updated = lastUpdated(`agencies/${a.slug}.md`, 'roadmap.md', 'agencies/top33.md');
 const factors = [
   { k: 'Exposure', w: '30%', v: a.factors.exposure },
   { k: 'Public data', w: '30%', v: a.factors.data },
@@ -38,7 +41,9 @@ const factors = [
       { label: 'Scorecard', href: url() },
       { label: 'Agency plans', href: url('agencies/') },
     ]}
-  />
+  >
+    <p class="updated">Last updated <time datetime={updated}>{fmtDate(updated)}</time></p>
+  </PageTitle>
 
   <section class="section">
     <div class="container layout">
@@ -124,25 +129,36 @@ const factors = [
           </dl>
         </div>
 
-        <div class="links">
+        <div class="links no-print">
           <a class="btn" href={url(`library/results/${a.slug}/`)}>Detailed results (placeholder)</a>
           <a class="btn primary" href={url(`downloads/briefs/${a.slug}.pdf`)}>Download agency brief (PDF)</a>
           <a class="btn" href={url(`briefs/${a.slug}/`)}>Print view</a>
           {tools.map((t) => <a class="btn" href={url(`tools/${t.slug}/`)}>Tool preview: {t.short.replace(/^\S+ /, '')}</a>)}
           <a class="btn" href={url(`downloads/docs/agencies/${a.slug}.pdf`)}>One-page brief (PDF)</a>
           <a class="btn" href={`${REPO}/blob/main/docs/agencies/${a.slug}.md`} target="_blank" rel="noopener">Source Markdown</a>
+          <button class="btn" type="button" data-print>Print this plan</button>
         </div>
       </aside>
     </div>
   </section>
 
-  <nav class="container pn" aria-label="Other agencies">
+  <nav class="container pn no-print" aria-label="Other agencies">
     {prev ? <a class="btn" href={url(`agencies/${prev.slug}/`)}>← #{prev.rank} {prev.short}</a> : <span />}
     {next && <a class="btn" href={url(`agencies/${next.slug}/`)}>#{next.rank} {next.short} →</a>}
   </nav>
 </Base>
 
+<script>
+  document.querySelectorAll('[data-print]').forEach((b) => b.addEventListener('click', () => window.print()));
+</script>
+
 <style>
+  .updated {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
   .layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 320px;
@@ -220,6 +236,24 @@ const factors = [
     display: flex;
     justify-content: space-between;
     padding-bottom: 24px;
+  }
+  @media print {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 16pt;
+    }
+    aside {
+      order: -1;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    aside .facts {
+      flex: 1;
+      padding: 10pt 12pt;
+    }
+    .ideas-block {
+      margin-bottom: 16pt;
+    }
   }
   @media (max-width: 960px) {
     .layout {

@@ -11,12 +11,15 @@ import { url } from '../lib/content';
 interface Props {
   title?: string;
   description?: string;
-  section?: 'scorecard' | 'agencies' | 'plan' | 'pitches' | 'case-study' | 'tools' | 'library' | 'downloads';
+  section?: 'scorecard' | 'agencies' | 'plan' | 'pitches' | 'case-study' | 'tools' | 'library' | 'downloads' | 'search';
+  /** Include this page in the site search index (default true). */
+  searchable?: boolean;
 }
 const SITE = 'The Geodesic Accountability Office';
 const {
   title,
   section,
+  searchable = true,
   description = 'The Geodesic Accountability Office: fraud savings scorecard and plans for finding fraud across the 33 largest federal agencies, extending the SBA work.',
 } = Astro.props;
 const fullTitle = title ? `${title} | ${SITE}` : `${SITE} | Federal fraud scorecard`;
@@ -34,11 +37,12 @@ const fullTitle = title ? `${title} | ${SITE}` : `${SITE} | Federal fraud scorec
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:site_name" content={SITE} />
+    <slot name="head" />
   </head>
   <body>
-    <a class="sr-only" href="#main">Skip to content</a>
+    <a class="sr-only skip" href="#main">Skip to content</a>
     <Header current={section} />
-    <main id="main">
+    <main id="main" tabindex="-1" data-pagefind-body={searchable ? '' : undefined}>
       <slot />
     </main>
     <Footer />

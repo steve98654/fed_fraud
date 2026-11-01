@@ -2,6 +2,7 @@
 // shows what is committed in the repo. Markdown stays the source of truth.
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { Marked } from 'marked';
 
 const DOCS = path.resolve(process.cwd(), '..', 'docs');
@@ -13,6 +14,29 @@ const BASE = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 export const url = (p = '') => BASE + p.replace(/^\//, '');
 
 const read = (rel: string) => fs.readFileSync(path.join(DOCS, rel), 'utf8');
+
+/**
+ * Date (YYYY-MM-DD) the newest of the given docs/ files last changed, from git
+ * history. Falls back to file modification time when git history is missing,
+ * e.g. in a shallow clone. Deploy builds should fetch full history.
+ */
+export function lastUpdated(...rels: string[]): string {
+  const dates = rels.map((rel) => {
+    const file = path.join(DOCS, rel);
+    try {
+      const out = execFileSync('git', ['log', '-1', '--format=%cs', '--', file], {
+        cwd: DOCS,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      }).trim();
+      if (out) return out;
+    } catch {
+      /* not a git checkout */
+    }
+    return fs.statSync(file).mtime.toISOString().slice(0, 10);
+  });
+  return dates.sort().at(-1)!;
+}
 
 // ---------------------------------------------------------------------------
 // Markdown rendering with repo links rewritten to site routes.
