@@ -14,6 +14,8 @@ export interface LibraryDoc {
   /** Where the Markdown source will live in the repo. */
   source: string;
   outline: { heading: string; note: string }[];
+  /** Set once the source document is written; the page then renders it. */
+  status?: 'Draft' | 'Final';
 }
 
 export const library: LibraryDoc[] = [
@@ -26,6 +28,7 @@ export const library: LibraryDoc[] = [
     planIds: ['F3', 'F7', 'F8'],
     dueWeek: 4,
     source: 'docs/playbook/methodology.md',
+    status: 'Draft',
     outline: [
       { heading: 'Entity spine', note: 'SAM.gov, USAspending, FPDS keyed by UEI; NPI and EDGAR CIK cross-keys.' },
       { heading: 'Entity resolution', note: 'Names, USPS-standardized addresses, phones and officers; precision on 500 labeled pairs.' },
