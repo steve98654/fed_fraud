@@ -22,8 +22,8 @@ it works on built and deployed sites but not under `npm run dev`. The
 accessibility check needs a Playwright Chromium (`npx playwright install
 chromium`, once). Pull requests run both through `.github/workflows/site-check.yml`.
 
-Private hosting (Cloudflare Pages behind Cloudflare Access) is set out in
-[HOSTING.md](HOSTING.md). Nothing deploys automatically.
+Hosting on Cloudflare Pages behind a password (`functions/_middleware.js`)
+is set out step by step in [HOSTING.md](HOSTING.md).
 
 ## Polish
 

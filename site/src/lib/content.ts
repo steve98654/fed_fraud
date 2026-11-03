@@ -21,7 +21,24 @@ const read = (rel: string) => fs.readFileSync(path.join(DOCS, rel), 'utf8');
  * history. Falls back to file modification time when git history is missing,
  * e.g. in a shallow clone. Deploy builds should fetch full history.
  */
+let unshallowed = false;
+/** Hosted builders (e.g. Cloudflare Pages) may clone with depth 1, which would
+ * date every file to the latest commit. Fetch full history once if so. */
+function ensureHistory() {
+  if (unshallowed) return;
+  unshallowed = true;
+  try {
+    const opts = { cwd: DOCS, encoding: 'utf8' as const, stdio: ['ignore', 'pipe', 'ignore'] as const };
+    if (execFileSync('git', ['rev-parse', '--is-shallow-repository'], opts).trim() === 'true') {
+      execFileSync('git', ['fetch', '--unshallow', '--quiet'], { ...opts, timeout: 60_000 });
+    }
+  } catch {
+    /* no git or no network: fall back to what history there is */
+  }
+}
+
 export function lastUpdated(...rels: string[]): string {
+  ensureHistory();
   const dates = rels.map((rel) => {
     const file = path.join(DOCS, rel);
     try {
