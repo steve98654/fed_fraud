@@ -1,0 +1,466 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import { url } from '../../lib/content';
+---
+
+<Base
+  title="Benford checker"
+  section="tools"
+  description="Paste a column of amounts and test it against Benford's law: first-digit and first-two-digit tests with MAD conformity, chi-square and digit spikes. Runs in your browser; nothing is uploaded."
+>
+  <PageTitle
+    eyebrow="Tools · Working prototype"
+    title="Benford checker"
+    lead="Paste a column of amounts (invoices, awards, claims) and test it against Benford's law with the same formulas and thresholds as the forensic methods handbook. Everything runs in your browser; nothing is uploaded or stored."
+    crumbs={[{ label: 'Scorecard', href: url() }, { label: 'Tools', href: url('tools/') }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <p class="notice">
+        <span>
+          <strong>A reason to look, not a finding.</strong> Nonconformity can come from caps, fixed prices, small samples or a
+          mix of programs. Read <a href={url('library/forensic-methods/#3-digit-and-number-tests')}>section 3 of the handbook</a>
+          for when the test applies. The sample buttons load synthetic data generated in your browser.
+        </span>
+      </p>
+
+      <div class="grid">
+        <div class="input">
+          <label for="amounts"><strong>Amounts</strong> (one per line, or separated by spaces, tabs or semicolons)</label>
+          <textarea id="amounts" rows="12" spellcheck="false" placeholder="12,450.00&#10;318.20&#10;1,902.75&#10;..."></textarea>
+          <div class="row">
+            <label for="test">Test</label>
+            <select id="test">
+              <option value="first">First digit (1-9)</option>
+              <option value="first_two">First two digits (10-99)</option>
+            </select>
+            <button type="button" class="btn primary" id="run">Run test</button>
+          </div>
+          <div class="row samples">
+            <span>Synthetic samples:</span>
+            <button type="button" class="btn" data-sample="clean">Natural amounts</button>
+            <button type="button" class="btn" data-sample="invented">Invented amounts</button>
+            <button type="button" class="btn" data-sample="threshold">Steered under $5,000</button>
+          </div>
+        </div>
+
+        <div class="result" aria-live="polite">
+          <div id="summary" class="summary">
+            <p class="muted">Paste amounts or load a sample, then run the test.</p>
+          </div>
+        </div>
+      </div>
+
+      <figure class="chart-fig" id="fig" hidden>
+        <figcaption>
+          <span id="chart-title">Observed versus expected digit shares</span>
+          <span class="legend" aria-hidden="true">
+            <span><i class="sw obs"></i>Observed</span>
+            <span><i class="sw exp"></i>Benford expected</span>
+          </span>
+        </figcaption>
+        <div class="chart" id="chart"></div>
+        <div class="tip" id="tip" role="status" hidden></div>
+        <details>
+          <summary>Show as a table</summary>
+          <div class="table-wrap">
+            <table id="table">
+              <thead>
+                <tr><th scope="col">Digit</th><th scope="col" class="num">Count</th><th scope="col" class="num">Observed</th><th scope="col" class="num">Expected</th><th scope="col" class="num">z</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+      </figure>
+
+      <div class="method prose">
+        <h2>How the numbers are computed</h2>
+        <p>
+          Expected share of digit <em>d</em>: log<sub>10</sub>(1 + 1/<em>d</em>). Mean absolute deviation (MAD) is the average
+          gap between observed and expected shares; it does not grow with sample size, so it decides conformity using
+          Nigrini's thresholds (first digit: 0.006 / 0.012 / 0.015; first two digits: 0.0012 / 0.0018 / 0.0022). The chi-square
+          p-value is shown too, but with thousands of records it flags trivial deviations. A digit is a spike when its share
+          is above expectation with z &gt; 1.96 (continuity-corrected). Amounts below 10 are skipped for the first-two-digit
+          test, and zeros are skipped for both. The reference implementation is <code>analytics/forensic/digits.py</code>.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  type Test = 'first' | 'first_two';
+  const $ = <T extends Element>(s: string) => document.querySelector<T>(s)!;
+  const area = $<HTMLTextAreaElement>('#amounts');
+  const testSel = $<HTMLSelectElement>('#test');
+
+  // --- statistics ---------------------------------------------------------
+  function lgamma(x: number): number {
+    const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+    let y = x;
+    const tmp = x + 5.5 - (x + 0.5) * Math.log(x + 5.5);
+    let ser = 1.000000000190015;
+    for (const v of c) ser += v / ++y;
+    return -tmp + Math.log((2.5066282746310005 * ser) / x);
+  }
+  function chi2sf(x: number, df: number): number {
+    if (x <= 0) return 1;
+    const s = df / 2, h = x / 2;
+    if (h < s + 1) {
+      let term = 1 / s, sum = term;
+      for (let n = 1; n < 10000 && Math.abs(term) > Math.abs(sum) * 1e-15; n++) { term *= h / (s + n); sum += term; }
+      return 1 - sum * Math.exp(-h + s * Math.log(h) - lgamma(s));
+    }
+    const tiny = 1e-300;
+    let b = h + 1 - s, c = 1 / tiny, d = 1 / b, f = d;
+    for (let i = 1; i < 10000; i++) {
+      const an = -i * (i - s);
+      b += 2; d = an * d + b; if (Math.abs(d) < tiny) d = tiny;
+      c = b + an / c; if (Math.abs(c) < tiny) c = tiny;
+      d = 1 / d; const del = d * c; f *= del;
+      if (Math.abs(del - 1) < 1e-15) break;
+    }
+    return f * Math.exp(-h + s * Math.log(h) - lgamma(s));
+  }
+  const THRESH: Record<Test, [number, string][]> = {
+    first: [[0.006, 'Close conformity'], [0.012, 'Acceptable conformity'], [0.015, 'Marginal conformity']],
+    first_two: [[0.0012, 'Close conformity'], [0.0018, 'Acceptable conformity'], [0.0022, 'Marginal conformity']],
+  };
+
+  function parse(text: string): number[] {
+    const out: number[] = [];
+    for (let tok of text.split(/[\s;]+/)) {
+      tok = tok.replace(/[$()]/g, '');
+      if (!tok) continue;
+      const parts = /^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(tok) ? [tok.replace(/,/g, '')] : tok.split(',');
+      for (const p of parts) {
+        const v = Number(p);
+        if (p && Number.isFinite(v) && v !== 0) out.push(Math.abs(v));
+      }
+    }
+    return out;
+  }
+  function digitOf(v: number, test: Test): number | null {
+    const m = v.toExponential(10).replace('.', '');
+    if (test === 'first') return Number(m[0]);
+    return v < 10 ? null : Number(m.slice(0, 2));
+  }
+
+  function run() {
+    const test = testSel.value as Test;
+    const vals = parse(area.value);
+    const lo = test === 'first' ? 1 : 10, hi = test === 'first' ? 9 : 99;
+    const counts = new Map<number, number>();
+    let n = 0;
+    for (const v of vals) {
+      const d = digitOf(v, test);
+      if (d === null) continue;
+      counts.set(d, (counts.get(d) ?? 0) + 1); n++;
+    }
+    const summary = $('#summary');
+    const fig = $<HTMLElement>('#fig');
+    if (n < 10) {
+      summary.innerHTML = `<p class="muted">Found ${n} usable amounts. Paste at least a few hundred for a meaningful test.</p>`;
+      fig.hidden = true;
+      return;
+    }
+    const rows = [];
+    let chi = 0, mad = 0;
+    for (let d = lo; d <= hi; d++) {
+      const p = Math.log10(1 + 1 / d), c = counts.get(d) ?? 0, o = c / n;
+      chi += (n * (o - p) ** 2) / p; mad += Math.abs(o - p);
+      const z = Math.max(Math.abs(o - p) - 1 / (2 * n), 0) / Math.sqrt((p * (1 - p)) / n);
+      rows.push({ d, c, o, p, z });
+    }
+    mad /= rows.length;
+    const df = rows.length - 1, pv = chi2sf(chi, df);
+    const band = THRESH[test].find(([t]) => mad <= t)?.[1] ?? 'Nonconformity';
+    const spikes = rows.filter((r) => r.z > 1.96 && r.o > r.p).map((r) => r.d);
+    const small = test === 'first_two' ? n < 1000 : n < 300;
+    summary.innerHTML = `
+      <p class="verdict ${band === 'Nonconformity' ? 'bad' : band.startsWith('Marginal') ? 'warn' : 'ok'}">${band}</p>
+      <dl>
+        <div><dt>Amounts tested</dt><dd>${n.toLocaleString()}${vals.length > n ? ` <span class="muted">(${vals.length - n} skipped)</span>` : ''}</dd></div>
+        <div><dt>MAD</dt><dd>${mad.toFixed(test === 'first' ? 4 : 5)}</dd></div>
+        <div><dt>Chi-square</dt><dd>${chi.toFixed(1)} on ${df} df, p ${pv < 1e-4 ? '< 0.0001' : '= ' + pv.toFixed(4)}</dd></div>
+        <div><dt>Spike digits</dt><dd>${spikes.length ? spikes.join(', ') : 'None'}</dd></div>
+      </dl>
+      ${small ? '<p class="muted">Small sample: treat the result as weak. The handbook suggests 1,000 or more amounts for the first-two-digit test.</p>' : ''}`;
+    draw(rows, test);
+    const tb = $<HTMLTableSectionElement>('#table tbody');
+    tb.innerHTML = rows
+      .map((r) => `<tr><td>${r.d}</td><td class="num">${r.c}</td><td class="num">${(r.o * 100).toFixed(2)}%</td><td class="num">${(r.p * 100).toFixed(2)}%</td><td class="num">${r.z.toFixed(2)}</td></tr>`)
+      .join('');
+    $('#chart-title').textContent = test === 'first' ? 'First-digit shares: observed versus expected' : 'First-two-digit shares: observed versus expected';
+    fig.hidden = false;
+  }
+
+  function draw(rows: { d: number; c: number; o: number; p: number; z: number }[], test: Test) {
+    const W = 900, H = 300, m = { t: 12, r: 12, b: 30, l: 46 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const max = Math.max(...rows.map((r) => Math.max(r.o, r.p))) * 1.1;
+    const bw = iw / rows.length;
+    const y = (v: number) => m.t + ih - (v / max) * ih;
+    const ticks = 4;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Bar chart of observed digit shares with expected Benford shares as markers">`;
+    for (let i = 0; i <= ticks; i++) {
+      const v = (max / ticks) * i, yy = y(v);
+      svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}" class="grid"/>`;
+      svg += `<text x="${m.l - 6}" y="${yy + 4}" text-anchor="end" class="ax">${(v * 100).toFixed(test === 'first' ? 0 : 1)}%</text>`;
+    }
+    const path: string[] = [];
+    rows.forEach((r, i) => {
+      const x = m.l + i * bw, gap = Math.min(2, bw * 0.15), w = Math.max(bw - gap * 2, 1);
+      const top = y(r.o), h = m.t + ih - top;
+      const rad = Math.min(4, w / 2, h);
+      svg += `<g class="bar" data-i="${i}">`;
+      svg += `<rect x="${x}" y="${m.t}" width="${bw}" height="${ih}" class="hit"/>`;
+      svg += h > 0
+        ? `<path class="obs" d="M${x + gap},${m.t + ih} V${top + rad} Q${x + gap},${top} ${x + gap + rad},${top} H${x + gap + w - rad} Q${x + gap + w},${top} ${x + gap + w},${top + rad} V${m.t + ih} Z"/>`
+        : '';
+      svg += `</g>`;
+      path.push(`${i ? 'L' : 'M'}${x + bw / 2},${y(r.p)}`);
+      const show = test === 'first' || r.d % 10 === 0;
+      if (show) svg += `<text x="${x + bw / 2}" y="${H - 10}" text-anchor="middle" class="ax">${r.d}</text>`;
+    });
+    svg += `<path d="${path.join(' ')}" class="exp"/>`;
+    if (test === 'first') rows.forEach((r, i) => (svg += `<circle cx="${m.l + i * bw + bw / 2}" cy="${y(r.p)}" r="4.5" class="expdot"/>`));
+    svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}" class="base"/></svg>`;
+    const chart = $('#chart');
+    chart.innerHTML = svg;
+    const tip = $<HTMLElement>('#tip');
+    chart.querySelectorAll<SVGGElement>('.bar').forEach((g) => {
+      const r = rows[Number(g.dataset.i)];
+      const show = (e: MouseEvent) => {
+        tip.hidden = false;
+        tip.innerHTML = `<strong>Digit ${r.d}</strong><br>Observed ${(r.o * 100).toFixed(2)}% (${r.c})<br>Expected ${(r.p * 100).toFixed(2)}%<br>z ${r.z.toFixed(2)}`;
+        const box = chart.parentElement!.getBoundingClientRect();
+        tip.style.left = `${Math.min(e.clientX - box.left + 12, box.width - 170)}px`;
+        tip.style.top = `${e.clientY - box.top - 10}px`;
+        g.classList.add('on');
+      };
+      g.addEventListener('mousemove', show);
+      g.addEventListener('mouseleave', () => { tip.hidden = true; g.classList.remove('on'); });
+    });
+  }
+
+  // --- synthetic samples (seeded, generated here) --------------------------
+  function rng(seed: number) {
+    return () => ((seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296);
+  }
+  const fmt = (v: number) => v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const samples: Record<string, () => number[]> = {
+    clean: () => { const r = rng(42); return Array.from({ length: 3000 }, () => 10 ** (1 + 5 * r())); },
+    invented: () => { const r = rng(7); return Array.from({ length: 3000 }, () => 3000 + 5000 * r()); },
+    threshold: () => {
+      const r = rng(11);
+      const base = Array.from({ length: 2700 }, () => 10 ** (1 + 4.5 * r()));
+      return base.concat(Array.from({ length: 300 }, () => 4800 + 199 * r()));
+    },
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => {
+      area.value = samples[b.dataset.sample!]().map(fmt).join('\n');
+      if (b.dataset.sample === 'threshold') testSel.value = 'first_two';
+      run();
+    }),
+  );
+  $('#run').addEventListener('click', run);
+</script>
+
+<style>
+  .notice {
+    display: flex;
+    gap: 12px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 28px;
+    margin-top: 24px;
+  }
+  .input label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.92rem;
+  }
+  textarea {
+    width: 100%;
+    font: 0.88rem/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    border: 1px solid #9aa6b8;
+    border-radius: 6px;
+    padding: 10px;
+    resize: vertical;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 12px;
+  }
+  .row label {
+    margin: 0;
+  }
+  select {
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 6px 8px;
+    border: 1px solid #9aa6b8;
+    border-radius: 6px;
+  }
+  .samples span {
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  .result {
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--geomid);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    align-self: start;
+  }
+  .result :global(.muted) {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .result :global(.verdict) {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+  }
+  .result :global(.verdict.ok) {
+    color: var(--geomid);
+  }
+  .result :global(.verdict.warn) {
+    color: var(--gold-ink);
+  }
+  .result :global(.verdict.bad) {
+    color: #9b2c1f;
+  }
+  .result :global(dl) {
+    margin: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .result :global(dl div) {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 8px;
+  }
+  .result :global(dt) {
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  .result :global(dd) {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .chart-fig {
+    margin: 32px 0 0;
+    position: relative;
+  }
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .legend {
+    display: flex;
+    gap: 16px;
+    font-weight: 400;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sw {
+    display: inline-block;
+    width: 14px;
+    height: 10px;
+    border-radius: 2px;
+  }
+  .sw.obs {
+    background: #3573b4;
+  }
+  .sw.exp {
+    height: 2px;
+    background: #b8892f;
+    position: relative;
+  }
+  .chart :global(svg) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .chart :global(.grid) {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+  .chart :global(.base) {
+    stroke: #9aa6b8;
+    stroke-width: 1;
+  }
+  .chart :global(.ax) {
+    fill: var(--muted);
+    font-size: 12px;
+  }
+  .chart :global(.hit) {
+    fill: transparent;
+  }
+  .chart :global(.obs) {
+    fill: #3573b4;
+  }
+  .chart :global(.bar.on .obs) {
+    fill: #21517c;
+  }
+  .chart :global(.exp) {
+    fill: none;
+    stroke: #b8892f;
+    stroke-width: 2;
+  }
+  .chart :global(.expdot) {
+    fill: #b8892f;
+    stroke: #fff;
+    stroke-width: 2;
+  }
+  .tip {
+    position: absolute;
+    pointer-events: none;
+    background: #fff;
+    border: 1px solid var(--line);
+    box-shadow: 0 4px 14px rgba(20, 30, 50, 0.12);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    width: 160px;
+  }
+  details {
+    margin-top: 12px;
+  }
+  .num {
+    text-align: right;
+  }
+  .method {
+    margin-top: 36px;
+    max-width: 820px;
+  }
+  .method h2 {
+    font-size: 1.25rem;
+  }
+  @media (max-width: 860px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

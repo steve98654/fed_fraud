@@ -470,3 +470,14 @@ main:focus {
     position: static !important;
   }
 }
+
+/* TeX math rendered by KaTeX at build time (forensic methods handbook). */
+.math-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 1em 0;
+  padding: 2px 0;
+}
+.katex {
+  font-size: 1.05em;
+}

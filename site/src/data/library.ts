@@ -39,6 +39,24 @@ export const library: LibraryDoc[] = [
     ],
   },
   {
+    slug: 'forensic-methods',
+    kind: 'Methodology',
+    title: 'Forensic methods handbook: the mathematics behind each fraud test',
+    summary:
+      'Formulas, thresholds, validity conditions and false-positive notes for every test: Benford and number tests, duplicate and split payments, peer outliers with Bayesian shrinkage, bid-rigging screens, record linkage, networks, improper payment estimation and reconciliations.',
+    planIds: ['F7', 'F8', 'U1-U8'],
+    dueWeek: 4,
+    source: 'docs/playbook/forensic_methods.md',
+    status: 'Draft',
+    outline: [
+      { heading: 'Digit and number tests', note: 'Benford first, second and first-two digits; MAD conformity; round numbers.' },
+      { heading: 'Transaction tests', note: 'Duplicates, split purchases, impossible days, after-death payments.' },
+      { heading: 'Outliers', note: 'Robust z, Poisson-Gamma shrinkage, CUSUM, bunching.' },
+      { heading: 'Networks and linkage', note: 'Fellegi-Sunter, shared attributes, risk propagation.' },
+      { heading: 'Estimation', note: 'Stratified and ratio estimators, monetary unit sampling.' },
+    ],
+  },
+  {
     slug: 'sba-baseline',
     kind: 'Methodology',
     title: 'SBA baseline playbook',

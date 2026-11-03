@@ -1,4 +1,5 @@
 ---
+import 'katex/dist/katex.min.css';
 import Base from '../../layouts/Base.astro';
 import PageTitle from '../../components/PageTitle.astro';
 import Placeholder from '../../components/Placeholder.astro';
@@ -43,7 +44,7 @@ const body = written?.sections.filter((s) => s !== bottom) ?? [];
                 ))}
               </ol>
             </nav>
-            <DocBody sections={body} callouts={['7.']} />
+            <DocBody sections={body} callouts={d.slug === 'methodology' ? ['7.'] : []} />
           </article>
         ) : (
           <Placeholder outline={d.outline} />

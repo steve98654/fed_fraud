@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { Marked } from 'marked';
+import katex from 'katex';
 
 const DOCS = path.resolve(process.cwd(), '..', 'docs');
 export const REPO = 'https://github.com/steve98654/fed_fraud';
@@ -61,12 +62,39 @@ function rewriteHref(href: string, fromDir: string): string {
   if (pitch) return url(`pitches/${pitch[1]}/`) + anchor;
   if (rel === 'playbook/methodology.md') return url('library/methodology/') + anchor;
   if (rel === 'playbook/sba-case-study.md') return url('case-study/sba/') + anchor;
+  if (rel === 'playbook/forensic_methods.md') return url('library/forensic-methods/') + anchor;
+  if (rel === 'universe/all_agencies.md' || rel === 'universe') return url('universe/') + anchor;
   return `${BLOB}/${rel}${anchor}`;
 }
 
-export function md(src: string, fromDir = ''): string {
+// TeX math ($...$ inline, $$...$$ display) for docs that opt in. The inline
+// rule mirrors pandoc's, so the site and the PDF agree on what is math: the
+// opening $ is followed by a non-space, the closing $ follows a non-space and
+// is not followed by a digit (so "$5,000 to $9,000" stays plain text).
+const MATH_DISPLAY = /\$\$([\s\S]+?)\$\$/g;
+const MATH_INLINE = /\$(?=\S)([^$\n]+?)(?<=\S)\$(?!\d)/g;
+
+function protectMath(src: string): { text: string; restore: (html: string) => string } {
+  const blocks: string[] = [];
+  const keep = (tex: string, display: boolean) => {
+    blocks.push(katex.renderToString(tex.trim(), { displayMode: display, throwOnError: false }));
+    return `MATHPH${blocks.length - 1}X`;
+  };
+  const text = src
+    .replace(MATH_DISPLAY, (_, tex) => `\n\n${keep(tex, true)}\n\n`)
+    .replace(MATH_INLINE, (_, tex) => keep(tex, false));
+  const restore = (html: string) =>
+    html
+      .replace(/<p>MATHPH(\d+)X<\/p>/g, (_, i) => `<div class="math-display">${blocks[+i]}</div>`)
+      .replace(/MATHPH(\d+)X/g, (_, i) => blocks[+i]);
+  return { text, restore };
+}
+
+export function md(src: string, fromDir = '', opts: { math?: boolean } = {}): string {
   const seen = new Set<string>();
-  const html = marked.parse(src, { async: false }) as string;
+  const m = opts.math ? protectMath(src) : undefined;
+  const parsed = marked.parse(m ? m.text : src, { async: false }) as string;
+  const html = m ? m.restore(parsed) : parsed;
   return html
     .replace(/href="([^"]+)"/g, (_, h) => {
       const out = rewriteHref(h, fromDir);
@@ -318,6 +346,7 @@ export function doc(rel: string): Doc {
   const first = body.search(/^## /m);
   const intro = (first < 0 ? body : body.slice(0, first)).trim();
   const rest = first < 0 ? '' : body.slice(first);
+  const math = src.includes('$$');
   const sections = rest
     .split(/^## /m)
     .filter(Boolean)
@@ -325,7 +354,7 @@ export function doc(rel: string): Doc {
       const nl = chunk.indexOf('\n');
       const heading = chunk.slice(0, nl).trim();
       const s = chunk.slice(nl + 1).trim();
-      return { heading, id: slugify(heading), html: md(s, dir), src: s };
+      return { heading, id: slugify(heading), html: md(s, dir, { math }), src: s };
     });
   return {
     title,
@@ -459,6 +488,76 @@ export function changes(limit = 60): Change[] {
         agencies: [...agencySet],
         docs: [...docSet],
         site: files.some((f) => f.startsWith('site/')),
+      };
+    });
+}
+
+// ---------------------------------------------------------------------------
+// All federal bodies (docs/universe/data/all_agencies.csv), built by
+// analytics/universe/build_universe.py.
+// ---------------------------------------------------------------------------
+export interface Body {
+  abbreviation: string;
+  name: string;
+  kind: string;
+  inUsaspending: string;
+  outlaysUsd: number | null;
+  tier: 'A' | 'B' | 'C' | 'D' | 'X';
+  coverage: string;
+  ideaIds: string;
+  brief: string;
+  notes: string;
+}
+
+function parseCsv(text: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = '';
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') {
+        cell += '"';
+        i++;
+      } else if (c === '"') quoted = false;
+      else cell += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ',') {
+      row.push(cell);
+      cell = '';
+    } else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = '';
+    } else cell += c;
+  }
+  if (cell || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
+  return rows;
+}
+
+export function federalBodies(): Body[] {
+  const [head, ...rows] = parseCsv(read('universe/data/all_agencies.csv'));
+  return rows
+    .filter((r) => r.length === head.length)
+    .map((r) => {
+      const o = Object.fromEntries(head.map((h, i) => [h, r[i]]));
+      return {
+        abbreviation: o.abbreviation,
+        name: o.name,
+        kind: o.kind,
+        inUsaspending: o.in_usaspending,
+        outlaysUsd: o.outlays_usd ? Number(o.outlays_usd) : null,
+        tier: o.tier as Body['tier'],
+        coverage: o.coverage,
+        ideaIds: o.idea_ids,
+        brief: o.brief,
+        notes: o.notes,
       };
     });
 }

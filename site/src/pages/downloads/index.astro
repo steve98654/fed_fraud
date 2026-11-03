@@ -17,6 +17,16 @@ const plans = [
     text: 'Week-by-week Phase 1 plan: shared foundation, validation, lead packages and a review plan for every agency.',
   },
   {
+    title: 'Every federal agency',
+    file: 'universe/all_agencies.pdf',
+    text: 'All 137 federal bodies tiered, with eight universal screens, four new shared screens and new investigation ideas beyond the top 33.',
+  },
+  {
+    title: 'Forensic methods handbook',
+    file: 'playbook/forensic_methods.pdf',
+    text: 'The mathematics behind each fraud test: formulas, thresholds, validity conditions and false-positive notes.',
+  },
+  {
     title: 'Top 33 agency ranking',
     file: 'agencies/top33.pdf',
     text: 'How the 33 largest agencies were scored on exposure, public data, SBA method fit and actionability.',
@@ -74,6 +84,13 @@ const plans = [
         </div>
       </div>
       <div class="plans">
+        <a class="plan" href={url('downloads/all_agencies.csv')} download>
+          <span class="pdf">CSV</span>
+          <div>
+            <h3>All federal agencies (CSV)</h3>
+            <p>137 bodies with kind, FY2026 outlays, tier, screens and idea IDs.</p>
+          </div>
+        </a>
         <a class="plan" href={url('downloads/scorecard.csv')} download>
           <span class="pdf">CSV</span>
           <div>

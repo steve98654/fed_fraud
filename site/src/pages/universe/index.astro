@@ -1,0 +1,414 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import DocBody from '../../components/DocBody.astro';
+import OnThisPage from '../../components/OnThisPage.astro';
+import { url, doc, federalBodies, agencies, mdInline } from '../../lib/content';
+import { usd } from '../../lib/format';
+
+const d = doc('universe/all_agencies.md');
+const bottom = d.sections.find((s) => s.heading === 'Bottom line');
+const skip = new Set(['Bottom line', 'Full list outside the top 33']);
+const body = d.sections.filter((s) => !skip.has(s.heading));
+
+const bodies = federalBodies();
+const listed = bodies.filter((b) => b.inUsaspending === 'yes');
+const total = listed.reduce((n, b) => n + (b.outlaysUsd ?? 0), 0);
+const top33 = listed.filter((b) => b.tier === 'A').reduce((n, b) => n + (b.outlaysUsd ?? 0), 0);
+const rest = total - top33;
+const tiers = [
+  { t: 'A', label: 'Own plan (top 33 and their corporations)' },
+  { t: 'B', label: 'Own idea ID' },
+  { t: 'C', label: 'Universal and shared screens' },
+  { t: 'D', label: 'No reported outlays' },
+  { t: 'X', label: 'Out of scope' },
+] as const;
+const count = (t: string) => bodies.filter((b) => b.tier === t).length;
+const agencySlugs = new Set(agencies().map((a) => a.slug));
+const fmtOut = (v: number | null, inList: string) => {
+  if (v === null) return inList === 'no' ? 'Not listed' : inList.replace('within', 'Within');
+  if (v === 0) return '$0';
+  return usd(v);
+};
+const sections = [
+  { id: 'register', label: 'Register of all bodies' },
+  ...body.map((s) => ({ id: s.id, label: s.heading })),
+];
+---
+
+<Base
+  title="Every federal agency"
+  section="universe"
+  description="All 137 federal bodies, from cabinet departments to small commissions and government corporations, with their tier and the fraud screens that cover them."
+>
+  <PageTitle
+    eyebrow="Coverage · All federal bodies"
+    title="Every federal agency, not just the top 33"
+    lead="All 137 federal bodies we could identify, from cabinet departments to small commissions, foundations and government corporations, each with a tier and the screens that cover it."
+    crumbs={[{ label: 'Scorecard', href: url() }, { label: 'Agency plans', href: url('agencies/') }]}
+  >
+    <div class="title-actions">
+      <a class="btn" href={url('downloads/docs/universe/all_agencies.pdf')}>Download the plan (PDF)</a>
+      <a class="btn primary" href={url('library/forensic-methods/')}>Forensic methods</a>
+    </div>
+  </PageTitle>
+
+  <section class="section">
+    <div class="container">
+      <div class="notice" role="note">
+        <span aria-hidden="true">⚑</span>
+        <span>
+          <strong>Coverage plan, not findings.</strong> Outlays are FY2026 figures reported to USAspending, shown as context.
+          No body on this page has been found to have fraud, and savings stay <em>Pending</em> everywhere on the site.
+        </span>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="n">{bodies.length}</span>
+          <span class="l">federal bodies in the register</span>
+        </div>
+        <div class="stat">
+          <span class="n">{((top33 / total) * 100).toFixed(1)}%</span>
+          <span class="l">of FY2026 USAspending outlays sit in the top 33 ({usd(top33)})</span>
+        </div>
+        <div class="stat">
+          <span class="n">{usd(rest)}</span>
+          <span class="l">paid out by the other {listed.length - 33} listed agencies combined</span>
+        </div>
+        <div class="stat">
+          <span class="n">15</span>
+          <span class="l">agencies report improper payment estimates (FY2025)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container layout">
+      <article>
+        {bottom && <div class="bottom prose" set:html={bottom.html} />}
+
+        <section id="register" class="register">
+          <h2>Register of all bodies</h2>
+          <p class="hint">
+            Filter by tier or search by name, abbreviation, kind or screen. Top 33 agencies link to their plans. The same data
+            are in the <a href={url('downloads/all_agencies.csv')}>CSV download</a>.
+          </p>
+          <div class="controls no-print">
+            <div class="tiers" role="group" aria-label="Filter by tier">
+              <button type="button" data-tier="" aria-pressed="true">All <span>{bodies.length}</span></button>
+              {
+                tiers.map(({ t, label }) => (
+                  <button type="button" data-tier={t} aria-pressed="false" title={label}>
+                    Tier {t} <span>{count(t)}</span>
+                  </button>
+                ))
+              }
+            </div>
+            <label class="sr-only" for="body-search">Search bodies</label>
+            <input id="body-search" type="search" placeholder="Search, e.g. commission, C3, RRB" autocomplete="off" />
+          </div>
+          <p class="shown" aria-live="polite"><span id="shown">{bodies.length}</span> shown</p>
+          <div class="table-wrap">
+            <table class="reg">
+              <caption class="sr-only">Federal bodies with tier, FY2026 outlays and coverage</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Body</th>
+                  <th scope="col">Kind</th>
+                  <th scope="col" class="num">FY26 outlays</th>
+                  <th scope="col">Tier</th>
+                  <th scope="col">Coverage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  bodies.map((b) => (
+                    <tr
+                      data-tier={b.tier}
+                      data-text={`${b.name} ${b.abbreviation} ${b.kind} ${b.coverage} ${b.ideaIds}`.toLowerCase()}
+                    >
+                      <td>
+                        {b.brief && agencySlugs.has(b.brief) ? (
+                          <a href={url(`agencies/${b.brief}/`)}>{b.name}</a>
+                        ) : (
+                          b.name
+                        )}{' '}
+                        <span class="abbr">{b.abbreviation}</span>
+                        {b.tier === 'B' && b.ideaIds && <span class="ids">{b.ideaIds}</span>}
+                      </td>
+                      <td>{b.kind}</td>
+                      <td class="num">{fmtOut(b.outlaysUsd, b.inUsaspending)}</td>
+                      <td>
+                        <span class={`tier t${b.tier}`}>{b.tier}</span>
+                      </td>
+                      <td class="cov">
+                        {b.coverage ? b.coverage.split(' ').filter((c) => c !== 'plan').map((c) => <span>{c === 'Own' ? 'Own plan' : c}</span>) : '—'}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <DocBody sections={body} />
+      </article>
+      <aside class="side no-print">
+        <OnThisPage items={sections} />
+        <div class="key">
+          <h3>Tiers</h3>
+          <dl>
+            {
+              tiers.map(({ t, label }) => (
+                <div>
+                  <dt>
+                    <span class={`tier t${t}`}>{t}</span>
+                  </dt>
+                  <dd>
+                    {label} ({count(t)})
+                  </dd>
+                </div>
+              ))
+            }
+          </dl>
+          <h3>Universal screens</h3>
+          <p set:html={mdInline('U1 award number tests · U2 split and duplicate awards · U3 contract growth · U4 recipient integrity · U5 Single Audit check · U6 DATA Act reconciliation · U7 charge card and payroll (Phase 2) · U8 death and Do Not Pay match (Phase 2)')} />
+        </div>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('.tiers button')];
+  const input = document.querySelector<HTMLInputElement>('#body-search')!;
+  const rows = [...document.querySelectorAll<HTMLTableRowElement>('table.reg tbody tr')];
+  const shown = document.querySelector('#shown')!;
+  let tier = new URLSearchParams(location.search).get('tier') ?? '';
+  function apply() {
+    const q = input.value.trim().toLowerCase();
+    let n = 0;
+    for (const r of rows) {
+      const ok = (!tier || r.dataset.tier === tier) && (!q || r.dataset.text!.includes(q));
+      r.hidden = !ok;
+      if (ok) n++;
+    }
+    shown.textContent = String(n);
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tier === tier)));
+  }
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      tier = b.dataset.tier ?? '';
+      const u = new URL(location.href);
+      if (tier) u.searchParams.set('tier', tier);
+      else u.searchParams.delete('tier');
+      history.replaceState(null, '', u);
+      apply();
+    }),
+  );
+  input.addEventListener('input', apply);
+  apply();
+</script>
+
+<style>
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .stat {
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--geomid);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    display: grid;
+    gap: 6px;
+  }
+  .stat .n {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.1;
+  }
+  .stat .l {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 40px;
+    align-items: start;
+  }
+  .bottom {
+    font-size: 1.02rem;
+    border-left: 4px solid var(--geomid);
+    padding: 4px 0 4px 20px;
+    margin-bottom: 32px;
+  }
+  .register {
+    margin-bottom: 36px;
+  }
+  .register h2 {
+    font-size: 1.45rem;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .hint,
+  .shown {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin: 12px 0 4px;
+  }
+  .tiers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tiers button {
+    font: inherit;
+    font-size: 0.85rem;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--navy);
+    border-radius: 999px;
+    padding: 5px 12px;
+    cursor: pointer;
+  }
+  .tiers button span {
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  .tiers button[aria-pressed='true'] {
+    background: var(--geomid);
+    border-color: var(--geomid);
+    color: #fff;
+  }
+  .tiers button[aria-pressed='true'] span {
+    color: #dfe8f3;
+  }
+  #body-search {
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 7px 12px;
+    border: 1px solid #9aa6b8;
+    border-radius: 6px;
+    min-width: 260px;
+  }
+  table.reg {
+    font-size: 0.88rem;
+  }
+  .reg .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+  .abbr {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+  .ids {
+    display: block;
+    color: var(--gold-ink);
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .cov {
+    font-size: 0.82rem;
+  }
+  .cov span {
+    white-space: nowrap;
+    margin-right: 6px;
+  }
+  .tier {
+    display: inline-block;
+    min-width: 1.6em;
+    text-align: center;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 1px 6px;
+    background: var(--line);
+    color: var(--navy);
+  }
+  .tier.tA {
+    background: var(--geomid);
+    color: #fff;
+  }
+  .tier.tB {
+    background: var(--gold-soft);
+    color: var(--gold-ink);
+  }
+  .tier.tD,
+  .tier.tX {
+    background: #eef0f3;
+    color: var(--muted);
+  }
+  .side {
+    position: sticky;
+    top: 16px;
+    display: grid;
+    gap: 20px;
+  }
+  .key {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 0.88rem;
+  }
+  .key h3 {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--geomid);
+    margin: 0 0 8px;
+  }
+  .key h3 + p {
+    margin: 0;
+    color: var(--muted);
+  }
+  .key dl {
+    margin: 0 0 14px;
+    display: grid;
+    gap: 6px;
+  }
+  .key dl div {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+  }
+  .key dd {
+    margin: 0;
+  }
+  @media (max-width: 1000px) {
+    .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .layout {
+      grid-template-columns: 1fr;
+    }
+    .side {
+      position: static;
+    }
+  }
+  @media (max-width: 560px) {
+    .stats {
+      grid-template-columns: 1fr;
+    }
+    #body-search {
+      min-width: 0;
+      width: 100%;
+    }
+  }
+</style>
