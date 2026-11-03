@@ -1,8 +1,6 @@
-# Deploys the site to Cloudflare Pages, behind Cloudflare Access.
-#
-# Manual only for now: run it from the Actions tab once the Cloudflare project
-# and the Access policy exist (see site/HOSTING.md). Do not add a push trigger
-# until the Access gate has been tested, because a deploy without it is public.
+# Optional: deploys the site to Cloudflare Pages from GitHub Actions. Not needed
+# if the Pages project is connected to the repo in the Cloudflare dashboard
+# (the route in site/HOSTING.md). Manual only.
 name: Site deploy
 
 on:
@@ -32,8 +30,10 @@ jobs:
         working-directory: site
       - run: npm run build
         working-directory: site
+      # Runs from site/ so wrangler also uploads site/functions (the password gate).
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy site/dist --project-name=${{ env.PROJECT }} --branch=main --commit-dirty=true
+          workingDirectory: site
+          command: pages deploy dist --project-name=${{ env.PROJECT }} --branch=main --commit-dirty=true
