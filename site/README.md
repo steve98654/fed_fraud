@@ -64,9 +64,21 @@ with `SITE_BASE=/fed_fraud/ npm run build`.
    new, from git history; needs a full clone to show anything).
 6. **Research library** (`/library/`): placeholder pages for methodology,
    research, detailed plans and per-agency results, to be filled in later.
-7. **Downloads** (`/downloads/`): a PDF brief per agency, the roadmap,
-   review plan, ranking and working plan PDFs (served from `../docs`), and
-   the scorecard as `/downloads/scorecard.csv` and `.json`, built from
+7. **Every federal agency** (`/universe/`): all 137 federal bodies with
+   tier, FY2026 outlays and screens, filterable by tier (`?tier=B`), plus
+   the coverage plan from `docs/universe/all_agencies.md`. The register is
+   `docs/universe/data/all_agencies.csv`, built by
+   `analytics/universe/build_universe.py`.
+8. **Forensic methods** (`/library/forensic-methods/`): the handbook from
+   `docs/playbook/forensic_methods.md`. TeX math (`$...$`, `$$...$$`) is
+   rendered with KaTeX at build time for docs that contain display math;
+   the inline rule matches pandoc's, so the site and the PDF agree.
+9. **Benford checker** (`/tools/benford/`): a working client-side prototype
+   of universal screen U1. Pasted data never leave the browser.
+10. **Downloads** (`/downloads/`): a PDF brief per agency, the roadmap,
+   review plan, ranking, all-agency plan, forensic methods and working plan
+   PDFs (served from `../docs`), the all-agency register as
+   `/downloads/all_agencies.csv`, and the scorecard as `/downloads/scorecard.csv` and `.json`, built from
    `src/lib/scorecard.ts`. Savings columns read `Pending` until findings
    are recorded.
 

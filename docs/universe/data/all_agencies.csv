@@ -1,0 +1,138 @@
+abbreviation,name,kind,in_usaspending,outlays_usd,tier,coverage,idea_ids,brief,notes
+HHS,Department of Health and Human Services,Cabinet department,yes,2687036276023.63,A,Own plan C7 U1-U6 U7-U8,HHS-n (roadmap),hhs,Own plan in the roadmap and review plan.
+TREAS,Department of the Treasury,Cabinet department,yes,1974592714924.28,A,Own plan C4 U1-U6 U7-U8,TREAS-n (roadmap),treasury,Own plan in the roadmap and review plan.
+SSA,Social Security Administration,Independent agency,yes,1663748219825.58,A,Own plan C5 U1-U6 U7-U8,SSA-n (roadmap),ssa,Own plan in the roadmap and review plan.
+DOD,Department of Defense,Cabinet department,yes,1345495480198.05,A,Own plan U1-U6 U7-U8,DOD-n (roadmap),dod,Own plan in the roadmap and review plan.
+VA,Department of Veterans Affairs,Cabinet department,yes,419008369132.37,A,Own plan C5 C7 U1-U6 U7-U8,VA-n (roadmap),va,Own plan in the roadmap and review plan.
+DHS,Department of Homeland Security,Cabinet department,yes,258878665703.04,A,Own plan U1-U6 U7-U8,DHS-n (roadmap),dhs,Own plan in the roadmap and review plan.
+USDA,Department of Agriculture,Cabinet department,yes,219705792049.93,A,Own plan C4 U1-U6 U7-U8,USDA-n (roadmap),usda,Own plan in the roadmap and review plan.
+OPM,Office of Personnel Management,Independent agency,yes,201211037895.55,A,Own plan C5 U1-U6 U7-U8,OPM-n (roadmap),opm,Own plan in the roadmap and review plan.
+ED,Department of Education,Cabinet department,yes,134685981382.19,A,Own plan C4 U1-U6 U7-U8,ED-n (roadmap),ed,Own plan in the roadmap and review plan.
+DOT,Department of Transportation,Cabinet department,yes,125479710925.43,A,Own plan U1-U6 U7-U8,DOT-n (roadmap),dot,Own plan in the roadmap and review plan.
+HUD,Department of Housing and Urban Development,Cabinet department,yes,84852887067.19,A,Own plan C4 U1-U6 U7-U8,HUD-n (roadmap),hud,Own plan in the roadmap and review plan.
+DOL,Department of Labor,Cabinet department,yes,62931241239.05,A,Own plan C5 C7 U1-U6 U7-U8,DOL-n (roadmap),dol,Own plan in the roadmap and review plan.
+DOE,Department of Energy,Cabinet department,yes,62670347332.00,A,Own plan U1-U6 U7-U8,DOE-n (roadmap),doe,Own plan in the roadmap and review plan.
+DOJ,Department of Justice,Cabinet department,yes,51705305343.23,A,Own plan C6 U1-U6 U7-U8,DOJ-n (roadmap),doj,Own plan in the roadmap and review plan.
+DOS,Department of State,Cabinet department,yes,38816371851.99,A,Own plan U1-U6 U7-U8,STATE-n (roadmap),state,Own plan in the roadmap and review plan.
+GSA,General Services Administration,Independent agency,yes,37784542850.08,A,Own plan U1-U6 U7-U8,GSA-n (roadmap),gsa,Own plan in the roadmap and review plan.
+DOI,Department of the Interior,Cabinet department,yes,36821485523.31,A,Own plan U1-U6 U7-U8,DOI-n (roadmap),doi,Own plan in the roadmap and review plan.
+USACE,Corps of Engineers - Civil Works,Independent agency,yes,28476371355.68,A,Own plan U1-U6 U7-U8,USACE-n (roadmap),usace,Own plan in the roadmap and review plan.
+NASA,National Aeronautics and Space Administration,Independent agency,yes,22889244715.83,A,Own plan U1-U6 U7-U8,NASA-n (roadmap),nasa,Own plan in the roadmap and review plan.
+DOC,Department of Commerce,Cabinet department,yes,20012273033.09,A,Own plan U1-U6 U7-U8,DOC-n (roadmap),doc,Own plan in the roadmap and review plan.
+EPA,Environmental Protection Agency,Independent agency,yes,17079612292.63,A,Own plan U1-U6 U7-U8,EPA-n (roadmap),epa,Own plan in the roadmap and review plan.
+SBA,Small Business Administration,Independent agency,yes,15042227942.33,A,Own plan C4 U1-U6 U7-U8,SBA-n (roadmap),sba,Own plan in the roadmap and review plan.
+USAID,Agency for International Development,Independent agency,yes,11667759543.10,A,Own plan U1-U6 U7-U8,USAID-n (roadmap),usaid,Own plan in the roadmap and review plan.
+PBGC,Pension Benefit Guaranty Corporation,Government corporation,yes,10570646210.44,A,Own plan C5 U1-U6 U7-U8,PBGC-n (roadmap),pbgc,Own plan in the roadmap and review plan.
+FCC,Federal Communications Commission,Regulatory commission or board,yes,10143243701.72,A,Own plan U1-U6 U7-U8,FCC-n (roadmap),fcc,Own plan in the roadmap and review plan.
+NSF,National Science Foundation,"Foundation, endowment or trust fund",yes,8053031182.02,A,Own plan U1-U6 U7-U8,NSF-n (roadmap),nsf,Own plan in the roadmap and review plan.
+FDIC,Federal Deposit Insurance Corporation,Government corporation,yes,4613942342.55,A,Own plan U1-U6 U7-U8,FDIC-n (roadmap),fdic,Own plan in the roadmap and review plan.
+SEC,Securities and Exchange Commission,Regulatory commission or board,yes,1812097244.39,A,Own plan C6 U1-U6 U7-U8,SEC-n (roadmap),sec,Own plan in the roadmap and review plan.
+DFC,U.S. International Development Finance Corporation,Government corporation,yes,1568291007.69,A,Own plan C4 U1-U6 U7-U8,DFC-n (roadmap),dfc,Own plan in the roadmap and review plan.
+CNCS,Corporation for National and Community Service,Government corporation,yes,1195241351.04,A,Own plan U1-U6 U7-U8,CNCS-n (roadmap),cncs,Own plan in the roadmap and review plan.
+PCORTF,Patient-Centered Outcomes Research Trust Fund,"Foundation, endowment or trust fund",yes,1113676811.61,A,Own plan U1-U6 U7-U8,PCORTF-n (roadmap),pcortf,Own plan in the roadmap and review plan.
+NRC,Nuclear Regulatory Commission,Regulatory commission or board,yes,858488529.68,A,Own plan U1-U6 U7-U8,NRC-n (roadmap),nrc,Own plan in the roadmap and review plan.
+EOP,Executive Office of the President,Executive Office of the President,yes,851475969.99,A,Own plan U1-U6 U7-U8,EOP-n (roadmap),eop,Own plan in the roadmap and review plan.
+CCC,Commodity Credit Corporation,Government corporation (component),within USDA,,A,Through USDA,,,Wholly owned corporation under 31 U.S.C. 9101; spending reported under USDA.
+CDFI,Community Development Financial Institutions Fund,Government corporation (component),within TREAS,,A,Through TREAS,,,Wholly owned corporation under 31 U.S.C. 9101; spending reported under TREAS.
+FCIC,Federal Crop Insurance Corporation,Government corporation (component),within USDA,,A,Through USDA,,,Wholly owned corporation under 31 U.S.C. 9101; spending reported under USDA.
+FHA,Federal Housing Administration Fund,Government corporation (component),within HUD,,A,Through HUD,,,Wholly owned corporation under 31 U.S.C. 9101; spending reported under HUD.
+FPI,Federal Prison Industries,Government corporation (component),within DOJ,,A,Through DOJ,,,Wholly owned corporation under 31 U.S.C. 9101; spending reported under DOJ.
+GNMA,Government National Mortgage Association (Ginnie Mae),Government corporation (component),within HUD,,A,Through HUD,,,Wholly owned corporation under 31 U.S.C. 9101; spending reported under HUD.
+GLS,Great Lakes St. Lawrence Seaway Development Corporation,Government corporation (component),within DOT,,A,Through DOT,,,Wholly owned corporation under 31 U.S.C. 9101; spending reported under DOT.
+MCC,Millennium Challenge Corporation,Government corporation,yes,530694161.88,B,C3 U1-U6 U7-U8,MCC-1,,Compact implementers and contractors against development-bank debarment lists
+USAGM,U.S. Agency for Global Media,Independent agency,yes,523249995.52,B,C3 C1 U1-U6 U7-U8,USAGM-1,,Grantee network and contractor screen
+CFPB,Consumer Financial Protection Bureau,Independent agency,yes,434698063.51,B,C6 C1 U1-U6 U7-U8,CFPB-1,,Civil Penalty Fund and redress payments: duplicate and synthetic claimant tests
+EXIM,Export-Import Bank of the United States,Government corporation,yes,401455811.69,B,C4 U1-U6 U7-U8,EXIM-1,,"Exporter, buyer and lender shell checks on authorizations"
+FTC,Federal Trade Commission,Regulatory commission or board,yes,355808771.11,B,C6 C1 U1-U6 U7-U8,FTC-1,,Consumer refund programs: duplicate and synthetic claimant tests
+DC COURTS,District of Columbia Courts,Judicial branch or court-related,yes,297794676.46,B,C7 C1 U1-U6 U7-U8,DCC-1,,Court-appointed counsel vouchers: impossible days and peer outliers (Phase 2)
+IMLS,Institute of Museum and Library Services,"Foundation, endowment or trust fund",yes,216668447.40,B,C3 U1-U6 U7-U8,ARTS-1,,See NEA
+GCERC,Gulf Coast Ecosystem Restoration Council,Regional commission,yes,178720568.00,B,C3 U1-U6 U7-U8,RESTORE-1,,RESTORE Act grants: subrecipient reconciliation and grantee screen
+NEA,National Endowment for the Arts,"Foundation, endowment or trust fund",yes,137221689.76,B,C3 U1-U6 U7-U8,ARTS-1,,"Duplicate funding across NEA, NEH and IMLS (text similarity) plus Single Audit findings"
+DRA,Delta Regional Authority,Regional commission,yes,75074395.68,B,C3 U1-U6 U7-U8,REG-1,,See ARC
+NEH,National Endowment for the Humanities,"Foundation, endowment or trust fund",yes,61746649.72,B,C3 U1-U6 U7-U8,ARTS-1,,See NEA
+DENALI,Denali Commission,Regional commission,yes,49098228.09,B,C3 U1-U6 U7-U8,REG-1,,See ARC
+NBRC,Northern Border Regional Commission,Regional commission,yes,43881901.89,B,C3 U1-U6 U7-U8,REG-1,,See ARC
+ARC,Appalachian Regional Commission,Regional commission,yes,12742196.69,B,C3 U1-U6 U7-U8,REG-1,,"Regional commission grant overlap with EDA, USDA Rural Development and each other"
+SCRC,Southeast Crescent Regional Commission,Regional commission,yes,11371092.42,B,C3 U1-U6 U7-U8,REG-1,,See ARC
+CPB,Corporation for Public Broadcasting,Federally funded nonprofit corporation,no,,B,C3 U1-U6 U7-U8,CPB-1,,Station grant screen against station financial reports
+JUD,Federal Judiciary (Administrative Office of the U.S. Courts),Judicial branch,no,,B,C7 C1 U1-U6 U7-U8,JUD-1,,Not on the USAspending toptier list. Criminal Justice Act attorney and expert vouchers: impossible days and peer outliers (Phase 2)
+LSC,Legal Services Corporation,Federally funded nonprofit corporation,no,,B,C3 U1-U6 U7-U8,LSC-1,,Legal aid grantee screen with Single Audit findings
+AMTRAK,National Railroad Passenger Corporation (Amtrak),Government corporation,no,,B,C3 C1 U1-U6 U7-U8,AMTRAK-1,,Federally chartered; federal grants flow through DOT. Contractor and grant subcontractor screen on federal grants to Amtrak
+RRB,Railroad Retirement Board,Independent agency,yes,0.00,B,C5 U7-U8,"RRB-1, RRB-2",,Disability and sickness benefit outliers by employer and physician; annuities after death (Phase 2). USAspending shows no FY2026 outlays for RRB; its benefit spending is not reported there under RRB.
+TVA,Tennessee Valley Authority,Government corporation,no,,B,C1 U1-U6 U7-U8,TVA-1,,Wholly owned corporation under 31 U.S.C. 9101. Supplier integrity screen (data access to confirm)
+USPS,United States Postal Service,Independent establishment (off-budget),no,,B,C7 C1 U1-U6 U7-U8,"USPS-1, USPS-2",,Supplier and highway contract route screen (not in FPDS; FOIA/OIG); workers' compensation provider outliers
+GAO,Government Accountability Office,Legislative branch,yes,817163942.09,C,C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+NARA,National Archives and Records Administration,Independent agency,yes,646979135.71,C,C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+EEOC,Equal Employment Opportunity Commission,Regulatory commission or board,yes,382043447.63,C,C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+PC,Peace Corps,Independent agency,yes,376670827.72,C,C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+CFTC,Commodity Futures Trading Commission,Regulatory commission or board,yes,323644524.55,C,C6 C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+PRESIDIO,Presidio Trust,Government corporation,yes,305536993.53,C,C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+NLRB,National Labor Relations Board,Regulatory commission or board,yes,255055073.73,C,C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+CSOSA,Court Services and Offender Supervision Agency,Judicial branch or court-related,yes,242649978.19,C,C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+FCSIC,Farm Credit System Insurance Corporation,Government corporation,yes,228457799.08,C,C4 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+NTSB,National Transportation Safety Board,Regulatory commission or board,yes,130341066.85,C,C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+CPSC,Consumer Product Safety Commission,Regulatory commission or board,yes,129069915.64,C,C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+AFRH,Armed Forces Retirement Home,Independent agency,yes,117047718.87,C,C5 C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+USITC,International Trade Commission,Regulatory commission or board,yes,111332725.91,C,C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+ABMC,American Battle Monuments Commission,Regulatory commission or board,yes,101152792.59,C,C1 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+FEC,Federal Election Commission,Regulatory commission or board,yes,71128012.87,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+USTDA,United States Trade and Development Agency,Independent agency,yes,58044149.09,C,C3 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+EAC,Election Assistance Commission,Regulatory commission or board,yes,57322609.42,C,C3 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+MSPB,Merit Systems Protection Board,Regulatory commission or board,yes,44945090.28,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+CAVC,United States Court of Appeals for Veterans Claims,Judicial branch or court-related,yes,40869980.50,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+STB,Surface Transportation Board,Regulatory commission or board,yes,37826183.10,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+DNFSB,Defense Nuclear Facilities Safety Board,Regulatory commission or board,yes,37142034.49,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+FMC,Federal Maritime Commission,Regulatory commission or board,yes,35707062.24,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+FPISC,Federal Permitting Improvement Steering Council,Regulatory commission or board,yes,30148789.08,C,C3 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+CIGIE,Council of the Inspectors General on Integrity and Efficiency,Independent agency,yes,27719244.95,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+SSS,Selective Service System,Independent agency,yes,27522147.05,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+OSC,Office of Special Counsel,Independent agency,yes,27015835.77,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+FMCS,Federal Mediation and Conciliation Service,Independent agency,yes,26385657.11,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+FLRA,Federal Labor Relations Authority,Regulatory commission or board,yes,21055172.89,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+OGE,Office of Government Ethics,Independent agency,yes,18326786.98,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+IAF,Inter-American Foundation,"Foundation, endowment or trust fund",yes,14268715.45,C,C3 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+FMSHRC,Federal Mine Safety and Health Review Commission,Regulatory commission or board,yes,13822410.25,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+NMB,National Mediation Board,Regulatory commission or board,yes,12653998.44,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+OSHRC,Occupational Safety and Health Review Commission,Regulatory commission or board,yes,12321105.73,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+CSB,United States Chemical Safety Board,Regulatory commission or board,yes,11848759.21,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+USCCR,Commission on Civil Rights,Regulatory commission or board,yes,11542943.79,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+PCLOB,Privacy and Civil Liberties Oversight Board,Regulatory commission or board,yes,11326920.40,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+ACHP,Advisory Council on Historic Preservation,Regulatory commission or board,yes,10376700.77,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+NCPC,National Capital Planning Commission,Regulatory commission or board,yes,10174535.42,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+ABILITYONE,Committee for Purchase from People Who Are Blind or Severely Disabled,Independent agency,yes,10157837.75,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+USAB,Access Board,Independent agency,yes,9427914.09,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+UDALL,Morris K. Udall and Stewart L. Udall Foundation,"Foundation, endowment or trust fund",yes,8897817.69,C,C3 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+USADF,African Development Foundation,"Foundation, endowment or trust fund",yes,8634696.29,C,C3 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+CFA,Commission of Fine Arts,Regulatory commission or board,yes,8077846.43,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+TRUMAN,Harry S Truman Scholarship Foundation,"Foundation, endowment or trust fund",yes,5283421.59,C,C3 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+NWTRB,Nuclear Waste Technical Review Board,Regulatory commission or board,yes,3238282.54,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+MMC,Marine Mammal Commission,Regulatory commission or board,yes,3121044.70,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+ACUS,Administrative Conference of the U.S.,Independent agency,yes,2982412.50,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+PBRB,Public Buildings Reform Board,Regulatory commission or board,yes,2871464.87,C,U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+GOLDWATER,Barry Goldwater Scholarship and Excellence In Education Foundation,"Foundation, endowment or trust fund",yes,2121090.59,C,C3 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+NCUA,National Credit Union Administration,Independent agency,yes,2083668.47,C,C4 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+MADISON,James Madison Memorial Fellowship Foundation,"Foundation, endowment or trust fund",yes,2004459.42,C,C3 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+JUSFC,Japan-United States Friendship Commission,"Foundation, endowment or trust fund",yes,1617447.87,C,C3 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+OPIC,Overseas Private Investment Corporation,Government corporation,yes,360163.12,C,C4 U1-U6 U7-U8,,,Universal screens and any shared screen listed.
+AOC,Architect of the Capitol,Legislative branch,no,,C,C1 U1-U6 U7-U8,,,
+CBO,Congressional Budget Office,Legislative branch,no,,C,U1-U6 U7-U8,,,Salaries only; universal screens only.
+FCA,Farm Credit Administration,Independent regulator (assessment-funded),no,,C,U1-U6 U7-U8,,,
+FHFA,Federal Housing Finance Agency,Independent regulator (assessment-funded),no,,C,U1-U6 U7-U8,,,
+GPO,Government Publishing Office,Legislative branch,no,,C,C1 U1-U6 U7-U8,,,
+CONGRESS,House of Representatives and Senate,Legislative branch,no,,C,U1-U6 U7-U8,,,Office spending is published in the Statements of Disbursements.
+LOC,Library of Congress,Legislative branch,no,,C,C1 U1-U6 U7-U8,,,
+PRC,Postal Regulatory Commission,Regulatory commission or board,no,,C,U1-U6 U7-U8,,,
+SI,Smithsonian Institution,Trust instrumentality,no,,C,C1 U1-U6 U7-U8,,,
+USIP,United States Institute of Peace,Federally funded nonprofit corporation,no,,C,U1-U6 U7-U8,,,
+AAHC,400 Years of African-American History Commission,Regulatory commission or board,yes,0.00,D,,,,No outlays reported to USAspending for FY2026; check whether spending is reported elsewhere.
+HERITAGEABROAD,Commission for the Preservation of America's Heritage Abroad,Regulatory commission or board,yes,0.00,D,,,,No outlays reported to USAspending for FY2026; check whether spending is reported elsewhere.
+FFIEC,Federal Financial Institutions Examination Council,Regulatory commission or board,yes,0.00,D,,,,No outlays reported to USAspending for FY2026; check whether spending is reported elsewhere.
+KENNEDY CENTER,John F. Kennedy Center for the Performing Arts,"Foundation, endowment or trust fund",yes,0.00,D,,,,No outlays reported to USAspending for FY2026; check whether spending is reported elsewhere.
+NCD,National Council on Disability,Regulatory commission or board,yes,0.00,D,,,,No outlays reported to USAspending for FY2026; check whether spending is reported elsewhere.
+ONHIR,Office of Navajo and Hopi Indian Relocation,Independent agency,yes,0.00,D,,,,No outlays reported to USAspending for FY2026; check whether spending is reported elsewhere.
+SBRC,Southwest Border Regional Commission,Regional commission,yes,0.00,D,,,,No outlays reported to USAspending for FY2026; check whether spending is reported elsewhere.
+USICH,U.S. Interagency Council on Homelessness,Regulatory commission or board,yes,0.00,D,,,,No outlays reported to USAspending for FY2026; check whether spending is reported elsewhere.
+VEF,Vietnam Education Foundation,"Foundation, endowment or trust fund",yes,0.00,D,,,,No outlays reported to USAspending for FY2026; check whether spending is reported elsewhere.
+GSE,"Fannie Mae, Freddie Mac and the Federal Home Loan Banks",Out of scope,no,,X,,,,Shareholder- or member-owned; FHFA and FHFA OIG oversee them.
+FCS,Farm Credit System banks,Out of scope,no,,X,,,,Privately owned successors to the Farm Credit banks named in 31 U.S.C. 9101(2); FCA supervises them.
+FRS,Federal Reserve System,Out of scope,no,,X,,,,Not funded by appropriations; has its own OIG.

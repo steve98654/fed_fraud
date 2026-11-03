@@ -6,6 +6,11 @@ agencies in the federal fraud initiative (america.gov/fraud).
 - [Working plan](docs/plan.md)
 - [Partner agencies: briefs and ranking (the original eight)](docs/agencies/landscape.md)
 - [Top 33 agencies by budget: briefs and ranking](docs/agencies/top33.md)
+- [Every federal agency: coverage plan beyond the top 33](docs/universe/all_agencies.md)
+  (137 bodies, universal screens U1-U8, shared screens C4-C7, new idea IDs)
+- [Forensic methods handbook](docs/playbook/forensic_methods.md): the mathematics
+  behind each fraud test, with a tested reference implementation in
+  [`analytics/`](analytics/README.md)
 - [The Geodesic Accountability Office website (Astro)](site/README.md): scorecard, agency plans,
   five-page roadmap and research library, built from `docs/`
 
@@ -15,7 +20,8 @@ Every Markdown file under `docs/` has a LaTeX source (`.tex`) and a compiled
 PDF next to it, for example [docs/plan.pdf](docs/plan.pdf). They use the
 Classic report template (`detailed_1_classic`) from
 `proposal_gen/templates/detailed_proposal_template`, set in Latin Modern.
-The plan, `landscape` and `top33` get the full title page and contents; the
+The plan, review plan, roadmap, `landscape`, `top33`, the all-agency plan
+and the forensic methods handbook get the full title page and contents; the
 agency briefs get a compact one-page header in the same style.
 
 The Markdown stays the source. After editing it, rebuild with

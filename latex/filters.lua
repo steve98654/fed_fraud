@@ -121,3 +121,19 @@ function Table(tbl)
   table.insert(out, "\\end{longtable}\\endgroup")
   return pandoc.RawBlock("latex", table.concat(out, "\n"))
 end
+
+-- Documents that number their own sections ("## 3. Digit tests", with
+-- cross-references like "section 5.4") keep those numbers: when any heading
+-- starts with a number, LaTeX's automatic numbering is turned off for all
+-- headings so the two schemes do not stack ("3 2. Ground rules").
+function Pandoc(doc)
+  local manual = false
+  doc:walk({ Header = function(h)
+    if h.level == 1 and pandoc.utils.stringify(h.content):match("^%d+%.%s") then manual = true end
+  end })
+  if not manual then return doc end
+  return doc:walk({ Header = function(h)
+    h.classes:insert("unnumbered")
+    return h
+  end })
+end
