@@ -1,0 +1,282 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Pilot proposal kit},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Pilot proposal kit}\par
+\vspace{2pt}{\large\color{geomid} A 90-day pilot with one agency}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Status:} Draft v0.1 (2026-11-04), for Steve's review. Extension
+4 of 10 (see the \href{../extensions.pdf}{extensions overview}).
+Recommended first partner: \textbf{HHS-OIG with CMS, on hospice and home
+health (HHS-1)}, with SBA OIG as the alternate. Everything below is
+written so the agency name and screen can be swapped.
+
+\hypertarget{bottom-line}{%
+\section*{Bottom line}\label{bottom-line}}
+\addcontentsline{toc}{section}{Bottom line}
+
+A leader can say yes to 90 days, a small team, no new system in their
+boundary and a clear stop rule. This kit gives them exactly that: a
+week-by-week plan, the data-sharing paperwork as fill-in templates, the
+metrics that decide whether to scale, and the staffing on both sides.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Why HHS first:} the largest improper payment base (\$28.8B
+  Medicare fee-for-service, \$37.4B Medicaid), the highest modeled
+  return (see the \href{roi_model.pdf}{ROI model}), a live public
+  problem (the 2026 hospice and home health moratorium) and an OIG that
+  already runs data analytics.
+\item
+  \textbf{Why SBA as the alternate:} the SBA work with Rosemary is the
+  proof of method, the OIG knows the pandemic cases, and the data is
+  already understood. It is the faster yes, but the smaller prize.
+\item
+  \textbf{Stop rule:} at day 75, if the screen's top 5\% does not
+  contain known cases at five times the base rate, or reviewers confirm
+  fewer than one in five leads as worth opening, the pilot ends and the
+  report says why.
+\end{itemize}
+
+\hypertarget{scope}{%
+\section*{1. Scope}\label{scope}}
+\addcontentsline{toc}{section}{1. Scope}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.143\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.429\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.429\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Item & \leavevmode\color{white}\bfseries HHS (recommended) & \leavevmode\color{white}\bfseries SBA (alternate) \\
+\endhead
+Partner & HHS-OIG Office of Investigations and Office of Audit Services; CMS Center for Program Integrity & SBA OIG; Office of Capital Access \\
+Screen & HHS-1 hospice and home health risk map, plus cluster scoring and exclusion matching & SBA-1 pandemic signals on 7(a) and 504, plus cross-program matching \\
+Data from the agency & Medicare hospice and home health claims for two states (California, Minnesota is the suggested pair), 2022-2026; provider enrollment with owners & 7(a) and 504 application and lender data, 2020-2026 \\
+Where analysis runs & Inside the OIG's or CMS's authorized environment, or the CMS Virtual Research Data Center & SBA OIG's environment \\
+Out of scope & Beneficiary-level contact, payment suspension decisions, any adverse action & Borrower contact, loan decisions \\
+\end{longtable}\endgroup
+
+\hypertarget{day-plan}{%
+\section*{2. 90-day plan}\label{day-plan}}
+\addcontentsline{toc}{section}{2. 90-day plan}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}l>{\raggedright\arraybackslash}p{\dimexpr 0.330\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.264\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.330\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Days & \leavevmode\color{white}\bfseries Work & \leavevmode\color{white}\bfseries Output & \leavevmode\color{white}\bfseries Agency time needed \\
+\endhead
+0-10 & Sign the memorandum of understanding and data use agreement; analysts complete suitability and access training; agree the known-case list for back-testing & Signed agreements; access granted & Counsel and privacy officer review (template below); 2 hours with the case lead \\
+11-25 & Load data; build the provider and owner spine; reproduce public-data HHS-1 results inside the environment & Data profile; reconciliation to published totals & Data steward, 2 hours a week \\
+26-45 & Run claim-level screens (billing ramp, length of stay, live discharge, shared owners, exclusion links); score clusters & First ranked list with reason codes & --- \\
+46-60 & Back-test on known cases; hand review of the top 50 leads with OIG investigators & Lift and precision report & Two investigators, 1 day each \\
+61-75 & Tune; second review round of 50 new leads; decide on stop rule & Final metrics & Two investigators, 1 day each \\
+76-90 & Lead packages for the confirmed-worth-opening cases; results briefing; scale-up proposal or close-out report & Briefing, report, lead packages & Leadership briefing, 1 hour \\
+\end{longtable}\endgroup
+
+\hypertarget{success-metrics}{%
+\section*{3. Success metrics}\label{success-metrics}}
+\addcontentsline{toc}{section}{3. Success metrics}
+
+Agreed before data arrives, and reported whatever the result.
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.186\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.465\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.349\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Metric & \leavevmode\color{white}\bfseries Definition & \leavevmode\color{white}\bfseries Pass mark \\
+\endhead
+Lift at 5\% & Known-case rate in the top 5\% of scores / overall rate & At least 5x (the review plan's release bar) \\
+Reviewer precision & Share of the 100 reviewed leads the OIG rates worth opening & At least 20\% \\
+New detection & Share of worth-opening leads not already known to the OIG or CMS & At least 50\% \\
+Dollars at issue & Medicare payments to providers in worth-opening leads & Reported, not targeted \\
+Time to lead & Days from data load to first reviewed lead list & 45 or fewer \\
+Catch rate vs break-even & Measured new detection against the ROI model's break-even rate & Above break-even \\
+Burden & Agency staff hours used & 80 or fewer \\
+\end{longtable}\endgroup
+
+\hypertarget{staffing}{%
+\section*{4. Staffing}\label{staffing}}
+\addcontentsline{toc}{section}{4. Staffing}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.152\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.247\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.152\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.323\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.127\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Role & \leavevmode\color{white}\bfseries Our side & \leavevmode\color{white}\bfseries Time & \leavevmode\color{white}\bfseries Agency side & \leavevmode\color{white}\bfseries Time \\
+\endhead
+Pilot lead & Lead (also the single point of contact) & 50\% & OIG Special Agent in Charge or Assistant IG sponsor & 1 hour every 2 weeks \\
+Data engineer & DE & 100\% days 0-45, then 50\% & Data steward & 2 hours a week \\
+Analysts & AN x2 (one health-claims specialist) & 100\% & Two investigators for review & 4 days total \\
+Statistician & Part time, for validation and metrics & 25\% & --- & --- \\
+Counsel and privacy & Our counsel & As needed & Privacy officer, counsel & Days 0-10 \\
+\end{longtable}\endgroup
+
+\hypertarget{template-memorandum-of-understanding-outline}{%
+\section*{5. Template: memorandum of understanding
+(outline)}\label{template-memorandum-of-understanding-outline}}
+\addcontentsline{toc}{section}{5. Template: memorandum of understanding
+(outline)}
+
+Fill in bracketed text; counsel on both sides should edit freely.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Parties.} {[}Agency or OIG{]} and {[}our organization{]}.
+\item
+  \textbf{Purpose.} A 90-day pilot to test whether {[}screen{]}
+  identifies {[}program{]} payments at elevated risk of fraud, for
+  review by {[}OIG{]}.
+\item
+  \textbf{Authority.} {[}IG Act of 1978 as amended, 5 U.S.C. 401-424 /
+  agency program integrity authority / Payment Integrity Information
+  Act{]}.
+\item
+  \textbf{Roles.} The agency decides every investigative and
+  administrative action. We supply methods, analysis and lead packages.
+\item
+  \textbf{Data.} As listed in the data use agreement (attachment A).
+\item
+  \textbf{Environment and security.} Analysis inside {[}agency
+  environment{]}; no data leaves it; outputs reviewed before export
+  (attachment B).
+\item
+  \textbf{Personnel.} Named analysts; suitability and training before
+  access.
+\item
+  \textbf{Confidentiality.} Leads and results are agency records; we
+  publish nothing about the pilot without written approval, and only in
+  aggregate.
+\item
+  \textbf{Cost.} {[}No cost to the agency / interagency agreement /
+  contract vehicle{]}.
+\item
+  \textbf{Term and termination.} 90 days from data access; either party
+  may end with 10 days' notice; data access ends at term.
+\item
+  \textbf{Deliverables.} Section 2 outputs; final report within 15 days
+  of term.
+\item
+  \textbf{Points of contact.}
+\end{enumerate}
+
+\hypertarget{template-data-use-agreement-attachment-a}{%
+\section*{6. Template: data use agreement (attachment
+A)}\label{template-data-use-agreement-attachment-a}}
+\addcontentsline{toc}{section}{6. Template: data use agreement
+(attachment A)}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.394\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.606\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Field & \leavevmode\color{white}\bfseries Entry \\
+\endhead
+Data owner and system of records & {[}System name and SORN number{]} \\
+Routine use or authority for disclosure & {[}Routine use / OIG access / Privacy Act exception{]} \\
+Files & {[}Claims, enrollment, owners{]}, years {[} {]}, states {[} {]} \\
+Fields & Listed in an appendix; minimum necessary for the screens \\
+Identifiers & Provider identifiers in clear; beneficiary identifiers {[}excluded / hashed{]} \\
+Location & {[}Environment{]}; no copies outside it \\
+Users & Named analysts only \\
+Retention & Destroyed or returned within 30 days of term, with a certificate \\
+Linkage & No linkage to other data except {[}public files listed{]} without written approval \\
+Re-disclosure & None \\
+Breach reporting & To the agency within one hour of discovery, per OMB M-17-12 \\
+Publication & Aggregate statistics only, with cell suppression under 11, after agency review \\
+\end{longtable}\endgroup
+
+\hypertarget{template-security-and-output-review-attachment-b}{%
+\section*{7. Template: security and output review (attachment
+B)}\label{template-security-and-output-review-attachment-b}}
+\addcontentsline{toc}{section}{7. Template: security and output review
+(attachment B)}
+
+\begin{itemize}
+\tightlist
+\item
+  Work only inside the environment, on agency-furnished or approved
+  devices.
+\item
+  Outputs leave the environment only after the agency's data steward
+  reviews them; lead packages go straight to the OIG case system.
+\item
+  Model documentation travels with every score: inputs, tests, known
+  limits and bias checks.
+\end{itemize}
+
+\hypertarget{leave-behind-for-the-first-meeting}{%
+\section*{8. Leave-behind for the first
+meeting}\label{leave-behind-for-the-first-meeting}}
+\addcontentsline{toc}{section}{8. Leave-behind for the first meeting}
+
+One page: the problem (pitch HHS-1), what the public-data screen already
+shows, the 90-day plan, the three asks (data, two investigators for four
+days, a sponsor), the stop rule, and the ROI row from the business case.
+The site's agency brief PDFs supply the layout.
+
+\hypertarget{questions-for-steve}{%
+\section*{9. Questions for Steve}\label{questions-for-steve}}
+\addcontentsline{toc}{section}{9. Questions for Steve}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  HHS-OIG first, or SBA OIG first because the relationship already
+  exists?
+\item
+  Who on our side signs the memorandum?
+\item
+  Will we fund the pilot ourselves to remove the cost question?
+\end{enumerate}
+
+\end{document}

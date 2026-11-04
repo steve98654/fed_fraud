@@ -6,6 +6,7 @@ import { agencies, url, fmtDate, weekEnd } from '../../lib/content';
 
 const kinds = ['Methodology', 'Research', 'Plan', 'Results'] as const;
 const list = agencies();
+const extensions = library.filter((d) => d.extension !== undefined).sort((a, b) => a.extension! - b.extension!);
 ---
 
 <Base title="Research library" section="library">
@@ -18,13 +19,44 @@ const list = agencies();
 
   <section class="section">
     <div class="container">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Extensions</span>
+          <h2>Ten extensions to the plan</h2>
+          <p>
+            Cross-agency matching, ring scoring, the business case, a 90-day pilot kit, the legal map, procurement and state
+            grant screens, a live demo, tip triage and a red-team playbook. Start with{' '}
+            <a href={url('library/extensions/')}>the overview</a>.
+          </p>
+        </div>
+      </div>
+      <ol class="ext">
+        {
+          extensions
+            .filter((d) => d.extension! > 0)
+            .map((d) => (
+              <li>
+                <a href={url(`library/${d.slug}/`)}>
+                  <span class="n">{d.extension}</span>
+                  <span class="t">{d.title.split(':')[0]}</span>
+                  <span class="s">{((t) => t.charAt(0).toUpperCase() + t.slice(1))(d.title.split(':').slice(1).join(':').trim())}</span>
+                </a>
+              </li>
+            ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
       <div class="grid">
         {
           kinds.map((k) => (
             <div class="col">
               <h2 class="kind">{k}</h2>
               {library
-                .filter((d) => d.kind === k)
+                .filter((d) => d.kind === k && d.extension === undefined)
                 .map((d) => (
                   <a class="doc" href={url(`library/${d.slug}/`)}>
                     <div class="top">
@@ -78,6 +110,48 @@ const list = agencies();
 </Base>
 
 <style>
+  .ext {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 22px;
+  }
+  .ext a {
+    display: grid;
+    grid-template-columns: 2.2rem 1fr;
+    gap: 2px 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--geogold);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--ink);
+    background: #fff;
+  }
+  .ext a:hover {
+    box-shadow: 0 6px 18px rgba(0, 46, 99, 0.08);
+  }
+  .ext .n {
+    grid-row: span 2;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--gold-ink);
+    line-height: 1.1;
+  }
+  .ext .t {
+    font-weight: 700;
+  }
+  .ext .s {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  @media (max-width: 760px) {
+    .ext {
+      grid-template-columns: 1fr;
+    }
+  }
   .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

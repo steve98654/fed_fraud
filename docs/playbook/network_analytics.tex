@@ -1,0 +1,200 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Network and graph analytics},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Network and graph analytics}\par
+\vspace{2pt}{\large\color{geomid} Scoring rings, not single payments}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Status:} Draft v0.1 (2026-11-04), for Steve's review. Extension
+2 of 10 (see the \href{../extensions.pdf}{extensions overview}).
+Reference code: \texttt{analytics/forensic/network.py}
+(\texttt{communities}, \texttt{cluster\_features},
+\texttt{cluster\_score}, \texttt{rank\_clusters}), tested on synthetic
+data only.
+
+\hypertarget{bottom-line}{%
+\section*{Bottom line}\label{bottom-line}}
+\addcontentsline{toc}{section}{Bottom line}
+
+Organized fraud runs through groups of entities that look ordinary one
+at a time: twenty hospices that each bill a plausible amount, eight PPP
+borrowers with plausible payrolls, five ``small businesses'' that each
+win a few set-asides. What gives them away is what they share: an
+address, an officer, a phone line, a bank account, a preparer. The
+forensic methods handbook already builds the shared-attribute graph and
+propagates risk from known bad actors. This extension adds the step that
+turns a graph into a work queue: \textbf{split the graph into
+communities, describe each community with a few features, and rank
+communities by a calibrated score}, so investigators open the ring, not
+one member of it.
+
+\hypertarget{graph}{%
+\section*{1. Graph}\label{graph}}
+\addcontentsline{toc}{section}{1. Graph}
+
+Nodes are entities (businesses, providers, borrowers). An edge joins two
+entities that share an attribute: address, officer or owner, phone,
+email, bank account, registered agent, or IP or device in Phase 2. Edge
+weight follows the handbook (section 8): each shared attribute adds 1 /
+log(1 + degree), so a phone shared by two firms counts far more than a
+registered-agent address shared by 4,000. Attributes on the benign-hub
+list (registered agents, mail centers, hospitals, large payroll firms)
+and attributes with more than 25 entities are dropped.
+
+\hypertarget{from-components-to-communities}{%
+\section*{2. From components to
+communities}\label{from-components-to-communities}}
+\addcontentsline{toc}{section}{2. From components to communities}
+
+Connected components chain together through single weak links, so one
+shared accountant can glue two unrelated rings into one blob. Weighted
+label propagation splits a component into groups that are densely tied
+inside and loosely tied outside. It is deterministic for a given seed,
+needs no tuning and runs in near-linear time, which matters at SAM.gov
+scale (several hundred thousand active registrations). Louvain or Leiden
+are drop-in alternatives in a graph database.
+
+\hypertarget{cluster-features}{%
+\section*{3. Cluster features}\label{cluster-features}}
+\addcontentsline{toc}{section}{3. Cluster features}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}l>{\raggedright\arraybackslash}p{\dimexpr 0.429\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.429\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Feature & \leavevmode\color{white}\bfseries Definition & \leavevmode\color{white}\bfseries Why it matters \\
+\endhead
+Size & Entities in the community & Rings are usually 3 to 50 entities \\
+Density & Internal edges / possible edges & Rings are tightly interconnected; franchises are star-shaped \\
+Bank share & Share of members sharing a bank account with another member & The strongest single sign of common control \\
+New share & Share first seen in the last two years & Rings form fast around a new program or rule change \\
+Dollars & Total paid to the community & Sets priority among similar scores \\
+Seed risk & Highest risk-propagation score from excluded, debarred or charged entities & Known bad actors nearby \\
+\end{longtable}\endgroup
+
+\hypertarget{score}{%
+\section*{4. Score}\label{score}}
+\addcontentsline{toc}{section}{4. Score}
+
+A logistic score combines the features, with size and dollars on log
+scales so a 200-outlet franchise does not outrank a six-firm ring that
+shares bank accounts. The default weights in \texttt{CLUSTER\_WEIGHTS}
+are starting values. Before any cluster is referred they are refit on
+confirmed rings (DOJ case releases, OIG reports, the SBA case set) using
+the likelihood ratio method in the handbook section 12, and the score
+must meet the review plan's release bar: known rings at least five times
+more common in the top 5\% than in the population.
+
+\hypertarget{what-an-investigator-sees}{%
+\section*{5. What an investigator
+sees}\label{what-an-investigator-sees}}
+\addcontentsline{toc}{section}{5. What an investigator sees}
+
+For each ranked cluster the tool shows: members and their awards or
+payments; the shared attributes that tie them, strongest first; a small
+graph drawing; dates of formation; any seed (excluded or charged entity)
+within two hops; and the reason codes behind the score. The tool preview
+pages on the site follow this layout.
+
+\hypertarget{where-it-applies-first}{%
+\section*{6. Where it applies first}\label{where-it-applies-first}}
+\addcontentsline{toc}{section}{6. Where it applies first}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.267\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.444\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.289\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Roadmap idea & \leavevmode\color{white}\bfseries Graph & \leavevmode\color{white}\bfseries Seeds \\
+\endhead
+HHS-1, HHS-2 hospice and home health & Owners, managing employees, addresses from CMS enrollment files & LEIE, revoked providers, DOJ defendants \\
+SBA-1, SBA-3 loan rings & Borrower addresses, lenders, agents, NAICS & Charged PPP and EIDL defendants \\
+DOD-1, VA-1 set-aside fronts & SAM.gov officers, addresses, parent firms & SAM exclusions, SBA protests sustained \\
+TREAS-2 ERC and EITC promoters & Preparers and promoters in charged cases & DOJ Tax Division cases \\
+X-4 hidden common control & All of the above, linked through cross-agency matching & All exclusion lists \\
+\end{longtable}\endgroup
+
+\hypertarget{limits}{%
+\section*{7. Limits}\label{limits}}
+\addcontentsline{toc}{section}{7. Limits}
+
+\begin{itemize}
+\tightlist
+\item
+  Public data shows registrations, not control. A shared officer may be
+  a part-time bookkeeper; the score asks a question, it does not answer
+  one.
+\item
+  Rings adapt by spreading attributes thin (one phone per firm). The
+  \href{red_team.pdf}{red-team playbook} sets out how the features
+  respond.
+\item
+  Bank accounts are the strongest feature and are not public; until
+  Phase 2 the bank-share feature is zero and the score leans on
+  officers, phones and addresses.
+\end{itemize}
+
+\hypertarget{next-steps}{%
+\section*{8. Next steps}\label{next-steps}}
+\addcontentsline{toc}{section}{8. Next steps}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Fit weights on the SBA confirmed set (weeks 5 to 6).
+\item
+  Run on HHS hospice enrollment data alongside HHS-1 (weeks 6 to 8).
+\item
+  Add a cluster view to the HHS-1 tool preview.
+\end{enumerate}
+
+\end{document}

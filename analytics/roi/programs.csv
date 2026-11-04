@@ -1,0 +1,13 @@
+agency,program,improper_usd,improper_rate,first_pilot,source,status,reach
+HHS,Medicaid,37400000000,0.061,HHS-2,GAO-26-108694 (FY2025),open,0.2
+HHS,Medicare fee-for-service,28800000000,0.066,HHS-1,GAO-26-108694 (FY2025),open,0.5
+TREAS,Earned Income Tax Credit,21100000000,0.327,TREAS-1,GAO-26-108694 (FY2025),open,0.2
+USDA,SNAP,10200000000,0.109,USDA-1,GAO-26-108694 (FY2025),open,0.3
+SBA,Shuttered Venue Operators Grant,10100000000,0.689,SBA-1,GAO-26-108694 (FY2025),closed,1.0
+SSA,Supplemental Security Income,7300000000,0.116,SSA-1,GAO-26-108694 (FY2025),open,0.5
+DOL,Federal-State Unemployment Insurance,5600000000,0.149,DOL-1,GAO-26-108694 (FY2025),open,0.3
+HUD,Rental Housing Assistance,4300000000,0.264,HUD-1,GAO-26-108694 (FY2025),open,0.4
+VA,Seven reporting programs,3920000000,,VA-1,GAO-26-108694 (FY2025),open,0.5
+SSA,Disability Insurance,2300000000,,SSA-2,GAO-26-108694 (FY2025),open,0.5
+OPM,Federal Retirement Services,364000000,0.0033,OPM-1,GAO-26-108694 (FY2025),open,0.8
+DHS,FEMA Public Assistance,300000000,,DHS-1,GAO-26-108694 (FY2025),open,0.6

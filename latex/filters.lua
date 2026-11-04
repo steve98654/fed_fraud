@@ -54,7 +54,7 @@ function Table(tbl)
     for _, row in ipairs(b.body) do table.insert(body, row) end
   end
 
-  local short, weights, total, nshort = {}, {}, 0, 0
+  local short, weights, total, nshort, shortw = {}, {}, 0, 0, 0
   for c = 1, ncols do
     local maxlen, word = 0, 0
     for _, row in ipairs(body) do
@@ -72,6 +72,9 @@ function Table(tbl)
     short[c] = maxlen <= SHORT and headword <= 14
     if short[c] then
       nshort = nshort + 1
+      -- natural width of a short column, as a share of the line: about 1.3% per
+      -- character at the table's small size, plus padding; at least 6.5%
+      shortw = shortw + math.max(0.065, 0.013 * math.max(maxlen, headword) + 0.012)
     else
       weights[c] = math.max(math.min(maxlen, 60), word * 2, headword * 2, 8)
       total = total + weights[c]
@@ -85,8 +88,8 @@ function Table(tbl)
     if short[c] then
       spec[c] = "l"
     else
-      -- share of the width left after the short columns, which take about 6.5 percent each
-      local free = math.max(1 - 0.065 * nshort, 0.3)
+      -- share of the width left after the short columns
+      local free = math.max(1 - shortw, 0.3)
       spec[c] = string.format(">{%s\\arraybackslash}p{\\dimexpr %.3f\\linewidth-2\\tabcolsep}",
         align, free * weights[c] / total)
     end

@@ -16,6 +16,9 @@ export interface LibraryDoc {
   outline: { heading: string; note: string }[];
   /** Set once the source document is written; the page then renders it. */
   status?: 'Draft' | 'Final';
+  /** Number (0-10) in the ten-extensions set; 0 is the overview. Shown in
+   * its own section of the library index instead of the kind columns. */
+  extension?: number;
 }
 
 export const library: LibraryDoc[] = [
@@ -167,6 +170,183 @@ export const library: LibraryDoc[] = [
       { heading: 'Savings', note: 'Identified, referred and confirmed amounts, each with its source.' },
       { heading: 'What did not work', note: 'Screens that missed the bar and why.' },
       { heading: 'Phase 2 recommendation', note: 'Partners, data and expected payoff.' },
+    ],
+  },
+  {
+    slug: 'extensions',
+    kind: 'Plan',
+    extension: 0,
+    title: 'Ten extensions: from agency plans to a government-wide program',
+    summary:
+      'The overview of the ten extensions: what each adds, how they fit together and what changed in the plan.',
+    planIds: ['X-1 to X-6', 'P1'],
+    dueWeek: 4,
+    source: 'docs/extensions.md',
+    status: 'Draft',
+    outline: [
+      { heading: 'Bottom line', note: 'What the ten extensions add.' },
+      { heading: 'How they fit together', note: 'Engine, case for action, engagement, durability.' },
+      { heading: 'Decisions', note: 'First pilot partner, policy paper, next demo data.' },
+    ],
+  },
+  {
+    slug: 'cross-agency-matching',
+    kind: 'Methodology',
+    extension: 1,
+    title: 'Cross-agency data matching: one identity across many programs',
+    summary:
+      'Link people and businesses across SBA, CMS, USDA, Treasury, SAM.gov and state programs with privacy-preserving keys, then catch stacking, payments after death, payments while excluded and shared identifiers.',
+    planIds: ['X-1', 'X-2', 'X-3', 'X-5'],
+    dueWeek: 4,
+    source: 'docs/playbook/cross_agency_matching.md',
+    status: 'Draft',
+    outline: [
+      { heading: 'Method', note: 'Normalize, hash in place, block, Fellegi-Sunter, review.' },
+      { heading: 'Four checks', note: 'Stacking, after death, while excluded, shared identifier.' },
+    ],
+  },
+  {
+    slug: 'network-analytics',
+    kind: 'Methodology',
+    extension: 2,
+    title: 'Network and graph analytics: scoring rings, not single payments',
+    summary:
+      'Split the shared-attribute graph into communities, describe each with size, density, shared banks, newness, dollars and seed risk, and rank communities by a calibrated score.',
+    planIds: ['X-4', 'HHS-1', 'SBA-1', 'DOD-1'],
+    dueWeek: 4,
+    source: 'docs/playbook/network_analytics.md',
+    status: 'Draft',
+    outline: [
+      { heading: 'Graph', note: 'Shared attributes with hub discounting.' },
+      { heading: 'Score', note: 'Cluster features and calibration.' },
+    ],
+  },
+  {
+    slug: 'roi-model',
+    kind: 'Plan',
+    extension: 3,
+    title: 'Recovery and ROI model: the business case by program',
+    summary:
+      'Five-year present value of prevention and recovery against build, run and review costs for twelve programs, with Monte Carlo ranges and a break-even catch rate a pilot must beat.',
+    planIds: ['P1', 'P6'],
+    dueWeek: 4,
+    source: 'docs/proposals/roi_model.md',
+    status: 'Draft',
+    outline: [
+      { heading: 'Results', note: 'Net benefit, ROI and break-even by program.' },
+      { heading: 'Assumptions', note: 'Each share with its range and basis.' },
+    ],
+  },
+  {
+    slug: 'pilot-kit',
+    kind: 'Plan',
+    extension: 4,
+    title: 'Pilot proposal kit: a 90-day pilot with one agency',
+    summary:
+      'A week-by-week 90-day pilot (HHS hospice and home health first, SBA as the alternate), with memorandum and data use agreement templates, success metrics, a stop rule and staffing.',
+    planIds: ['P1', 'P2', 'P7'],
+    dueWeek: 4,
+    source: 'docs/proposals/pilot_kit.md',
+    status: 'Draft',
+    outline: [
+      { heading: '90-day plan', note: 'Agreements, data, screens, review, results.' },
+      { heading: 'Templates', note: 'MOU, data use agreement, security review.' },
+    ],
+  },
+  {
+    slug: 'legal-track',
+    kind: 'Research',
+    extension: 5,
+    title: 'Policy and legal track: what the law allows, and what would unlock more',
+    summary:
+      'PIIA, Do Not Pay, the Privacy Act and computer matching, the IG Act, tax and new-hire data limits, and five legislative or policy changes ranked by value.',
+    planIds: ['P3', 'P4'],
+    dueWeek: 4,
+    source: 'docs/policy/legal_track.md',
+    status: 'Draft',
+    outline: [
+      { heading: 'Laws that matter', note: 'What each allows and constrains.' },
+      { heading: 'Changes to seek', note: 'Five ranked proposals.' },
+    ],
+  },
+  {
+    slug: 'procurement-fraud',
+    kind: 'Methodology',
+    extension: 6,
+    title: 'Procurement and contract fraud: bid rigging, change orders and false set-asides',
+    summary:
+      'Screens on FPDS and USAspending for weak competition, contract growth after award and set-aside eligibility (size, pass-through, affiliation, front-company profile).',
+    planIds: ['DOD-1', 'DOD-2', 'VA-1', 'GSA-1', 'DOT-1'],
+    dueWeek: 4,
+    source: 'docs/playbook/procurement_fraud.md',
+    status: 'Draft',
+    outline: [
+      { heading: 'Screens', note: 'Competition, growth, set-asides.' },
+      { heading: 'Validation', note: 'Sustained protests and charged cases.' },
+    ],
+  },
+  {
+    slug: 'grants-to-states',
+    kind: 'Research',
+    extension: 7,
+    title: 'Grants to states: following federal money through state programs',
+    summary:
+      'Medicaid, unemployment insurance, SNAP and child nutrition: state-level peer screens, Single Audit and subaward screens, and claim-level routes through NASWA, T-MSIS and the National Accuracy Clearinghouse.',
+    planIds: ['DOL-1', 'USDA-1', 'X-3'],
+    dueWeek: 4,
+    source: 'docs/research/grants_to_states.md',
+    status: 'Draft',
+    outline: [
+      { heading: 'Three layers', note: 'State screens, subrecipients, claims.' },
+      { heading: 'Partners', note: 'State auditors, MFCUs, OIGs.' },
+    ],
+  },
+  {
+    slug: 'live-demo',
+    kind: 'Results',
+    extension: 8,
+    title: 'Live demo: the methods on real public data',
+    summary:
+      'The reference code run on USAspending agency totals and GAO improper payment figures, with honest readings of what the tests can and cannot show; award-level results when fetched.',
+    planIds: ['U1', 'F7'],
+    dueWeek: 4,
+    source: 'docs/demo/live_demo.md',
+    status: 'Draft',
+    outline: [
+      { heading: 'Results', note: 'Digit tests, concentration, reconciliation.' },
+      { heading: 'Refresh', note: 'Scripts and the Demo data workflow.' },
+    ],
+  },
+  {
+    slug: 'tip-triage',
+    kind: 'Methodology',
+    extension: 9,
+    title: 'Whistleblower and tip triage: reading the best tips first',
+    summary:
+      'An AI model orders hotline tips and summarizes each one, with a transparent rule baseline, whistleblower-protection flags, prompt-injection safeguards and a 60-day pilot design.',
+    planIds: ['F8'],
+    dueWeek: 4,
+    source: 'docs/playbook/tip_triage.md',
+    status: 'Draft',
+    outline: [
+      { heading: 'Output', note: 'Score, priority, program, scheme, reasons.' },
+      { heading: 'Safeguards', note: 'No automated closure; hosting; bias.' },
+    ],
+  },
+  {
+    slug: 'red-team',
+    kind: 'Methodology',
+    extension: 10,
+    title: 'Red-team playbook: how fraudsters adapt, and how the controls hold',
+    summary:
+      'For each control, the likely adaptation, the trace the adaptation leaves and the counter; answers to the pushback leaders will raise; and how to run a red-team exercise.',
+    planIds: ['F7', 'F8'],
+    dueWeek: 4,
+    source: 'docs/playbook/red_team.md',
+    status: 'Draft',
+    outline: [
+      { heading: 'Adaptations', note: 'Control by control.' },
+      { heading: 'Pushback', note: 'Answers for leaders.' },
     ],
   },
 ];

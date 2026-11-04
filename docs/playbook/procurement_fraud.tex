@@ -1,0 +1,222 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Procurement and contract fraud},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Procurement and contract fraud}\par
+\vspace{2pt}{\large\color{geomid} Bid rigging, change orders and false set-asides}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Status:} Draft v0.1 (2026-11-04), for Steve's review. Extension
+6 of 10 (see the \href{../extensions.pdf}{extensions overview}).
+Reference code: \texttt{analytics/forensic/procurement.py} and
+\texttt{analytics/forensic/bids.py}, tested on synthetic data only.
+
+\hypertarget{bottom-line}{%
+\section*{Bottom line}\label{bottom-line}}
+\addcontentsline{toc}{section}{Bottom line}
+
+The government buys about \$750 billion a year of goods and services
+through contracts, and every award is published in FPDS and USAspending.
+Three schemes leave traces in those records: \textbf{weak or rigged
+competition}, \textbf{contracts that grow after they are won}, and
+\textbf{small business set-asides won by firms that are not small or do
+not do the work}. This extension turns each into a screen that runs on
+public data across every agency, so DoD-1, VA-1, GSA-1 and DOT-1 share
+one engine.
+
+\hypertarget{data}{%
+\section*{1. Data}\label{data}}
+\addcontentsline{toc}{section}{1. Data}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.333\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.333\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.333\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Source & \leavevmode\color{white}\bfseries What it gives & \leavevmode\color{white}\bfseries Notes \\
+\endhead
+FPDS / USAspending contract transactions & Every action: base and current value, offers received, extent competed, set-aside type, NAICS, PSC, office, modifications with reason codes & Award-level and transaction-level downloads; fields named as in the USAspending data dictionary \\
+SAM.gov entity data & Size representations by NAICS, socioeconomic certifications, parents, officers, addresses & Self-certified; size is measured at offer \\
+SBA Dynamic Small Business Search, certification lists (8(a), HUBZone, WOSB, VetCert) & Certified status and dates & VA's SDVOSB verification moved to SBA in 2023 \\
+FFATA subaward reports & First-tier subcontracts on larger awards & Underreported; absence is itself a signal \\
+SBA size and status protest decisions, OHA decisions & Firms found other than small & Labeled cases for validation \\
+DOJ Procurement Collusion Strike Force and contractor fraud releases & Charged cases & Labeled cases \\
+State DOT bid tabulations & All bids, not only winners & For sealed-bid screens (DOT-1) \\
+\end{longtable}\endgroup
+
+\hypertarget{screens}{%
+\section*{2. Screens}\label{screens}}
+\addcontentsline{toc}{section}{2. Screens}
+
+\hypertarget{competition}{%
+\subsection*{2.1 Competition}\label{competition}}
+\addcontentsline{toc}{subsection}{2.1 Competition}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Single-offer rate} by office and market: competed awards that
+  drew one offer. Persistently high rates point to tailored requirements
+  or a steered market. Compared within NAICS, since some markets are
+  thin.
+\item
+  \textbf{Incumbent lock-in:} Herfindahl index of vendor shares by
+  office and NAICS; high concentration with mostly single-offer
+  competitions.
+\item
+  \textbf{Sealed-bid distribution screens and rotation tests} (handbook
+  section 6): low coefficient of variation, high relative distance,
+  winners taking turns.
+\end{itemize}
+
+\hypertarget{change-order-and-modification-inflation}{%
+\subsection*{2.2 Change-order and modification
+inflation}\label{change-order-and-modification-inflation}}
+\addcontentsline{toc}{subsection}{2.2 Change-order and modification
+inflation}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Growth ratio:} current value / base and all options value at
+  award. Robust z-score of its log within NAICS; awards above 3.5 are
+  reviewed.
+\item
+  \textbf{Many modifications just under an approval threshold} (warrant
+  limits, cost or pricing data thresholds, legal review levels): the
+  modification version of a split purchase.
+\item
+  \textbf{Out-of-scope growth:} modifications coded as ``additional work
+  (new agreement)'' or ``supplemental agreement'' on sole-source
+  bridges.
+\end{itemize}
+
+\hypertarget{set-aside-eligibility}{%
+\subsection*{2.3 Set-aside eligibility}\label{set-aside-eligibility}}
+\addcontentsline{toc}{subsection}{2.3 Set-aside eligibility}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.250\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.375\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.375\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Check & \leavevmode\color{white}\bfseries Rule & \leavevmode\color{white}\bfseries Source \\
+\endhead
+Size & Average annual receipts or employees above the NAICS size standard & 13 CFR 121.201; SAM representations, public filings \\
+Pass-through & Prime pays more than the limit to firms that are not similarly situated & FAR 52.219-14: 50\% for services and supplies, 85\% general construction, 75\% specialty trade \\
+Affiliation and ostensible subcontractor & Set-aside winner shares owners, officers, address or bank account with a large firm & 13 CFR 121.103; network method \\
+Front-company profile & Set-aside share of revenue jumps by more than 40 points while awards at least double & Award history \\
+Status after award & Firm acquired by or merged into a large business but keeps receiving set-aside orders without recertifying & SAM, FPDS recertification fields \\
+\end{longtable}\endgroup
+
+Each reason is a question for the contracting officer or SBA, not a
+finding. Size is measured on the date of the offer, and affiliation
+needs the facts behind a shared address.
+
+\hypertarget{thresholds-to-know}{%
+\section*{3. Thresholds to know}\label{thresholds-to-know}}
+\addcontentsline{toc}{section}{3. Thresholds to know}
+
+Thresholds change with inflation adjustments (FAR 1.109). The October
+2025 adjustment raised the micro-purchase threshold to \$15,000 and the
+simplified acquisition threshold to \$350,000; check the current FAR
+2.101 before relying on these. Bunching tests (handbook section 5.4)
+look for excess awards just under each threshold.
+
+\hypertarget{validation}{%
+\section*{4. Validation}\label{validation}}
+\addcontentsline{toc}{section}{4. Validation}
+
+\begin{itemize}
+\tightlist
+\item
+  Positive set: SBA size protests sustained, OHA decisions, DOJ
+  set-aside fraud cases, suspension and debarment records with
+  procurement causes.
+\item
+  Release bar as in the review plan: known cases at least five times
+  more common in the top 5\% than overall.
+\item
+  False positives to expect: legitimate scope growth on research and
+  development, emergency buys, sole-source awards under statute, joint
+  ventures that are allowed to share resources.
+\end{itemize}
+
+\hypertarget{where-it-runs-first}{%
+\section*{5. Where it runs first}\label{where-it-runs-first}}
+\addcontentsline{toc}{section}{5. Where it runs first}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.330\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.340\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.330\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Idea & \leavevmode\color{white}\bfseries Screens & \leavevmode\color{white}\bfseries Partner \\
+\endhead
+DOD-1 set-aside fronts & Size, pass-through, affiliation & DoD OIG, DCIS, SBA OIG \\
+DOD-2 price and growth outliers & Growth ratio, threshold bunching & DoD OIG, DCAA \\
+VA-1 SDVOSB fronts & Affiliation, front profile & VA OIG \\
+GSA-1 schedule and MAS orders & Single-offer, lock-in, growth & GSA OIG \\
+DOT-1 highway bid rigging & Sealed-bid screens, rotation & DOT OIG, DOJ Antitrust Division \\
+\end{longtable}\endgroup
+
+\hypertarget{next-steps}{%
+\section*{6. Next steps}\label{next-steps}}
+\addcontentsline{toc}{section}{6. Next steps}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Pull FY2021-FY2026 contract transactions for DoD, VA and GSA (public).
+\item
+  Build the growth and single-offer tables by office (week 6).
+\item
+  Back-test set-aside checks on sustained size protests (week 8).
+\end{enumerate}
+
+\end{document}
