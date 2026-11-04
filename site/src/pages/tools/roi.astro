@@ -1,0 +1,377 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import { url } from '../../lib/content';
+
+const file = path.resolve(process.cwd(), '..', 'docs/proposals/data/roi_results.json');
+const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+const A = data.meta.assumptions as Record<string, [number, number, number]>;
+const sliders = [
+  { key: 'detectable', label: 'Detectable share', fmt: 'pct', step: 0.01 },
+  { key: 'new_detection', label: 'New detection', fmt: 'pct', step: 0.005 },
+  { key: 'precision', label: 'Precision', fmt: 'pct', step: 0.01 },
+  { key: 'prevent', label: 'Caught before payment', fmt: 'pct', step: 0.01 },
+  { key: 'recovery', label: 'Recovery after payment', fmt: 'pct', step: 0.01 },
+  { key: 'deterrence', label: 'Deterrence', fmt: 'pct', step: 0.01 },
+  { key: 'build_usd', label: 'Build cost (per program)', fmt: 'usd', step: 250000 },
+  { key: 'run_usd', label: 'Run cost (per year)', fmt: 'usd', step: 250000 },
+  { key: 'review_cost', label: 'Review cost per flagged $', fmt: 'pct', step: 0.005 },
+].map((s) => ({ ...s, lo: A[s.key][0], mode: A[s.key][1], hi: A[s.key][2] }));
+const programs = data.programs.map((p: any) => ({
+  agency: p.agency,
+  program: p.program,
+  status: p.status,
+  improper: p.improper_usd,
+  reach: p.reach,
+  p10: p.net['10'],
+  p90: p.net['90'],
+  pPos: p.p_positive,
+}));
+const payload = JSON.stringify({ programs, ramp: data.meta.ramp, discount: data.meta.discount });
+---
+
+<Base
+  title="ROI calculator"
+  section="roi"
+  description="Five-year return on fraud detection tooling by program, from reported improper payments and adjustable assumptions. Estimates for a business case, not savings."
+>
+  <PageTitle
+    eyebrow="Tools · Working prototype"
+    title="Recovery and ROI calculator"
+    lead="What detection tooling could prevent or recover in each program over five years, against what it costs. Move the assumptions to see which programs still pay back. Defaults are the 'likely' values from the ROI model."
+    crumbs={[{ label: 'Scorecard', href: url() }, { label: 'Tools', href: url('tools/') }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <p class="notice">
+        <span>
+          <strong>Estimates for a business case, not savings.</strong> Savings stay "Pending" until an Inspector General or
+          DOJ confirms them. Improper payment figures are GAO's FY2025 numbers. Method and sources:{' '}
+          <a href={url('library/roi-model/')}>the ROI model</a>.
+        </span>
+      </p>
+
+      <div class="grid">
+        <form class="controls" id="controls" aria-label="Assumptions">
+          <h2>Assumptions</h2>
+          {
+            sliders.map((s) => (
+              <div class="ctl">
+                <label for={`s-${s.key}`}>
+                  {s.label} <output id={`o-${s.key}`} />
+                </label>
+                <input
+                  type="range"
+                  id={`s-${s.key}`}
+                  name={s.key}
+                  min={s.lo}
+                  max={s.hi}
+                  step={s.step}
+                  value={s.mode}
+                  data-fmt={s.fmt}
+                />
+                <span class="range">
+                  <span>{s.fmt === 'usd' ? `$${s.lo / 1e6}M` : `${+(s.lo * 100).toFixed(1)}%`}</span>
+                  <span>{s.fmt === 'usd' ? `$${s.hi / 1e6}M` : `${+(s.hi * 100).toFixed(1)}%`}</span>
+                </span>
+              </div>
+            ))
+          }
+          <button type="reset" class="btn">Reset to likely values</button>
+        </form>
+
+        <div class="out" aria-live="polite">
+          <div class="tiles">
+            <div class="tile"><span class="lbl">Five-year net, all programs</span><span class="val" id="t-net"></span></div>
+            <div class="tile"><span class="lbl">Programs that pay back</span><span class="val" id="t-pos"></span></div>
+            <div class="tile"><span class="lbl">Overall return</span><span class="val" id="t-roi"></span></div>
+          </div>
+          <figure class="chart-fig">
+            <figcaption>Five-year net benefit by program (present value, $ millions)</figcaption>
+            <div id="chart" class="chart"></div>
+            <div class="tip" id="tip" role="status" hidden></div>
+          </figure>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="table">
+          <caption>Results at the assumptions above, with the Monte Carlo range at the default assumptions</caption>
+          <thead>
+            <tr>
+              <th scope="col">Program</th>
+              <th scope="col" class="num">Improper FY2025</th>
+              <th scope="col" class="num">Reach</th>
+              <th scope="col" class="num">5-yr benefit</th>
+              <th scope="col" class="num">5-yr cost</th>
+              <th scope="col" class="num">Net</th>
+              <th scope="col" class="num">ROI</th>
+              <th scope="col" class="num">Break-even</th>
+              <th scope="col" class="num">Net P10 to P90 (defaults)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="more">
+        Closed programs (marked) get recovery only, on the stock of improper payments over three years. Reach is the share of
+        each program the team's data access covers within five years, set per program in{' '}
+        <code>analytics/roi/programs.csv</code>. The same formula runs in <code>analytics/roi/model.py</code>.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<script is:inline define:vars={{ payload }}>
+  const D = JSON.parse(payload);
+  const $ = (s) => document.querySelector(s);
+  const form = $('#controls');
+  const M = (x) => (x < 0 ? '-' : '') + (Math.abs(x) >= 1e9 ? `$${(Math.abs(x) / 1e9).toFixed(2)}B` : `$${Math.round(Math.abs(x) / 1e6).toLocaleString()}M`);
+  const pct = (x) => `${+(x * 100).toFixed(2)}%`;
+
+  function simulate(p, a) {
+    let pvB = 0, pvC = 0;
+    const open = p.status === 'open';
+    D.ramp.forEach((ramp, t) => {
+      const disc = Math.pow(1 + D.discount, -(t + 0.5));
+      const base = open ? p.improper : t < 3 ? p.improper / 3 : 0;
+      const caught = base * p.reach * a.detectable * a.new_detection * ramp;
+      const flagged = caught / a.precision;
+      const prev = open ? a.prevent : 0;
+      const det = open ? a.deterrence : 0;
+      const benefit = caught * (prev + (1 - prev) * a.recovery) * (1 + det);
+      const cost = a.run_usd + a.review_cost * flagged + (t === 0 ? a.build_usd : 0);
+      pvB += benefit * disc;
+      pvC += cost * disc;
+    });
+    return { b: pvB, c: pvC, net: pvB - pvC, roi: pvB / pvC };
+  }
+  function breakeven(p, a) {
+    let lo = 0, hi = 1;
+    for (let i = 0; i < 50; i++) {
+      const mid = (lo + hi) / 2;
+      if (simulate(p, { ...a, new_detection: mid }).net > 0) hi = mid; else lo = mid;
+    }
+    return hi;
+  }
+  function read() {
+    const a = {};
+    form.querySelectorAll('input[type=range]').forEach((el) => {
+      a[el.name] = +el.value;
+      const o = $(`#o-${el.name}`);
+      o.textContent = el.dataset.fmt === 'usd' ? M(+el.value) : pct(+el.value);
+    });
+    return a;
+  }
+  function render() {
+    const a = read();
+    const rows = D.programs.map((p) => ({ p, r: simulate(p, a), be: breakeven(p, a) })).sort((x, y) => y.r.net - x.r.net);
+    const net = rows.reduce((s, x) => s + x.r.net, 0);
+    const b = rows.reduce((s, x) => s + x.r.b, 0);
+    const c = rows.reduce((s, x) => s + x.r.c, 0);
+    $('#t-net').textContent = M(net);
+    $('#t-pos').textContent = `${rows.filter((x) => x.r.net > 0).length} of ${rows.length}`;
+    $('#t-roi').textContent = `${(b / c).toFixed(1)}x`;
+
+    const tb = $('#table tbody');
+    tb.innerHTML = rows
+      .map(({ p, r, be }) => `<tr><td>${p.agency} · ${p.program}${p.status === 'closed' ? ' <span class="badge placeholder">closed</span>' : ''}</td>
+        <td class="num">${M(p.improper)}</td><td class="num">${Math.round(p.reach * 100)}%</td>
+        <td class="num">${M(r.b)}</td><td class="num">${M(r.c)}</td><td class="num">${M(r.net)}</td>
+        <td class="num">${r.roi.toFixed(1)}x</td><td class="num">${pct(be)}</td>
+        <td class="num">${M(p.p10)} to ${M(p.p90)}</td></tr>`)
+      .join('');
+
+    // Horizontal bars, one series; negative bars use the second (gold) tone and are labeled.
+    const W = 760, rowH = 30, L = 250, R = 90, H = rows.length * rowH + 30;
+    const max = Math.max(...rows.map((x) => x.r.net), 1);
+    const min = Math.min(...rows.map((x) => x.r.net), 0);
+    const sx = (v) => L + ((v - min) / (max - min)) * (W - L - R);
+    let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Bar chart of five-year net benefit by program; the table below has the values">`;
+    svg += `<line class="base" x1="${sx(0)}" x2="${sx(0)}" y1="4" y2="${H - 22}"/>`;
+    rows.forEach(({ p, r }, i) => {
+      const y = 8 + i * rowH;
+      const x0 = sx(Math.min(0, r.net)), x1 = sx(Math.max(0, r.net));
+      const neg = r.net < 0;
+      svg += `<g class="bar" data-i="${i}" tabindex="0"><rect class="hit" x="0" y="${y - 3}" width="${W}" height="${rowH}" />`;
+      svg += `<text class="ax" x="${L - 10}" y="${y + 15}" text-anchor="end">${p.agency} · ${p.program.length > 26 ? p.program.slice(0, 25) + '…' : p.program}</text>`;
+      svg += `<rect class="${neg ? 'neg' : 'pos'}" x="${x0}" y="${y + 2}" width="${Math.max(x1 - x0, 1)}" height="${rowH - 10}" rx="4"/>`;
+      svg += `<text class="val" x="${x1 + 6}" y="${y + 15}" text-anchor="start">${M(r.net)}</text></g>`;
+    });
+    svg += `<text class="ax" x="${sx(0)}" y="${H - 6}" text-anchor="middle">$0</text></svg>`;
+    const chart = $('#chart');
+    chart.innerHTML = svg;
+    const tip = $('#tip');
+    chart.querySelectorAll('.bar').forEach((g) => {
+      const show = () => {
+        const { p, r, be } = rows[+g.dataset.i];
+        tip.innerHTML = `<strong>${p.agency} · ${p.program}</strong><br>Net ${M(r.net)} · benefit ${M(r.b)} · cost ${M(r.c)}<br>ROI ${r.roi.toFixed(1)}x · break-even ${pct(be)}`;
+        tip.hidden = false;
+        g.classList.add('on');
+      };
+      const hide = () => { tip.hidden = true; g.classList.remove('on'); };
+      g.addEventListener('mouseenter', show);
+      g.addEventListener('focus', show);
+      g.addEventListener('mouseleave', hide);
+      g.addEventListener('blur', hide);
+    });
+  }
+  form.addEventListener('input', render);
+  form.addEventListener('reset', () => setTimeout(render, 0));
+  render();
+</script>
+
+<style>
+  .notice {
+    margin: 0 0 28px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+  }
+  .controls {
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--geomid);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    background: #fff;
+  }
+  .controls h2 {
+    font-size: 1.1rem;
+    margin: 0 0 12px;
+  }
+  .ctl {
+    margin-bottom: 14px;
+  }
+  .ctl label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .ctl output {
+    font-weight: 700;
+    color: var(--geomid);
+    font-variant-numeric: tabular-nums;
+  }
+  .ctl input {
+    width: 100%;
+    accent-color: var(--geomid);
+  }
+  .range {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .tile {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    background: var(--geomist);
+  }
+  .lbl {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .val {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--ink);
+  }
+  .chart-fig {
+    position: relative;
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    background: #fff;
+  }
+  figcaption {
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 8px;
+  }
+  .chart :global(svg) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .chart :global(.base) {
+    stroke: var(--georule);
+    stroke-width: 1;
+  }
+  .chart :global(.ax) {
+    fill: var(--muted);
+    font-size: 12px;
+  }
+  .chart :global(.val) {
+    fill: var(--ink);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .chart :global(.hit) {
+    fill: transparent;
+  }
+  .chart :global(.bar.on .hit) {
+    fill: var(--geomist);
+  }
+  .chart :global(.pos) {
+    fill: var(--geomid);
+  }
+  .chart :global(.neg) {
+    fill: var(--geogold);
+  }
+  .chart :global(.bar:focus) {
+    outline: none;
+  }
+  .chart :global(.bar:focus .hit) {
+    stroke: var(--geomid);
+    stroke-width: 2;
+  }
+  .tip {
+    position: absolute;
+    right: 16px;
+    top: 12px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 0.82rem;
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    max-width: 320px;
+    pointer-events: none;
+  }
+  .table-wrap {
+    margin-top: 28px;
+  }
+  caption {
+    text-align: left;
+    font-weight: 600;
+    padding-bottom: 8px;
+  }
+  .more {
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  @media (max-width: 960px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .tiles {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

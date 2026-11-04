@@ -11,6 +11,10 @@ agencies in the federal fraud initiative (america.gov/fraud).
 - [Forensic methods handbook](docs/playbook/forensic_methods.md): the mathematics
   behind each fraud test, with a tested reference implementation in
   [`analytics/`](analytics/README.md)
+- [Ten extensions](docs/extensions.md): cross-agency matching, network
+  scoring, the ROI model, a 90-day pilot kit, the policy and legal track,
+  procurement fraud, grants to states, a live demo on public data, tip
+  triage and a red-team playbook
 - [The Geodesic Accountability Office website (Astro)](site/README.md): scorecard, agency plans,
   five-page roadmap and research library, built from `docs/`
 

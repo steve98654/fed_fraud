@@ -81,6 +81,14 @@ with `SITE_BASE=/fed_fraud/ npm run build`.
    `/downloads/all_agencies.csv`, and the scorecard as `/downloads/scorecard.csv` and `.json`, built from
    `src/lib/scorecard.ts`. Savings columns read `Pending` until findings
    are recorded.
+11. **Ten extensions** (`/library/` "Extensions" section,
+   `/library/extensions/`): the ten extension documents from `docs/`
+   (playbook, proposals, policy, research, demo), rendered in the library.
+12. **ROI calculator** (`/tools/roi/`): five-year net benefit by program from
+   `docs/proposals/data/roi_results.json` (built by `analytics/roi/model.py`),
+   with sliders for every assumption. Estimates, not savings.
+13. **Live demo** (`/demo/`): results from `docs/demo/data/demo.json` (built
+   by `analytics/demo/run_demo.py`) on real public data.
 
 ## Agency brief PDFs
 

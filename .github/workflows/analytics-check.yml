@@ -1,0 +1,23 @@
+# Runs the analytics unit tests (synthetic data only) on pull requests that
+# touch the analytics code or the data it reads.
+name: Analytics check
+
+on:
+  pull_request:
+    paths: ['analytics/**', 'docs/universe/data/**', '.github/workflows/analytics-check.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install numpy anthropic
+      - run: python3 -m unittest discover -s analytics/tests -t analytics -v
+      - run: python3 analytics/roi/model.py && python3 analytics/demo/run_demo.py

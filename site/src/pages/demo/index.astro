@@ -1,0 +1,295 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import { url, REPO } from '../../lib/content';
+
+const d = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), '..', 'docs/demo/data/demo.json'), 'utf8'));
+const t = d.toptier;
+const pct = (x: number, dp = 1) => `${(x * 100).toFixed(dp)}%`;
+const M = (x: number) => (x < 0 ? '-' : '') + (Math.abs(x) >= 1e9 ? `$${(Math.abs(x) / 1e9).toFixed(1)}B` : `$${Math.round(Math.abs(x) / 1e6).toLocaleString()}M`);
+
+const blocks = [
+  {
+    id: 'pooled',
+    title: 'All three amounts pooled (outlays, budget authority, obligations)',
+    b: t.digits,
+    reading:
+      'Flags as nonconforming, and it is a false positive: each agency contributes three near-identical amounts, so the 301 values are about 100 independent numbers counted three times, which inflates the chi-square. Benford tests assume many independent transactions.',
+  },
+  {
+    id: 'outlays',
+    title: 'Outlays only, one amount per agency',
+    b: t.digits_outlays_only,
+    reading:
+      'Chi-square finds no evidence against Benford. The MAD still reads "nonconformity" because its ranges assume thousands of records; at about 100 values MAD is mostly noise. This is why the handbook sets a minimum of 1,000 records.',
+  },
+];
+
+function digitSvg(b: any): string {
+  const W = 520, H = 220, L = 40, B = 28, T = 10;
+  const ymax = 0.35;
+  const bw = (W - L - 10) / 9;
+  const sy = (v: number) => T + (1 - v / ymax) * (H - T - B);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Observed first-digit shares as bars with Benford expected shares as markers; values in the table">`;
+  for (const g of [0, 0.1, 0.2, 0.3]) {
+    s += `<line class="grid" x1="${L}" x2="${W - 10}" y1="${sy(g)}" y2="${sy(g)}"/><text class="ax" x="${L - 6}" y="${sy(g) + 4}" text-anchor="end">${g * 100}%</text>`;
+  }
+  for (let i = 1; i <= 9; i++) {
+    const o = b.observed[String(i)], e = b.expected[String(i)];
+    const x = L + (i - 1) * bw;
+    s += `<g><title>Digit ${i}: observed ${(o * 100).toFixed(1)}%, expected ${(e * 100).toFixed(1)}%</title>`;
+    s += `<rect class="obs" x="${x + bw * 0.2}" y="${sy(o)}" width="${bw * 0.6}" height="${sy(0) - sy(o)}" rx="3"/>`;
+    s += `<line class="exp" x1="${x + bw * 0.1}" x2="${x + bw * 0.9}" y1="${sy(e)}" y2="${sy(e)}"/>`;
+    s += `<text class="ax" x="${x + bw / 2}" y="${H - 8}" text-anchor="middle">${i}</text></g>`;
+  }
+  return s + '</svg>';
+}
+const roiTop = d.roi.slice(0, 5);
+---
+
+<Base
+  title="Live demo"
+  section="demo"
+  description="The forensic methods run on real public data: digit tests, concentration and reconciliation on every agency's FY2026 totals, and the ROI model on GAO's improper payment figures."
+>
+  <PageTitle
+    eyebrow="Live demo · Real public data"
+    title="The methods, running on real data"
+    lead="The tool pages show wireframes with made-up records. This page shows the reference code from the forensic methods handbook run on real public data, with an honest reading of each result, including what the tests cannot show."
+    crumbs={[{ label: 'Scorecard', href: url() }]}
+  />
+
+  <section class="section">
+    <div class="container">
+      <p class="notice">
+        <span>
+          <strong>Test statistics, not findings.</strong> A result is a reason to look; savings stay Pending. No recipient is named on this page. Source:{' '}
+          {t.source}. Rebuilt by <code>analytics/demo/run_demo.py</code>; see <a href={url('library/live-demo/')}>the demo write-up</a>.
+        </span>
+      </p>
+
+      <div class="tiles">
+        <div class="tile"><span class="lbl">Agencies tested</span><span class="val">{t.agencies_with_outlays}</span><span class="sub">of {t.agencies} in USAspending</span></div>
+        <div class="tile"><span class="lbl">Top five agencies' share of outlays</span><span class="val">{pct(t.top5_share, 0)}</span><span class="sub">Gini {t.gini_outlays.toFixed(2)}</span></div>
+        <div class="tile"><span class="lbl">Reconciliation exceptions</span><span class="val">{t.reconciliation.length}</span><span class="sub">obligations or outlays over budget authority by 5%+</span></div>
+        <div class="tile"><span class="lbl">Programs modeled for ROI</span><span class="val">{d.roi.length}</span><span class="sub"><a href={url('tools/roi/')}>Open the calculator</a></span></div>
+      </div>
+
+      <h2 class="h">1. Benford's law on agency totals</h2>
+      <div class="pair">
+        {
+          blocks.map(({ id, title, b, reading }) => (
+            <figure class="card" id={id}>
+              <figcaption>
+                <strong>{title}</strong>
+                <span class="legend" aria-hidden="true">
+                  <span><i class="sw obs" />Observed</span>
+                  <span><i class="sw exp" />Benford expected</span>
+                </span>
+              </figcaption>
+              <div class="chart" set:html={digitSvg(b)} />
+              <dl class="stats">
+                <div><dt>n</dt><dd>{b.n}</dd></div>
+                <div><dt>Chi-square p</dt><dd>{b.p_value.toFixed(3)}</dd></div>
+                <div><dt>MAD</dt><dd>{b.mad.toFixed(4)}</dd></div>
+                <div><dt>Nigrini band</dt><dd>{b.conformity}</dd></div>
+              </dl>
+              <p class="reading"><strong>Reading:</strong> {reading}</p>
+              <details>
+                <summary>Show as a table</summary>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th scope="col">Digit</th><th scope="col" class="num">Observed</th><th scope="col" class="num">Expected</th></tr></thead>
+                    <tbody>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+                        <tr><td>{i}</td><td class="num">{pct(b.observed[String(i)])}</td><td class="num">{pct(b.expected[String(i)])}</td></tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            </figure>
+          ))
+        }
+      </div>
+
+      <h2 class="h">2. Reconciliation</h2>
+      {
+        t.reconciliation.length ? (
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th scope="col">Agency</th><th scope="col" class="num">Budget authority</th><th scope="col" class="num">Obligated</th><th scope="col" class="num">Outlays</th></tr></thead>
+              <tbody>
+                {t.reconciliation.map((r: any) => (
+                  <tr><td>{r.agency}</td><td class="num">{M(r.budget_authority)}</td><td class="num">{M(r.obligated)}</td><td class="num">{M(r.outlays)}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p>
+            No agency with more than $100M in budget authority shows obligations or outlays more than 5% above it. Clean at this
+            level, as expected: agency totals are reconciled before publication. The test earns its keep at the program and
+            award level, where the next demos run.
+          </p>
+        )
+      }
+
+      <h2 class="h">3. Where the business case is strongest</h2>
+      <p>Median five-year net benefit at the ROI model's default assumptions (estimates, not savings).</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Program</th><th scope="col" class="num">Improper FY2025</th><th scope="col" class="num">Net (median)</th><th scope="col" class="num">ROI</th><th scope="col" class="num">Break-even catch rate</th></tr></thead>
+          <tbody>
+            {roiTop.map((r: any) => (
+              <tr><td>{r.agency} · {r.program}</td><td class="num">{M(r.improper_usd)}</td><td class="num">{M(r.net['50'])}</td><td class="num">{r.roi['50'].toFixed(1)}x</td><td class="num">{pct(r.breakeven_new_detection, 2)}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="h">4. Contract awards</h2>
+      {
+        d.awards.length ? (
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th scope="col">File</th><th scope="col" class="num">Awards</th><th scope="col" class="num">Recipients</th><th scope="col" class="num">Top-10 share</th><th scope="col" class="num">First-digit MAD</th><th scope="col" class="num">Round $1,000s</th></tr></thead>
+              <tbody>
+                {d.awards.map((a: any) => (
+                  <tr><td><code>{a.file}</code></td><td class="num">{a.awards}</td><td class="num">{a.recipients}</td><td class="num">{pct(a.top10_recipient_share)}</td><td class="num">{a.digits ? `${a.digits.mad.toFixed(4)} (${a.digits.conformity})` : 'n < 100'}</td><td class="num">{pct(a.round_thousand_share)}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p>
+            Award-level results appear here once award files are pulled from the USAspending API. Run the{' '}
+            <a href={`${REPO}/actions/workflows/demo-data.yml`} target="_blank" rel="noopener">Demo data workflow</a> or{' '}
+            <code>analytics/demo/fetch_usaspending.py</code> where api.usaspending.gov is reachable, then commit{' '}
+            <code>docs/demo/data/</code>.
+          </p>
+        )
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .notice {
+    margin: 0 0 24px;
+  }
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .tile {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    background: var(--geomist);
+  }
+  .lbl,
+  .sub {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .val {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+  }
+  .h {
+    font-size: 1.35rem;
+    margin: 36px 0 12px;
+  }
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+  .card {
+    margin: 0;
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--geomid);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    background: #fff;
+  }
+  figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.92rem;
+    margin-bottom: 6px;
+  }
+  .legend {
+    display: flex;
+    gap: 14px;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .sw {
+    display: inline-block;
+    width: 12px;
+    height: 10px;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+  .sw.obs {
+    background: var(--geomid);
+    border-radius: 2px;
+  }
+  .sw.exp {
+    height: 2px;
+    background: var(--geogold);
+  }
+  .chart :global(svg) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .chart :global(.grid) {
+    stroke: var(--line);
+  }
+  .chart :global(.ax) {
+    fill: var(--muted);
+    font-size: 11px;
+  }
+  .chart :global(.obs) {
+    fill: var(--geomid);
+  }
+  .chart :global(.exp) {
+    stroke: var(--geogold);
+    stroke-width: 3;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 10px 0;
+  }
+  .stats dt {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .stats dd {
+    margin: 0;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .reading {
+    font-size: 0.92rem;
+    margin: 6px 0 8px;
+  }
+  @media (max-width: 960px) {
+    .tiles,
+    .pair {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

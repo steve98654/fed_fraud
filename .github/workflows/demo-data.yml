@@ -1,0 +1,51 @@
+# Pulls contract awards for one agency from the public USAspending API and
+# scores them with analytics/demo/run_demo.py, for the site's live demo page.
+# Manual only. The results are uploaded as a build artifact and summarized on
+# the run page; commit docs/demo/data/ from the artifact to publish them.
+name: Demo data
+
+on:
+  workflow_dispatch:
+    inputs:
+      agency:
+        description: 'Toptier awarding agency name'
+        default: 'Department of Veterans Affairs'
+      fy:
+        description: 'Fiscal year'
+        default: '2025'
+      max:
+        description: 'Most recent awards to pull'
+        default: '5000'
+
+permissions:
+  contents: read
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install numpy
+      - run: python3 -m unittest discover -s analytics/tests -t analytics
+      - run: python3 analytics/demo/fetch_usaspending.py --agency "${{ inputs.agency }}" --fy "${{ inputs.fy }}" --max "${{ inputs.max }}"
+      - run: python3 analytics/demo/run_demo.py
+      - name: Summary
+        run: |
+          python3 - >> "$GITHUB_STEP_SUMMARY" <<'PY'
+          import json
+          d = json.load(open("docs/demo/data/demo.json"))
+          print("## Live demo results\n")
+          for a in d["awards"]:
+              dg = a["digits"] or {}
+              print(f"- `{a['file']}`: {a['awards']} awards, {a['recipients']} recipients, "
+                    f"top-10 recipient share {a['top10_recipient_share']:.1%}, "
+                    f"first-digit MAD {dg.get('mad', float('nan')):.4f} ({dg.get('conformity', 'n/a')}), "
+                    f"round-thousand share {a['round_thousand_share']:.1%}")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: demo-data
+          path: docs/demo/data/

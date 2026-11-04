@@ -81,8 +81,25 @@ function rewriteHref(href: string, fromDir: string): string {
   if (rel === 'playbook/sba-case-study.md') return url('case-study/sba/') + anchor;
   if (rel === 'playbook/forensic_methods.md') return url('library/forensic-methods/') + anchor;
   if (rel === 'universe/all_agencies.md' || rel === 'universe') return url('universe/') + anchor;
+  const lib = LIBRARY_ROUTES[rel];
+  if (lib) return url(lib) + anchor;
   return `${BLOB}/${rel}${anchor}`;
 }
+
+/** Docs written for the ten extensions, rendered in the research library. */
+const LIBRARY_ROUTES: Record<string, string> = {
+  'extensions.md': 'library/extensions/',
+  'playbook/cross_agency_matching.md': 'library/cross-agency-matching/',
+  'playbook/network_analytics.md': 'library/network-analytics/',
+  'proposals/roi_model.md': 'library/roi-model/',
+  'proposals/pilot_kit.md': 'library/pilot-kit/',
+  'policy/legal_track.md': 'library/legal-track/',
+  'playbook/procurement_fraud.md': 'library/procurement-fraud/',
+  'research/grants_to_states.md': 'library/grants-to-states/',
+  'demo/live_demo.md': 'library/live-demo/',
+  'playbook/tip_triage.md': 'library/tip-triage/',
+  'playbook/red_team.md': 'library/red-team/',
+};
 
 // TeX math ($...$ inline, $$...$$ display) for docs that opt in. The inline
 // rule mirrors pandoc's, so the site and the PDF agree on what is math: the
@@ -119,7 +136,7 @@ export function md(src: string, fromDir = '', opts: { math?: boolean } = {}): st
       return `href="${out}"${ext}`;
     })
     .replace(/>([a-z]+)\.md<\/a>/g, (all, slug) => (SHORT[slug] ? `>${SHORT[slug]}</a>` : all))
-    .replace(/<table>/g, '<div class="table-wrap"><table>')
+    .replace(/<table>/g, '<div class="table-wrap" tabindex="0" role="region" aria-label="Table"><table>')
     .replace(/<\/table>/g, '</table></div>')
     .replace(/<h([23])>([\s\S]*?)<\/h\1>/g, (_, lvl, inner) => {
       const base = slugify(inner.replace(/<[^>]+>/g, '')) || 'section';
