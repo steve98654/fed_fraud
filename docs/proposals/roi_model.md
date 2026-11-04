@@ -29,23 +29,24 @@ prevent or recover, against what it costs to build, run and review.
 
 ## Results by program
 
-| Program | Improper FY2025 | 5-yr benefit (median) | 5-yr cost (median) | Net (P10 to P50) | ROI (median) | P(net > 0) | Break-even catch rate |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Medicare fee-for-service | $28.8B | $993M | $100M | $499M to $884M | 9.7x | 100% | 0.17% |
-| Medicaid | $37.4B | $516M | $62M | $249M to $449M | 8.0x | 100% | 0.32% |
-| EITC | $21.1B | $291M | $45M | $131M to $244M | 6.4x | 100% | 0.57% |
-| SSI | $7.3B | $252M | $42M | $111M to $208M | 5.9x | 100% | 0.66% |
-| SNAP | $10.2B | $211M | $38M | $89M to $171M | 5.4x | 100% | 0.79% |
-| VA (seven programs) | $3.9B | $135M | $32M | $49M to $102M | 4.2x | 100% | 1.2% |
-| HUD rental assistance | $4.3B | $119M | $31M | $41M to $87M | 3.8x | 100% | 1.4% |
-| Unemployment insurance | $5.6B | $116M | $31M | $39M to $85M | 3.8x | 100% | 1.4% |
-| Disability Insurance | $2.3B | $79M | $28M | $20M to $51M | 2.9x | 100% | 2.1% |
-| Shuttered Venue grants (closed) | $10.1B | $32M | $31M | -$14M to $1M | 1.0x | 53% | 6.9% |
-| OPM retirement | $0.4B | $20M | $23M | -$13M to -$3M | 0.9x | 38% | 8.3% |
-| FEMA Public Assistance | $0.3B | $12M | $22M | -$18M to -$9M | 0.6x | 8% | 13% |
+| Program | Improper | Benefit / cost | Net, P10 to P50 | ROI | Break-even |
+| --- | --- | --- | --- | --- | --- |
+| Medicare FFS | $28.8B | $993M / $100M | $499M to $884M | 9.7x | 0.17% |
+| Medicaid | $37.4B | $516M / $62M | $249M to $449M | 8.0x | 0.32% |
+| EITC | $21.1B | $291M / $45M | $131M to $244M | 6.4x | 0.57% |
+| SSI | $7.3B | $252M / $42M | $111M to $208M | 5.9x | 0.66% |
+| SNAP | $10.2B | $211M / $38M | $89M to $171M | 5.4x | 0.79% |
+| VA (7 programs) | $3.9B | $135M / $32M | $49M to $102M | 4.2x | 1.2% |
+| HUD rental aid | $4.3B | $119M / $31M | $41M to $87M | 3.8x | 1.4% |
+| UI | $5.6B | $116M / $31M | $39M to $85M | 3.8x | 1.4% |
+| SSDI | $2.3B | $79M / $28M | $20M to $51M | 2.9x | 2.1% |
+| SVOG (closed) | $10.1B | $32M / $31M | -$14M to $1M | 1.0x | 6.9% |
+| OPM retirement | $0.4B | $20M / $23M | -$13M to -$3M | 0.9x | 8.3% |
+| FEMA PA | $0.3B | $12M / $22M | -$18M to -$9M | 0.6x | 13% |
 
-Figures are present values at a 2% real discount rate, from 20,000 Monte
-Carlo draws. Run `python3 analytics/roi/model.py` to reproduce them.
+Improper payments are FY2025. Benefit, cost and ROI are five-year medians;
+break-even is the catch rate at which net benefit is zero. Figures are
+present values at a 2% real discount rate, from 20,000 Monte Carlo draws. Run `python3 analytics/roi/model.py` to reproduce them.
 
 ## 1. The chain
 

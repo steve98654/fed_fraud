@@ -1,0 +1,154 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Ten extensions},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Ten extensions}\par
+\vspace{2pt}{\large\color{geomid} From agency plans to a government-wide program}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Status:} Draft v0.1 (2026-11-04), for Steve's review. Builds on
+the \href{plan.pdf}{working plan}, the \href{review_plan.pdf}{review
+plan}, the \href{roadmap.pdf}{roadmap}, the
+\href{universe/all_agencies.pdf}{all-agency plan} and the
+\href{playbook/forensic_methods.pdf}{forensic methods handbook}.
+
+\hypertarget{bottom-line}{%
+\section{Bottom line}\label{bottom-line}}
+
+The agency plans say where fraud is likely and which public-data screens
+to run first. These ten extensions supply what a leader asks next: how
+the screens work across agencies, what they would return, what a first
+engagement looks like, what the law allows, and whether the controls
+will survive contact with people trying to beat them. Each has a
+planning document; seven have tested reference code; the ROI model and
+live demo also have pages on the site.
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}l>{\raggedright\arraybackslash}p{\dimexpr 0.196\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.157\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.432\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.150\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries \# & \leavevmode\color{white}\bfseries Extension & \leavevmode\color{white}\bfseries Document & \leavevmode\color{white}\bfseries Code & \leavevmode\color{white}\bfseries Site \\
+\endhead
+1 & Cross-agency data matching & \href{playbook/cross_agency_matching.pdf}{Cross-agency matching} & \texttt{analytics/forensic/crossmatch.py} & Library \\
+2 & Network and graph analytics & \href{playbook/network_analytics.pdf}{Network analytics} & \texttt{analytics/forensic/network.py} (cluster scoring) & Library \\
+3 & Recovery and ROI model & \href{proposals/roi_model.pdf}{ROI model} & \texttt{analytics/roi/} & Library, ROI calculator \\
+4 & Pilot proposal kit & \href{proposals/pilot_kit.pdf}{Pilot kit} & --- & Library \\
+5 & Policy and legal track & \href{policy/legal_track.pdf}{Policy and legal track} & --- & Library \\
+6 & Procurement and contract fraud & \href{playbook/procurement_fraud.pdf}{Procurement fraud} & \texttt{analytics/forensic/procurement.py} & Library \\
+7 & Grants to states & \href{research/grants_to_states.pdf}{Grants to states} & \texttt{analytics/forensic/passthrough.py} & Library \\
+8 & Live demo on public data & \href{demo/live_demo.pdf}{Live demo} & \texttt{analytics/demo/} & Live demo page \\
+9 & Whistleblower and tip triage & \href{playbook/tip_triage.pdf}{Tip triage} & \texttt{analytics/triage/tips.py} & Library \\
+10 & Red-team playbook & \href{playbook/red_team.pdf}{Red-team playbook} & --- & Library \\
+\end{longtable}\endgroup
+
+\hypertarget{how-they-fit-together}{%
+\section{How they fit together}\label{how-they-fit-together}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Engine:} cross-agency matching (1) builds the linked
+  identities; network analytics (2) groups them into rings; procurement
+  (6) and grants to states (7) are new screen families on top of the
+  same spine.
+\item
+  \textbf{Case for action:} the ROI model (3) gives each program a
+  business case and a break-even bar; the live demo (8) shows the
+  methods running on real data instead of wireframes.
+\item
+  \textbf{Engagement:} the pilot kit (4) is the 90-day offer; the policy
+  and legal track (5) is the map for data access; tip triage (9) is a
+  second, small offer that any OIG can accept quickly.
+\item
+  \textbf{Durability:} the red-team playbook (10) answers ``won't they
+  just adapt?'' before anyone asks.
+\end{itemize}
+
+\hypertarget{what-changed-in-the-plan}{%
+\section{What changed in the plan}\label{what-changed-in-the-plan}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Shared screens get priority over single-agency builds for
+  small programs.} The ROI model shows OPM retirement, FEMA Public
+  Assistance and closed pandemic programs do not pay back on their own;
+  they should ride on cross-agency matching and exclusion checks.
+\item
+  \textbf{The first Phase 2 proposal is the HHS 90-day pilot}, with SBA
+  as the alternate, using the pilot kit's stop rule and metrics.
+\item
+  \textbf{Every proposal carries the ROI row, the break-even rate and
+  the legal route} from the policy track.
+\item
+  \textbf{Tip triage is offered as a quick, low-data second engagement}
+  with the same OIGs.
+\end{enumerate}
+
+\hypertarget{decisions-for-steve}{%
+\section{Decisions for Steve}\label{decisions-for-steve}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  HHS-OIG or SBA OIG as the first pilot partner?
+\item
+  Publish the policy white paper on Do Not Pay data access now, or wait
+  for the first pilot result?
+\item
+  Which award datasets should the live demo pull next (VA, DoD or GSA
+  contracts)?
+\end{enumerate}
+
+\end{document}

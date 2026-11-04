@@ -1,0 +1,239 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Grants to states},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Grants to states}\par
+\vspace{2pt}{\large\color{geomid} Following federal money through state programs}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Status:} Draft v0.1 (2026-11-04), for Steve's review. Extension
+7 of 10 (see the \href{../extensions.pdf}{extensions overview}).
+Reference code: \texttt{analytics/forensic/passthrough.py}, tested on
+synthetic data only.
+
+\hypertarget{bottom-line}{%
+\section*{Bottom line}\label{bottom-line}}
+\addcontentsline{toc}{section}{Bottom line}
+
+Most of the pandemic-era losses happened in programs the federal
+government pays for and states run: unemployment insurance (GAO
+estimated fraud at \$100 billion to \$135 billion), Medicaid, SNAP,
+child nutrition and emergency rental assistance. Federal agencies see
+these programs as a state-level total; the fraud happens one claimant,
+provider or subrecipient below that, in state systems. This extension
+sets out how to follow the money anyway, in three layers:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{State-level screens on public statistics} (Phase 1): which
+  states, programs and years look unusual against their peers, adjusted
+  so small states are not over-flagged.
+\item
+  \textbf{Subrecipient screens on Single Audit and subaward data} (Phase
+  1): the organizations a state keeps funding despite repeated audit
+  findings, and pass-through programs where one new subrecipient takes
+  most of the money.
+\item
+  \textbf{Claim-level screens through states and existing hubs} (Phase
+  2): NASWA's Integrity Data Hub for UI, CMS's T-MSIS for Medicaid,
+  USDA's National Accuracy Clearinghouse for duplicate SNAP
+  participation.
+\end{enumerate}
+
+\hypertarget{programs-and-exposure}{%
+\section*{1. Programs and exposure}\label{programs-and-exposure}}
+\addcontentsline{toc}{section}{1. Programs and exposure}
+
+Public figures; check each against the latest PaymentAccuracy.gov
+release.
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.336\linewidth-2\tabcolsep}l>{\raggedright\arraybackslash}p{\dimexpr 0.149\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.373\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Program & \leavevmode\color{white}\bfseries \makecell[tl]{Federal\\agency} & \leavevmode\color{white}\bfseries FY2025 improper payments & \leavevmode\color{white}\bfseries Main fraud patterns \\
+\endhead
+Medicaid & HHS (CMS) & \$37.4B (6.1\%) & Billing for services not provided (personal care, behavioral health, housing supports, autism therapy), provider identity theft, ineligible enrollees \\
+Unemployment insurance & DOL & \$5.6B (14.9\%) & Identity theft, multi-state claims, fictitious employers, prisoners and deceased claimants \\
+SNAP & USDA (FNS) & \$10.2B (10.9\%) & Retailer trafficking, duplicate participation across states, EBT skimming \\
+Child Nutrition (CACFP, Summer Food) & USDA (FNS) & CACFP 10.5\% & Sponsor fraud on meal counts (the Feeding Our Future case, about \$250M) \\
+TANF, child care (CCDF) & HHS (ACF) & Not all reported & Misuse of block grant funds, phantom attendance \\
+Emergency Rental Assistance, Homeowner Assistance Fund & Treasury & Not reported as improper & Fictitious tenants and landlords \\
+\end{longtable}\endgroup
+
+\hypertarget{layer-1-state-level-screens-public-data}{%
+\section*{2. Layer 1: state-level screens (public
+data)}\label{layer-1-state-level-screens-public-data}}
+\addcontentsline{toc}{section}{2. Layer 1: state-level screens (public
+data)}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.277\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.361\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.361\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Screen & \leavevmode\color{white}\bfseries Data & \leavevmode\color{white}\bfseries Method \\
+\endhead
+UI overpayment and fraud rates by state & DOL ETA 902P (Benefit Accuracy Measurement), ETA 227 overpayment reports & Robust z and empirical-Bayes rate ratio across states (\texttt{state\_outliers}) \\
+UI claims versus local job loss & ETA 539 weekly claims, BLS LAUS and QCEW & Claims growth that outruns job loss (DOL-1) \\
+Medicaid spending versus enrollment by service & CMS-64 expenditure reports, T-MSIS Analytic Files summaries, enrollment reports & Spending that grows faster than people served (\texttt{growth\_without\_caseload}), by service category \\
+SNAP payment error rates by state & FNS Quality Control reports & Peer comparison with shrinkage \\
+SNAP retailer redemptions & FNS retailer data (where public), store counts by area & Redemption per store outliers (USDA-1) \\
+\end{longtable}\endgroup
+
+A high state rate can mean more fraud or better detection. States that
+look hardest find the most, so the first question to a flagged state is
+how it measures, before whether it has a problem.
+
+\hypertarget{layer-2-subrecipients-public-data}{%
+\section*{3. Layer 2: subrecipients (public
+data)}\label{layer-2-subrecipients-public-data}}
+\addcontentsline{toc}{section}{3. Layer 2: subrecipients (public data)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Single Audit findings} (Federal Audit Clearinghouse, fac.gov):
+  every entity spending \$1M or more in federal awards a year (2 CFR
+  200.501, as revised in 2024) files an audit with findings, questioned
+  costs and repeat-finding flags. Screen: subrecipients with material
+  weaknesses or questioned costs in three or more years that keep
+  receiving funds (\texttt{repeat\_finding\_entities}).
+\item
+  \textbf{Subaward concentration} (FFATA subaward reports in
+  USAspending): Herfindahl index of each state agency's subawards and
+  the largest subrecipient's share, by program and year
+  (\texttt{subaward\_concentration}). One new subrecipient taking most
+  of a pass-through program is the shape of the Feeding Our Future case.
+\item
+  \textbf{Missing audits:} subrecipients whose federal spending implies
+  a Single Audit but none was filed.
+\item
+  \textbf{Cross-agency matching} of subrecipients against exclusions,
+  and network scoring of subrecipients that share officers and addresses
+  (see \href{../playbook/cross_agency_matching.pdf}{cross-agency
+  matching} and \href{../playbook/network_analytics.pdf}{network
+  analytics}).
+\end{itemize}
+
+\hypertarget{layer-3-claim-level-with-states-phase-2}{%
+\section*{4. Layer 3: claim-level, with states (Phase
+2)}\label{layer-3-claim-level-with-states-phase-2}}
+\addcontentsline{toc}{section}{4. Layer 3: claim-level, with states
+(Phase 2)}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.181\linewidth-2\tabcolsep}l>{\raggedright\arraybackslash}p{\dimexpr 0.351\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.351\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Hub or route & \leavevmode\color{white}\bfseries Program & \leavevmode\color{white}\bfseries What it allows & \leavevmode\color{white}\bfseries Who to ask \\
+\endhead
+NASWA Integrity Data Hub & UI & Cross-state matching of claims, suspicious actor repository, bank account verification & NASWA, DOL ETA, participating states \\
+T-MSIS & Medicaid & National claim-level data submitted by states & CMS, HHS-OIG (already uses it) \\
+National Accuracy Clearinghouse & SNAP & Duplicate participation across states, required by the 2018 Farm Bill & FNS \\
+State data sharing agreements & Any & Claim and eligibility files for a pilot & State program integrity units, state auditors, Medicaid Fraud Control Units \\
+\end{longtable}\endgroup
+
+Recommended Phase 2 entry: two states that already participate in the
+Integrity Data Hub and have an active state auditor partnership, running
+UI and SNAP identity reuse (roadmap X-3).
+
+\hypertarget{partners-beyond-federal-agencies}{%
+\section*{5. Partners beyond federal
+agencies}\label{partners-beyond-federal-agencies}}
+\addcontentsline{toc}{section}{5. Partners beyond federal agencies}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{State auditors} (through NASACT) and \textbf{Medicaid Fraud
+  Control Units} (federally funded, in every state).
+\item
+  \textbf{Program integrity units} in state Medicaid, labor and human
+  services agencies.
+\item
+  \textbf{Federal OIGs} with state grant oversight: HHS-OIG, DOL-OIG,
+  USDA-OIG.
+\end{itemize}
+
+\hypertarget{limits}{%
+\section*{6. Limits}\label{limits}}
+\addcontentsline{toc}{section}{6. Limits}
+
+\begin{itemize}
+\tightlist
+\item
+  Public state data is aggregate and lags by a year or more.
+\item
+  Single Audit quality varies, and findings are self-reported by the
+  auditee's auditor.
+\item
+  States own the claim data; each state agreement is separate.
+\end{itemize}
+
+\hypertarget{next-steps}{%
+\section*{7. Next steps}\label{next-steps}}
+\addcontentsline{toc}{section}{7. Next steps}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Build the state UI panel (ETA 902P, 227, 539 with BLS) for 2019-2026.
+\item
+  Load FAC findings for the six largest pass-through programs and run
+  the repeat-finding screen.
+\item
+  Draft the two-state proposal using the
+  \href{../proposals/pilot_kit.pdf}{pilot kit}.
+\end{enumerate}
+
+\end{document}

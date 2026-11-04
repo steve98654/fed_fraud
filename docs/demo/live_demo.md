@@ -59,11 +59,12 @@ public records, for showing the method, not leads.
 
 ## 3. How to refresh
 
-```sh
+```
 python3 analytics/roi/model.py
 python3 analytics/demo/run_demo.py
 # with network access to api.usaspending.gov:
-python3 analytics/demo/fetch_usaspending.py --agency "Department of Veterans Affairs" --fy 2025
+python3 analytics/demo/fetch_usaspending.py \
+  --agency "Department of Veterans Affairs" --fy 2025
 python3 analytics/demo/run_demo.py
 ```
 

@@ -1,0 +1,231 @@
+% Pandoc template for the fed_fraud documents.
+% Based on proposal_gen/templates/detailed_proposal_template/detailed_1_classic.tex
+% (Classic report): centered title page, table of contents, ruled section
+% headings and the Geodesic house footer. Fonts are Latin Modern (lmodern).
+% Two layouts: the full report (title page and contents) and, with
+% -V brief, a compact one-page-brief header in the same style.
+\documentclass[letterpaper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[letterpaper,top=0.9in,bottom=1.2in,left=1in,right=1in,footskip=0.6in]{geometry}
+\usepackage[table]{xcolor}
+\usepackage{geodesicbrand}
+\usepackage{amsmath,amssymb}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{calc}
+\usepackage{longtable}
+\usepackage{makecell}
+\usepackage[most]{tcolorbox}
+\usepackage{titlesec}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,urlcolor=coolblack,linkcolor=coolblack,filecolor=geoblue,
+  pdftitle={Recovery and ROI model},pdfauthor={\geofirm}}
+\urlstyle{same}
+
+\setlist{itemsep=2pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+
+% Section style: house rule under each heading
+\titleformat{\section}{\Large\bfseries\color{coolblack}}{\thesection}{0.6em}{}[{\color{coolblack}\titlerule[0.5pt]}]
+\titleformat{\subsection}{\large\bfseries\color{geomid}}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{geomid}}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+% Tables are written by latex/filters.lua (navy header, banded rows)
+\setlength{\LTpre}{6pt}\setlength{\LTpost}{6pt}
+
+\begin{document}
+
+% BRIEF HEADER
+\thispagestyle{geodesic}
+\begin{minipage}[c]{0.13\textwidth}\includegraphics[width=\linewidth]{icon.png}\end{minipage}\hfill
+\begin{minipage}[c]{0.84\textwidth}
+  {\textsc{\large \geofirm}}\par\vspace{2pt}
+  {\small\color{geogray}Federal fraud expansion\enspace\textperiodcentered\enspace When: \compiletime}
+\end{minipage}\par\vspace{6pt}
+{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{2pt}
+{\LARGE\bfseries\color{coolblack} Recovery and ROI model}\par
+\vspace{2pt}{\large\color{geomid} The business case by program}\par
+\vspace{-2pt}{\color{coolblack}\rule{\linewidth}{0.3mm}}\par\vspace{4pt}
+\pagestyle{geodesic}
+
+\textbf{Status:} Draft v0.1 (2026-11-04), for Steve's review. Extension
+3 of 10 (see the \href{../extensions.pdf}{extensions overview}). Model:
+\texttt{analytics/roi/model.py}; inputs:
+\texttt{analytics/roi/programs.csv}; results:
+\texttt{docs/proposals/data/roi\_results.csv}. Interactive version on
+the site at \texttt{/tools/roi/}. \textbf{These are estimates for a
+business case, not savings. Savings stay Pending until an Inspector
+General or DOJ confirms them.}
+
+\hypertarget{bottom-line}{%
+\section*{Bottom line}\label{bottom-line}}
+\addcontentsline{toc}{section}{Bottom line}
+
+Leaders fund what pays back. Starting from each program's reported
+improper payments (GAO, FY2025) and a stated chain of assumptions, the
+model estimates the five-year present value of what detection tooling
+would prevent or recover, against what it costs to build, run and
+review.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{The large health and benefit programs pay back many times over
+  even on cautious assumptions.} Medicare fee-for-service: median net
+  benefit about \$880M over five years, roughly 10 times cost; Medicaid
+  about \$450M (8 times), even with only a fifth of Medicaid reachable
+  through state data.
+\item
+  \textbf{The break-even bar is low.} For Medicare, the tooling pays for
+  itself if it catches 0.2\% of the improper dollars it can see that
+  current controls miss. For SNAP it is 0.8\%. A pilot only has to beat
+  that number.
+\item
+  \textbf{Small programs do not pay back on their own.} OPM retirement,
+  FEMA Public Assistance and the closed Shuttered Venue grant program
+  have a 50\% or lower chance of positive net benefit as stand-alone
+  builds. They should ride on shared screens (cross-agency matching,
+  exclusion checks), not get their own tooling.
+\end{itemize}
+
+\hypertarget{results-by-program}{%
+\section*{Results by program}\label{results-by-program}}
+\addcontentsline{toc}{section}{Results by program}
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.282\linewidth-2\tabcolsep}l>{\raggedright\arraybackslash}p{\dimexpr 0.197\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.197\linewidth-2\tabcolsep}ll@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Program & \leavevmode\color{white}\bfseries Improper & \leavevmode\color{white}\bfseries Benefit / cost & \leavevmode\color{white}\bfseries Net, P10 to P50 & \leavevmode\color{white}\bfseries ROI & \leavevmode\color{white}\bfseries Break-even \\
+\endhead
+Medicare FFS & \$28.8B & \$993M / \$100M & \$499M to \$884M & 9.7x & 0.17\% \\
+Medicaid & \$37.4B & \$516M / \$62M & \$249M to \$449M & 8.0x & 0.32\% \\
+EITC & \$21.1B & \$291M / \$45M & \$131M to \$244M & 6.4x & 0.57\% \\
+SSI & \$7.3B & \$252M / \$42M & \$111M to \$208M & 5.9x & 0.66\% \\
+SNAP & \$10.2B & \$211M / \$38M & \$89M to \$171M & 5.4x & 0.79\% \\
+VA (7 programs) & \$3.9B & \$135M / \$32M & \$49M to \$102M & 4.2x & 1.2\% \\
+HUD rental aid & \$4.3B & \$119M / \$31M & \$41M to \$87M & 3.8x & 1.4\% \\
+UI & \$5.6B & \$116M / \$31M & \$39M to \$85M & 3.8x & 1.4\% \\
+SSDI & \$2.3B & \$79M / \$28M & \$20M to \$51M & 2.9x & 2.1\% \\
+SVOG (closed) & \$10.1B & \$32M / \$31M & -\$14M to \$1M & 1.0x & 6.9\% \\
+OPM retirement & \$0.4B & \$20M / \$23M & -\$13M to -\$3M & 0.9x & 8.3\% \\
+FEMA PA & \$0.3B & \$12M / \$22M & -\$18M to -\$9M & 0.6x & 13\% \\
+\end{longtable}\endgroup
+
+Improper payments are FY2025. Benefit, cost and ROI are five-year
+medians; break-even is the catch rate at which net benefit is zero.
+Figures are present values at a 2\% real discount rate, from 20,000
+Monte Carlo draws. Run \texttt{python3\ analytics/roi/model.py} to
+reproduce them.
+
+\hypertarget{the-chain}{%
+\section*{1. The chain}\label{the-chain}}
+\addcontentsline{toc}{section}{1. The chain}
+
+For each program and year:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{caught} = improper payments x reach x detectable x new
+  detection x ramp
+\item
+  \textbf{flagged} = caught / precision (what reviewers have to look at)
+\item
+  \textbf{benefit} = caught x {[}prevent + (1 - prevent) x recovery{]} x
+  (1 + deterrence)
+\item
+  \textbf{cost} = build (year 1) + run (every year) + review cost x
+  flagged
+\end{itemize}
+
+Closed programs get no prevention and no deterrence: only recovery on
+the stock of improper payments, spread over three years.
+
+\hypertarget{assumptions-and-why}{%
+\section*{2. Assumptions and why}\label{assumptions-and-why}}
+\addcontentsline{toc}{section}{2. Assumptions and why}
+
+Each share is drawn from a triangular distribution (low, likely, high).
+These are the numbers to argue about with an agency, and the pilot is
+designed to measure the three that matter most (new detection,
+precision, prevent).
+
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\rowcolors{2}{white}{geolight}
+\begin{longtable}[l]{@{}>{\raggedright\arraybackslash}p{\dimexpr 0.159\linewidth-2\tabcolsep}>{\raggedright\arraybackslash}p{\dimexpr 0.207\linewidth-2\tabcolsep}ll>{\raggedright\arraybackslash}p{\dimexpr 0.478\linewidth-2\tabcolsep}@{}}
+\rowcolor{coolblack}\leavevmode\color{white}\bfseries Assumption & \leavevmode\color{white}\bfseries Low & \leavevmode\color{white}\bfseries Likely & \leavevmode\color{white}\bfseries High & \leavevmode\color{white}\bfseries Basis \\
+\endhead
+Reach & per program (0.2 to 1.0) &  &  & Share of program dollars our data access covers within five years. Medicaid and EITC 0.2 (state data, tax-data limits); Medicare 0.5; OPM 0.8 \\
+Detectable & 25\% & 40\% & 55\% & Share of improper dollars with a data trace (identity, eligibility, billing pattern) rather than a missing document. Agencies report most improper payments as documentation errors; the detectable share is what the screens can reach \\
+New detection & 3\% & 8\% & 15\% & Share of detectable dollars our screens catch that current controls miss. The single most uncertain number; the pilot measures it \\
+Precision & 30\% & 50\% & 70\% & Share of flagged dollars confirmed on review. Sets reviewer workload \\
+Prevent & 20\% & 45\% & 70\% & Share caught before payment. Needs pre-payment integration (Do Not Pay, claims edits) \\
+Recovery & 5\% & 15\% & 30\% & Share recovered when caught after payment. Pay-and-chase recovers little; GAO and OIG reports show low recovery rates \\
+Deterrence & 0\% & 5\% & 15\% & Extra benefit from fewer attempts once controls are known \\
+Build & \$2M & \$4M & \$8M & One-time, per program, on the shared platform \\
+Run & \$1.5M & \$3M & \$6M & Per year, per program: data, compute, analysts \\
+Review cost & 1\% & 2\% & 4\% & Review and investigation cost per flagged dollar \\
+Ramp & 25\%, 60\%, 100\%, 100\%, 100\% &  &  & Capacity reached in years 1 to 5 \\
+Discount rate & 2\% real &  &  & OMB Circular A-94 (2023 revision) default; check the current value \\
+\end{longtable}\endgroup
+
+\hypertarget{what-the-model-does-not-count}{%
+\section*{3. What the model does not
+count}\label{what-the-model-does-not-count}}
+\addcontentsline{toc}{section}{3. What the model does not count}
+
+\begin{itemize}
+\tightlist
+\item
+  Criminal fines, False Claims Act damages and penalties (often larger
+  than the recovered overpayment; treble damages under 31 U.S.C. 3729).
+\item
+  Fraud outside improper payment estimates. GAO estimated total fraud
+  losses at \$233B to \$521B a year (GAO-24-105833), well above reported
+  improper payments, so starting from improper payments is conservative.
+\item
+  Shared-platform savings: the second and later programs reuse the
+  entity spine and screens, so build cost per program falls.
+\item
+  Benefits to states (the state share of Medicaid, UI administration).
+\end{itemize}
+
+\hypertarget{sensitivity}{%
+\section*{4. Sensitivity}\label{sensitivity}}
+\addcontentsline{toc}{section}{4. Sensitivity}
+
+The ranking is driven by improper dollars x reach. Within a program, net
+benefit moves almost one for one with new detection and prevent.
+Precision matters through review cost only; at 30\% precision review
+cost roughly doubles, but no large program turns negative. The
+break-even column is the best single number for a leader: if the pilot
+shows a catch rate above it, scale; if not, stop.
+
+\hypertarget{how-to-use-it-in-a-proposal}{%
+\section*{5. How to use it in a
+proposal}\label{how-to-use-it-in-a-proposal}}
+\addcontentsline{toc}{section}{5. How to use it in a proposal}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Quote the program's row, the break-even rate and the P10 (pessimistic)
+  net, not the median.
+\item
+  Replace our assumptions with the agency's own where it has them
+  (recovery rates, review cost).
+\item
+  State that savings stay Pending until confirmed, and that the pilot
+  exists to measure the uncertain assumptions.
+\end{enumerate}
+
+\end{document}
