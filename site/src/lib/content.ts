@@ -175,7 +175,7 @@ export function sections(src: string): Map<string, string> {
   return out;
 }
 
-function tableRows(block: string): string[][] {
+export function tableRows(block: string): string[][] {
   return block
     .split('\n')
     .filter((l) => l.startsWith('|') && !/^\|\s*-/.test(l))
@@ -595,3 +595,84 @@ export function federalBodies(): Body[] {
       };
     });
 }
+
+// ---------------------------------------------------------------------------
+// Proposal inputs: budget and fraud ROM table (analytics/universe/
+// budget_fraud_rom.py), ROI model results (analytics/roi/model.py) and the
+// pilot kit tables (docs/proposals/pilot_kit.md).
+// ---------------------------------------------------------------------------
+export interface BudgetRom {
+  rank: number;
+  abbreviation: string;
+  name: string;
+  budgetUsd: number;
+  basis: string;
+  risk: string;
+  romLowUsd: number;
+  romHighUsd: number;
+  magnitude: string;
+  rateLow: number;
+  rateHigh: number;
+  improperUsd: number | null;
+  count: number;
+}
+
+export function budgetRom(abbreviation: string): BudgetRom | undefined {
+  const [head, ...rows] = parseCsv(read('universe/data/agency_budget_fraud_rom.csv').trim());
+  const all = rows.filter((r) => r.length === head.length).map((r) => Object.fromEntries(head.map((h, i) => [h, r[i]])));
+  const o = all.find((x) => x.abbreviation === abbreviation);
+  if (!o) return undefined;
+  return {
+    rank: Number(o.rank),
+    abbreviation: o.abbreviation,
+    name: o.name,
+    budgetUsd: Number(o.budget_usd),
+    basis: `${o.budget_measure}, ${o.budget_fy}`,
+    risk: o.risk_class,
+    romLowUsd: Number(o.fraud_rom_low_usd),
+    romHighUsd: Number(o.fraud_rom_high_usd),
+    magnitude: o.fraud_rom_magnitude,
+    rateLow: Number(o.implied_rate_low),
+    rateHigh: Number(o.implied_rate_high),
+    improperUsd: o.improper_fy2025_usd ? Number(o.improper_fy2025_usd) : null,
+    count: all.length,
+  };
+}
+
+export interface RoiRow {
+  agency: string;
+  program: string;
+  status: string;
+  improperUsd: number;
+  pPositive: number;
+  breakeven: number;
+}
+
+export function roiRows(agency: string): RoiRow[] {
+  const [head, ...rows] = parseCsv(read('proposals/data/roi_results.csv').trim());
+  return rows
+    .filter((r) => r.length === head.length)
+    .map((r) => Object.fromEntries(head.map((h, i) => [h, r[i]])))
+    .filter((o) => o.agency === agency)
+    .map((o) => ({
+      agency: o.agency,
+      program: o.program,
+      status: o.status,
+      improperUsd: Number(o.improper_usd),
+      pPositive: Number(o.p_positive),
+      breakeven: Number(o.breakeven_new_detection),
+    }));
+}
+
+/** The 90-day plan and success metrics tables from the pilot kit. */
+export function pilotKit() {
+  const s = sections(read('proposals/pilot_kit.md'));
+  return {
+    plan: tableRows(s.get('2. 90-day plan') ?? '').map((r) => ({ days: r[0], work: r[1], output: r[2], agencyTime: r[3] })),
+    metrics: tableRows(s.get('3. Success metrics') ?? '').map((r) => ({ metric: r[0], definition: r[1], pass: r[2] })),
+  };
+}
+
+/** One section of a docs/ file, by heading, rendered. */
+export const docSection = (rel: string, heading: string) =>
+  md(sections(read(rel)).get(heading) ?? '', path.posix.dirname(rel));

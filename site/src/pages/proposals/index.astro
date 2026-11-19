@@ -1,0 +1,223 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import { agencies, url, budgetRom } from '../../lib/content';
+import { usd } from '../../lib/format';
+import { proposals } from '../../data/proposals';
+
+const items = proposals
+  .map((p) => ({ p, a: agencies().find((x) => x.slug === p.slug)!, rom: budgetRom(p.romAbbr) }))
+  .sort((x, y) => x.a.rank - y.a.rank || x.a.name.localeCompare(y.a.name));
+const covered = new Set(proposals.map((p) => p.slug));
+const nextUp = agencies()
+  .filter((a) => !covered.has(a.slug))
+  .slice(0, 5);
+const template = [
+  ['The ask', 'One paragraph for the agency leader: what we propose and what it asks of them.'],
+  ['Where the fraud risk is', 'Budget, rough fraud estimate and main risks, from the budget and fraud table.'],
+  ['What we’d look for', 'The agency’s roadmap ideas, each linked to its tool wireframe and pitch.'],
+  ['Proof it works', 'The SBA case study and the signals that carry over to this agency.'],
+  ['Pilot plan', 'Scope, 90-day timeline, data access, legal basis and stop rule, from the pilot kit.'],
+  ['Expected return', 'The ROI model’s break-even bar. Return and savings read Pending until confirmed.'],
+  ['Download', 'A printable PDF to leave behind after a meeting.'],
+];
+---
+
+<Base
+  title="Proposals"
+  section="proposals"
+  description="Proposals for agency leaders: a 90-day fraud detection pilot per priority agency, on one template."
+>
+  <PageTitle
+    eyebrow="Proposals · For agency leaders"
+    title="What we propose to each agency"
+    lead="One proposal per priority agency, on the same seven-part template, ranked by priority. Each asks for a 90-day pilot with a clear stop rule and no new system inside the agency's boundary."
+    crumbs={[{ label: 'Scorecard', href: url() }]}
+  >
+    <div class="title-actions">
+      <a class="btn" href={url('library/pilot-kit/')}>Pilot kit</a>
+      <a class="btn" href={url('pitches/')}>Pitches</a>
+    </div>
+  </PageTitle>
+
+  <section class="section">
+    <div class="container">
+      <div class="notice" role="note">
+        <span aria-hidden="true">⚑</span>
+        <span>
+          <strong>Drafts for discussion.</strong> Fraud ranges are rough allocations of GAO's government-wide estimate,
+          for sizing only. Return and savings figures read <em>Pending</em> until a pilot measures them and an Inspector
+          General or DOJ confirms results.
+        </span>
+      </div>
+
+      <ol class="cards">
+        {
+          items.map(({ p, a, rom }) => (
+            <li>
+              <a href={url(`proposals/${a.slug}/`)}>
+                <span class="n">{a.rank}</span>
+                <span class="body">
+                  <span class="row1">
+                    {p.leadIdeas.map((id) => (
+                      <span class="id-chip">{id}</span>
+                    ))}
+                    <span class="badge pending">Savings pending</span>
+                  </span>
+                  <span class="title">{a.name}</span>
+                  <span class="line">
+                    <strong>Partner:</strong> {p.pilot.partner}.
+                  </span>
+                  {rom && (
+                    <span class="line">
+                      <strong>Budget</strong> {usd(rom.budgetUsd)} · <strong>fraud ROM</strong> {usd(rom.romLowUsd)} to{' '}
+                      {usd(rom.romHighUsd)} a year
+                    </span>
+                  )}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="below">
+        <div>
+          <h2>The template</h2>
+          <ol class="template">
+            {
+              template.map(([k, v]) => (
+                <li>
+                  <strong>{k}.</strong> {v}
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+        <div class="facts">
+          <h3>Next in line</h3>
+          <p class="soft">The next agencies by priority. Each has an agency plan today; a proposal follows once the template is agreed.</p>
+          <ul class="next">
+            {
+              nextUp.map((a) => (
+                <li>
+                  <a href={url(`agencies/${a.slug}/`)}>
+                    #{a.rank} {a.name}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .title-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .notice {
+    margin-bottom: 28px;
+  }
+  .cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr));
+    gap: 14px;
+  }
+  .cards a {
+    display: flex;
+    gap: 16px;
+    height: 100%;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    background: #fff;
+    text-decoration: none;
+    color: var(--ink);
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .cards a:hover {
+    box-shadow: 0 10px 28px rgba(0, 46, 99, 0.08);
+    transform: translateY(-2px);
+    color: var(--ink);
+  }
+  .n {
+    flex: none;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--gold-ink);
+    width: 1.4em;
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+  }
+  .row1 {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .row1 .badge {
+    margin-left: auto;
+  }
+  .title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--coolblack);
+    line-height: 1.25;
+  }
+  .line {
+    font-size: 0.86rem;
+    color: var(--muted);
+  }
+  .body strong {
+    color: var(--coolblack);
+    font-weight: 600;
+  }
+  .below {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 40px;
+    margin-top: 44px;
+    align-items: start;
+  }
+  .below h2 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+  .template {
+    margin: 0;
+    padding-left: 1.3em;
+    display: grid;
+    gap: 6px;
+  }
+  .soft {
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+  .next {
+    margin: 0;
+    padding-left: 1.1em;
+    display: grid;
+    gap: 4px;
+    font-size: 0.92rem;
+  }
+  @media (max-width: 900px) {
+    .below {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

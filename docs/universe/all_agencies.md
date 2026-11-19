@@ -228,6 +228,9 @@ which case those ideas move to Phase 2.
 
 ## Improper payment reporting, FY2025
 
+For every body's budget and a rough order-of-magnitude fraud estimate, see
+[budget_fraud_rom.md](budget_fraud_rom.md).
+
 Context only, never savings. Source: PaymentAccuracy.gov agencies and
 programs page, FY2025 data; "susceptible outlays" are outlays in programs
 the agency has found susceptible to significant improper payments, not

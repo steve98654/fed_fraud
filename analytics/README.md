@@ -26,12 +26,17 @@ NumPy; no other dependencies.
   (every federal body, its tier and its screens) from the USAspending agency
   list and the classification set out in
   [the all-agency plan](../docs/universe/all_agencies.md).
+- `universe/budget_fraud_rom.py`: builds the agency budget and fraud ROM
+  table ([budget_fraud_rom.md](../docs/universe/budget_fraud_rom.md) and
+  `docs/universe/data/agency_budget_fraud_rom.csv`), sharing GAO's $233B to
+  $521B government-wide estimate across agencies by risk-weighted outlays.
 
 Run from the repository root:
 
 ```sh
 python3 -m unittest discover -s analytics/tests -t analytics
 python3 analytics/universe/build_universe.py
+python3 analytics/universe/budget_fraud_rom.py
 python3 analytics/roi/model.py
 python3 analytics/demo/run_demo.py
 ```
