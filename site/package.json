@@ -9,6 +9,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "briefs": "node scripts/briefs.mjs",
+    "proposals": "node scripts/briefs.mjs --proposals",
     "test:a11y": "node scripts/a11y.mjs"
   },
   "dependencies": {

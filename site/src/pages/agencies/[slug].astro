@@ -7,6 +7,7 @@ import OnThisPage from '../../components/OnThisPage.astro';
 import { usd, weeksLabel } from '../../lib/format';
 import { findings, stageOverride } from '../../data/scorecard';
 import { toolsFor } from '../../data/tools';
+import { proposalFor } from '../../data/proposals';
 
 export function getStaticPaths() {
   return agencies().map((a) => ({ params: { slug: a.slug } }));
@@ -21,6 +22,7 @@ const prev = list[i - 1];
 const next = list[i + 1];
 const mine = findings.filter((f) => f.agency === a.slug);
 const tools = toolsFor(a.slug);
+const proposal = proposalFor(a.slug);
 const stage = stageOverride[a.slug] ?? (mine.length ? 'Leads delivered' : 'Planned');
 // Newest change to anything this page is built from: the brief, the roadmap
 // row (ideas, weeks) and the ranking.
@@ -132,6 +134,7 @@ const factors = [
         </div>
 
         <div class="links no-print">
+          {proposal && <a class="btn primary" href={url(`proposals/${a.slug}/`)}>Proposal for agency leaders</a>}
           <a class="btn" href={url(`library/results/${a.slug}/`)}>Detailed results (placeholder)</a>
           <a class="btn primary" href={url(`downloads/briefs/${a.slug}.pdf`)}>Download agency brief (PDF)</a>
           <a class="btn" href={url(`briefs/${a.slug}/`)}>Print view</a>

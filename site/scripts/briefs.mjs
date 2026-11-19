@@ -1,9 +1,10 @@
 // Prints every agency brief (/briefs/<slug>/) to a PDF leave-behind.
 //
 //   npm run build && npm run briefs
+//   npm run build && npm run proposals     (agency proposals, /proposals/<slug>/)
 //
 // Serves the built site from dist/, opens each print view in Chromium
-// (Playwright) and writes public/downloads/briefs/<slug>.pdf, copying each
+// (Playwright) and writes public/downloads/<kind>/<slug>.pdf, copying each
 // file into dist/ too so the current build includes it. Commit the PDFs in
 // public/ so builds without a browser still ship them.
 import fs from 'node:fs';
@@ -17,16 +18,20 @@ const { chromium } = require('playwright');
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
-const out = path.join(root, 'public', 'downloads', 'briefs');
-const distOut = path.join(dist, 'downloads', 'briefs');
-const only = process.argv.slice(2);
+const args = process.argv.slice(2);
+const kind = args.includes('--proposals') ? 'proposals' : 'briefs';
+const label = kind === 'proposals' ? 'pilot proposal' : 'fraud brief';
+const out = path.join(root, 'public', 'downloads', kind);
+const distOut = path.join(dist, 'downloads', kind);
+const only = args.filter((a) => !a.startsWith('--'));
 
-if (!fs.existsSync(path.join(dist, 'briefs'))) {
-  console.error('dist/briefs/ not found. Run "npm run build" first (without SITE_BASE).');
+if (!fs.existsSync(path.join(dist, kind))) {
+  console.error(`dist/${kind}/ not found. Run "npm run build" first (without SITE_BASE).`);
   process.exit(1);
 }
 const slugs = fs
-  .readdirSync(path.join(dist, 'briefs'))
+  .readdirSync(path.join(dist, kind))
+  .filter((s) => fs.statSync(path.join(dist, kind, s)).isDirectory())
   .filter((s) => !only.length || only.includes(s))
   .sort();
 
@@ -51,14 +56,14 @@ const browser = await chromium.launch();
 const page = await browser.newPage();
 const footer = (name) => `
   <div style="width:100%;font:7pt Helvetica,Arial,sans-serif;color:#586273;padding:0 0.55in;display:flex;justify-content:space-between">
-    <span>The Geodesic Accountability Office · ${name} fraud brief · Draft for discussion</span>
+    <span>The Geodesic Accountability Office · ${name} ${label} · Draft for discussion</span>
     <span>Page <span class="pageNumber"></span> of <span class="totalPages"></span></span>
   </div>`;
 
 for (const slug of slugs) {
-  await page.goto(`${base}/briefs/${slug}/`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/${kind}/${slug}/`, { waitUntil: 'networkidle' });
   await page.evaluate(() => document.fonts.ready);
-  const name = (await page.title()).replace(/ fraud brief.*$/, '');
+  const name = (await page.title()).replace(/ (fraud brief|proposal)\b.*$/, '');
   const file = path.join(out, `${slug}.pdf`);
   await page.pdf({
     path: file,
@@ -75,4 +80,4 @@ for (const slug of slugs) {
 
 await browser.close();
 server.close();
-console.log(`${slugs.length} briefs written to public/downloads/briefs/`);
+console.log(`${slugs.length} ${kind} written to public/downloads/${kind}/`);

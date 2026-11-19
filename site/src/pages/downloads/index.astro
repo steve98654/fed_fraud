@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import PageTitle from '../../components/PageTitle.astro';
 import { agencies, url } from '../../lib/content';
 import { toolsFor } from '../../data/tools';
+import { proposalFor } from '../../data/proposals';
 
 const list = agencies();
 const plans = [
@@ -136,6 +137,7 @@ const plans = [
             {
               list.map((a) => {
                 const tool = toolsFor(a.slug)[0];
+                const proposal = proposalFor(a.slug);
                 return (
                   <tr>
                     <td class="rank">{a.rank}</td>
@@ -153,6 +155,11 @@ const plans = [
                     </td>
                     <td class="nowrap">
                       <a href={url(`downloads/docs/agencies/${a.slug}.pdf`)}>One-pager</a>
+                      {proposal && (
+                        <>
+                          {' '}· <a href={url(`downloads/proposals/${a.slug}.pdf`)}>Proposal (PDF)</a>
+                        </>
+                      )}
                       {tool && (
                         <>
                           {' '}· <a href={url(`tools/${tool.slug}/`)}>Tool preview</a>

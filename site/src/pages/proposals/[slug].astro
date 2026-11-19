@@ -1,0 +1,676 @@
+---
+// One proposal per priority agency, all on the same seven-section template:
+// the ask, where the risk is, what we'd look for, proof it works, pilot plan,
+// expected return and download. Hand-written words live in
+// src/data/proposals.ts; every figure is read from the repo at build time.
+import Base from '../../layouts/Base.astro';
+import PageTitle from '../../components/PageTitle.astro';
+import {
+  agencies, url, mdInline, hasPitch, phase2Ask, budgetRom, roiRows, pilotKit, docSection, sections, tableRows,
+  docPath, REPO,
+} from '../../lib/content';
+import fs from 'node:fs';
+import { usd } from '../../lib/format';
+import { proposals } from '../../data/proposals';
+import { tools } from '../../data/tools';
+
+export function getStaticPaths() {
+  const rank = (s: string) => agencies().find((a) => a.slug === s)!.rank;
+  const list = [...proposals].sort((x, y) => rank(x.slug) - rank(y.slug));
+  return list.map((p, i) => ({ params: { slug: p.slug }, props: { p, prev: list[i - 1], next: list[i + 1] } }));
+}
+
+const { p, prev, next } = Astro.props;
+const a = agencies().find((x) => x.slug === p.slug)!;
+const rom = budgetRom(p.romAbbr);
+const roi = roiRows(p.roiAgency);
+// The pilot kit is written for HHS; swap its HHS-specific words for the
+// agency's own (the kit says the agency name and screen can be swapped).
+const swap = (t: string) =>
+  p.slug === 'hhs'
+    ? t
+    : t
+        .replace(/HHS-1/g, p.leadIdeas[0])
+        .replace(/Medicare payments to providers/g, 'Payments to the entities')
+        .replace(/the OIG or CMS/g, 'the agency or its OIG')
+        .replace(/with OIG investigators/g, 'with your investigators')
+        .replace(/the OIG rates/g, 'your reviewers rate');
+const raw = pilotKit();
+const kit = {
+  plan: raw.plan.map((r) => ({ days: r.days, work: swap(r.work), output: swap(r.output), agencyTime: swap(r.agencyTime) })),
+  metrics: raw.metrics.map((m) => ({ metric: m.metric, definition: swap(m.definition), pass: swap(m.pass) })),
+};
+const ask = phase2Ask(p.slug);
+const pct = (x: number) => `${(x * 100).toFixed(x < 0.01 ? 2 : 1)}%`;
+const toolFor = (id: string) => tools.find((t) => t.ideas.includes(id));
+const ideaIds = new Set(a.ideas.map((i) => i.id));
+
+// Proof: the SBA case study's bottom line and the carry-over rows for this
+// agency's ideas.
+const caseSrc = fs.readFileSync(docPath('playbook/sba-case-study.md'), 'utf8');
+const caseBottom = docSection('playbook/sba-case-study.md', 'Bottom line');
+const carry = tableRows(sections(caseSrc).get('Why it carries over') ?? '')
+  .map((r) => ({ sba: r[0], here: r[1], ids: r[2] }))
+  .filter((r) => r.ids.split(',').some((id) => ideaIds.has(id.trim())));
+
+const pdf = `downloads/proposals/${p.slug}.pdf`;
+const hasPdf = fs.existsSync(new URL(`../../../public/${pdf}`, import.meta.url));
+const nav = [
+  ['ask', '1. The ask'],
+  ['risk', '2. Where the fraud risk is'],
+  ['look', '3. What we’d look for'],
+  ['proof', '4. Proof it works'],
+  ['pilot', '5. Pilot plan'],
+  ['return', '6. Expected return'],
+  ['download', '7. Download'],
+];
+---
+
+<Base
+  title={`${a.short} proposal`}
+  section="proposals"
+  description={`Proposal to ${a.name} leaders: a 90-day fraud detection pilot on ${p.leadIdeas.join(' and ')}.`}
+>
+  <PageTitle
+    eyebrow={`Proposal · Priority ${a.rank} of 33`}
+    title={`A 90-day fraud detection pilot with ${a.name}`}
+    lead={p.status}
+    crumbs={[
+      { label: 'Scorecard', href: url() },
+      { label: 'Proposals', href: url('proposals/') },
+    ]}
+  >
+    <div class="title-actions no-print">
+      {hasPdf && <a class="btn primary" href={url(pdf)}>Download PDF</a>}
+      <button class="btn" type="button" data-print>Print or save as PDF</button>
+    </div>
+  </PageTitle>
+
+  <section class="section">
+    <div class="container layout">
+      <article class="proposal">
+        <section id="ask" class="block ask">
+          <h2><span class="num">1</span> The ask</h2>
+          <p class="ask-text">{p.ask}</p>
+          <div class="ask-grid">
+            <div>
+              <h3>What it asks of you</h3>
+              <ul>{p.cost.map((c) => <li>{c}</li>)}</ul>
+            </div>
+            <div>
+              <h3>What you get</h3>
+              <ul>
+                <li>Ranked leads with reason codes and source records, for your investigators only</li>
+                <li>A measured result: lift, reviewer precision and new detection, reported whatever the outcome</li>
+                <li>A scale-up proposal, or a close-out report that says why not</li>
+              </ul>
+              <p class="funding">
+                <strong>Dollar cost:</strong> <span class="badge pending">To be confirmed</span>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="risk" class="block">
+          <h2><span class="num">2</span> Where the fraud risk is</h2>
+          {
+            rom && (
+              <div class="tiles">
+                <div class="tile">
+                  <span class="k">Budget</span>
+                  <span class="v">{usd(rom.budgetUsd)}</span>
+                  <span class="s">{rom.basis}</span>
+                </div>
+                <div class="tile">
+                  <span class="k">Fraud, rough order of magnitude</span>
+                  <span class="v">
+                    {usd(rom.romLowUsd)} to {usd(rom.romHighUsd)}
+                  </span>
+                  <span class="s">
+                    a year · {pct(rom.rateLow)} to {pct(rom.rateHigh)} of budget · #{rom.rank} of {rom.count}
+                  </span>
+                </div>
+                <div class="tile">
+                  <span class="k">Improper payments reported</span>
+                  <span class="v">{rom.improperUsd ? usd(rom.improperUsd) : 'Not reported'}</span>
+                  <span class="s">FY2025, PaymentAccuracy.gov</span>
+                </div>
+              </div>
+            )
+          }
+          <p class="caveat">
+            The fraud range is GAO's government-wide estimate ($233B to $521B a year) shared out by risk-weighted
+            outlays. It sizes the opportunity; it is not a measurement or a finding about {a.short}. Improper payments
+            include errors as well as fraud. <a href={`${REPO}/blob/main/docs/universe/budget_fraud_rom.md`}>Method and full table</a>.
+          </p>
+          <h3>Main risks</h3>
+          <ul class="risks">{p.risks.map((r) => <li>{r}</li>)}</ul>
+        </section>
+
+        <section id="look" class="block">
+          <h2><span class="num">3</span> What we'd look for</h2>
+          <p>
+            Each idea is a screen from the <a href={url('plan/')}>roadmap</a>, built first on public data. The pilot runs
+            the first {p.leadIdeas.length === 1 ? 'one' : `${p.leadIdeas.length}`} on your data.
+          </p>
+          <ol class="ideas">
+            {
+              a.ideas.map((idea) => {
+                const t = toolFor(idea.id);
+                return (
+                  <li>
+                    <span class="id-chip">{idea.id}</span>
+                    <span class="txt">
+                      <span set:html={mdInline(idea.text)} />
+                      {p.leadIdeas.includes(idea.id) && <span class="badge planned">In the pilot</span>}
+                    </span>
+                    <span class="links no-print">
+                      {t ? <a href={url(`tools/${t.slug}/`)}>Tool wireframe</a> : <span class="soft">Wireframe not yet built</span>}
+                      {hasPitch(idea.id) && <a href={url(`pitches/${idea.id.toLowerCase()}/`)}>One-page pitch</a>}
+                    </span>
+                  </li>
+                );
+              })
+            }
+          </ol>
+        </section>
+
+        <section id="proof" class="block">
+          <h2><span class="num">4</span> Proof it works</h2>
+          <div class="prose" set:html={caseBottom} />
+          {
+            carry.length > 0 && (
+              <div class="table-wrap" tabindex="0" role="region" aria-label="Table">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Signal proven at SBA</th>
+                    <th scope="col">Same signal at {a.short}</th>
+                    <th scope="col">Ideas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {carry.map((r) => (
+                    <tr>
+                      <td>{r.sba}</td>
+                      <td>{r.here}</td>
+                      <td>{r.ids}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table></div>
+            )
+          }
+          <p class="soft-p">
+            SBA results (loans screened, leads referred, dollars confirmed): <span class="badge pending">Pending</span>
+            until the SBA team's figures are supplied and checked. <a class="no-print" href={url('case-study/sba/')}>Read the case study</a>.
+          </p>
+        </section>
+
+        <section id="pilot" class="block">
+          <h2><span class="num">5</span> Pilot plan</h2>
+          <h3>Scope</h3>
+          <div class="table-wrap" tabindex="0" role="region" aria-label="Table">
+          <table class="kv">
+            <tbody>
+              <tr><th scope="row">Partner</th><td>{p.pilot.partner}</td></tr>
+              <tr><th scope="row">Screen</th><td>{p.pilot.screen}</td></tr>
+              <tr><th scope="row">Data from the agency</th><td>{p.pilot.data}</td></tr>
+              <tr><th scope="row">Where analysis runs</th><td>{p.pilot.where}</td></tr>
+              <tr><th scope="row">Out of scope</th><td>{p.pilot.outOfScope}</td></tr>
+            </tbody>
+          </table></div>
+
+          <h3>Timeline: 90 days from data access</h3>
+          <div class="table-wrap" tabindex="0" role="region" aria-label="90-day plan">
+            <table>
+              <thead>
+                <tr><th scope="col">Days</th><th scope="col">Work</th><th scope="col">Output</th><th scope="col">Your time</th></tr>
+              </thead>
+              <tbody>
+                {kit.plan.map((r) => (
+                  <tr><td class="nowrap">{r.days}</td><td>{r.work}</td><td>{r.output}</td><td>{r.agencyTime}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {
+            ask && (
+              <>
+                <h3>Data access needed</h3>
+                <div class="table-wrap" tabindex="0" role="region" aria-label="Table">
+                <table class="kv">
+                  <tbody>
+                    <tr><th scope="row">Internal data</th><td>{ask.data}</td></tr>
+                    <tr><th scope="row">What it enables</th><td>{ask.enables}</td></tr>
+                    <tr><th scope="row">Access route</th><td>{ask.route}</td></tr>
+                  </tbody>
+                </table></div>
+              </>
+            )
+          }
+
+          <h3>Legal basis</h3>
+          <div class="table-wrap" tabindex="0" role="region" aria-label="Table">
+          <table>
+            <thead>
+              <tr><th scope="col">Authority or agreement</th><th scope="col">What it covers here</th></tr>
+            </thead>
+            <tbody>
+              {p.legal.map((l) => (
+                <tr><td>{l.basis}</td><td>{l.use}</td></tr>
+              ))}
+            </tbody>
+          </table></div>
+          <p class="soft-p">
+            Typical time to signed agreements: {p.agreementTime}. Not legal advice: counsel on both sides reviews before
+            anything is signed. <a class="no-print" href={url('library/legal-track/')}>Legal track</a> ·
+            <a class="no-print" href={url('library/pilot-kit/')}>Pilot kit with agreement templates</a>.
+          </p>
+
+          <h3>Success metrics and stop rule</h3>
+          <div class="table-wrap" tabindex="0" role="region" aria-label="Success metrics">
+            <table>
+              <thead>
+                <tr><th scope="col">Metric</th><th scope="col">Definition</th><th scope="col">Pass mark</th></tr>
+              </thead>
+              <tbody>
+                {kit.metrics.map((m) => (
+                  <tr><td>{m.metric}</td><td>{m.definition}</td><td>{m.pass}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p class="stop">
+            <strong>Stop rule.</strong> At day 75, if the screen's top 5% does not contain known cases at five times the
+            base rate, or reviewers rate fewer than one in five leads worth opening, the pilot ends and the report says why.
+          </p>
+        </section>
+
+        <section id="return" class="block">
+          <h2><span class="num">6</span> Expected return</h2>
+          <p>{p.returnNote}</p>
+          {
+            roi.length > 0 && (
+              <div class="table-wrap" tabindex="0" role="region" aria-label="Table">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Program</th>
+                    <th scope="col">Improper payments (FY2025)</th>
+                    <th scope="col">Break-even catch rate</th>
+                    <th scope="col">Net benefit</th>
+                    <th scope="col">Savings confirmed</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {roi.map((r) => (
+                    <tr>
+                      <td>
+                        {r.program}
+                        {r.status === 'closed' && <span class="soft"> (closed)</span>}
+                      </td>
+                      <td>{usd(r.improperUsd)}</td>
+                      <td>{pct(r.breakeven)}</td>
+                      <td><span class="badge pending">Pending</span></td>
+                      <td><span class="badge pending">Pending</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table></div>
+            )
+          }
+          <div class="return-tiles">
+            <div class="tile"><span class="k">Return on investment</span><span class="v"><span class="badge pending">Pending</span></span></div>
+            <div class="tile"><span class="k">Fraud savings identified</span><span class="v"><span class="badge pending">Pending</span></span></div>
+          </div>
+          <p class="soft-p">
+            Return figures stay Pending until the pilot measures the catch rate and an Inspector General or DOJ confirms
+            results. <a class="no-print" href={url('library/roi-model/')}>ROI model and assumptions</a>.
+          </p>
+        </section>
+
+        <section id="download" class="block no-print">
+          <h2><span class="num">7</span> Download</h2>
+          <p>A printable copy of this proposal to leave behind after a meeting.</p>
+          <div class="dl">
+            {hasPdf && <a class="btn primary" href={url(pdf)}>Download PDF</a>}
+            <button class="btn" type="button" data-print>Print or save as PDF</button>
+            <a class="btn" href={url(`downloads/briefs/${a.slug}.pdf`)}>Agency brief (PDF)</a>
+          </div>
+        </section>
+      </article>
+
+      <aside class="no-print">
+        <nav class="toc" aria-label="Sections">
+          <h3>Sections</h3>
+          <ol>{nav.map(([id, label]) => <li><a href={`#${id}`}>{label}</a></li>)}</ol>
+        </nav>
+        <div class="facts">
+          <h3>At a glance</h3>
+          <dl>
+            <div><dt>Priority</dt><dd>{a.rank} of 33 · score {a.score.toFixed(1)}</dd></div>
+            <div><dt>Pilot</dt><dd>{p.leadIdeas.join(', ')} · 90 days</dd></div>
+            <div><dt>Leads go to</dt><dd class="soft-strong">{a.takeTo || p.pilot.partner}</dd></div>
+            <div><dt>Fraud savings identified</dt><dd><span class="badge pending">Pending</span></dd></div>
+          </dl>
+        </div>
+        <div class="links-col">
+          <a class="btn" href={url(`agencies/${a.slug}/`)}>{a.short} agency plan</a>
+          <a class="btn" href={url('proposals/')}>All proposals</a>
+        </div>
+      </aside>
+    </div>
+
+    <nav class="container pager no-print" aria-label="Other proposals">
+      {prev ? <a href={url(`proposals/${prev.slug}/`)}>← {prev.slug.toUpperCase()}</a> : <span />}
+      <a href={url('proposals/')}>All proposals</a>
+      {next ? <a href={url(`proposals/${next.slug}/`)}>{next.slug.toUpperCase()} →</a> : <span />}
+    </nav>
+  </section>
+</Base>
+
+<script>
+  document.querySelectorAll('[data-print]').forEach((b) => b.addEventListener('click', () => window.print()));
+</script>
+
+<style>
+  .title-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 48px;
+    align-items: start;
+  }
+  aside {
+    display: grid;
+    gap: 18px;
+    position: sticky;
+    top: 20px;
+  }
+  .block {
+    margin-bottom: 44px;
+    scroll-margin-top: 20px;
+  }
+  .block h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--geogold);
+    margin-bottom: 16px;
+  }
+  .num {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--geomid);
+    border-radius: 50%;
+    width: 1.8em;
+    height: 1.8em;
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    transform: translateY(-3px);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .block h3 {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--geomid);
+    margin: 22px 0 8px;
+  }
+  .ask-text {
+    font-size: 1.08rem;
+    line-height: 1.6;
+    border-left: 4px solid var(--geogold);
+    padding: 4px 0 4px 18px;
+    margin: 0 0 8px;
+  }
+  .ask-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .ask-grid ul,
+  .risks {
+    margin: 0;
+    padding-left: 1.2em;
+    font-size: 0.93rem;
+  }
+  .ask-grid li,
+  .risks li {
+    margin-bottom: 4px;
+  }
+  .funding {
+    margin: 12px 0 0;
+    font-size: 0.93rem;
+  }
+  .tiles,
+  .return-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .return-tiles {
+    grid-template-columns: repeat(2, 1fr);
+    margin-top: 14px;
+  }
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--geomist);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--geomid);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .tile .k {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .tile .v {
+    font-family: var(--font-display);
+    font-size: 1.45rem;
+    color: var(--coolblack);
+    line-height: 1.2;
+  }
+  .tile .s {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .caveat,
+  .soft-p {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .ideas {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .ideas li {
+    display: grid;
+    grid-template-columns: 82px 1fr auto;
+    gap: 10px;
+    align-items: baseline;
+    font-size: 0.95rem;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .ideas .id-chip {
+    justify-self: start;
+  }
+  .ideas .txt .badge {
+    margin-left: 8px;
+  }
+  .ideas .links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .soft {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .soft-strong {
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+  table {
+    width: 100%;
+    font-size: 0.88rem;
+    margin: 0;
+  }
+  .block :global(.table-wrap) {
+    margin: 6px 0 12px;
+  }
+  .kv th {
+    width: 26%;
+    text-align: left;
+    vertical-align: top;
+  }
+  .nowrap {
+    white-space: nowrap;
+  }
+  .stop {
+    background: var(--gold-soft);
+    border-left: 4px solid var(--geogold);
+    padding: 10px 14px;
+    font-size: 0.92rem;
+  }
+  .dl {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .toc h3 {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--geomid);
+    margin-bottom: 8px;
+  }
+  .toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+    font-size: 0.9rem;
+  }
+  .toc a {
+    text-decoration: none;
+  }
+  .links-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .links-col .btn {
+    justify-content: center;
+  }
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    font-weight: 600;
+  }
+  .pager a {
+    text-decoration: none;
+  }
+  @media (max-width: 960px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    aside {
+      position: static;
+      order: -1;
+    }
+  }
+  @media (max-width: 640px) {
+    .ask-grid,
+    .tiles,
+    .return-tiles {
+      grid-template-columns: 1fr;
+    }
+    .ideas li {
+      grid-template-columns: 1fr;
+    }
+    .ideas .links {
+      align-items: flex-start;
+    }
+  }
+  @media print {
+    @page {
+      size: letter;
+      margin: 0.5in 0.55in 0.6in;
+    }
+    :global(.title-band h1) {
+      font-size: 1.6rem !important;
+      max-width: none !important;
+    }
+    .section {
+      padding: 6pt 0 0;
+    }
+    .layout {
+      display: block;
+    }
+    .block {
+      margin-bottom: 14pt;
+    }
+    .block h2 {
+      font-size: 1.2rem;
+      margin-bottom: 8pt;
+      break-after: avoid;
+    }
+    .block h3 {
+      margin: 10pt 0 4pt;
+      break-after: avoid;
+    }
+    :global(.footer) {
+      display: none !important;
+    }
+    .ask-text {
+      font-size: 0.98rem;
+    }
+    .tile {
+      padding: 8pt 10pt;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .tile .v {
+      font-size: 1.1rem;
+    }
+    tr {
+      break-inside: avoid;
+    }
+    :global(.table-wrap) {
+      overflow: visible !important;
+    }
+  }
+</style>

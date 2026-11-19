@@ -90,6 +90,15 @@ with `SITE_BASE=/fed_fraud/ npm run build`.
 13. **Live demo** (`/demo/`): results from `docs/demo/data/demo.json` (built
    by `analytics/demo/run_demo.py`) on real public data.
 
+14. **Proposals** (`/proposals/`): one proposal per priority agency for
+   agency leaders (HHS, DoD, SBA, USDA, DHS so far), on one seven-part
+   template: the ask, where the fraud risk is, what we'd look for, proof it
+   works, pilot plan, expected return and download. Words are in
+   `src/data/proposals.ts`; figures come from the budget and fraud ROM table,
+   the ROI model, the pilot kit, the briefs and the roadmap. Return and
+   savings read Pending. Add an agency by adding an entry to that file, then
+   rebuild and run `npm run proposals` to print its PDF.
+
 ## Agency brief PDFs
 
 Each agency has a printable leave-behind at `/briefs/<slug>/`, built from its
@@ -101,6 +110,9 @@ the Chromium that Playwright provides:
 npm run build      # without SITE_BASE
 npm run briefs     # all agencies, or: npm run briefs hhs dod
 ```
+
+`npm run proposals` does the same for the proposal pages, writing
+`public/downloads/proposals/<slug>.pdf`.
 
 Rerun both after editing a brief, `docs/roadmap.md` or `docs/review_plan.md`,
 and commit the updated PDFs.
